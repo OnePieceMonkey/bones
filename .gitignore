@@ -1,0 +1,16 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Note: .kiro/ must stay tracked (hackathon rule).
