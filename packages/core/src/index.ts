@@ -28,3 +28,15 @@ export type {
 
 // Constants and helpers
 export { TRACE_SCHEMA_VERSION, isCoreError } from "./types.js";
+
+// Condition AST
+export { getPath, evaluateCondition } from "./rules/ast.js";
+
+// Extraction
+export type { ExtractionPort, RawInput } from "./extraction/port.js";
+export { guardInput } from "./extraction/port.js";
+export { LiveAdapter } from "./extraction/live.js";
+export { RecordedAdapter } from "./extraction/recorded.js";
+
+// Core pipeline
+export { validate } from "./validation.js";
