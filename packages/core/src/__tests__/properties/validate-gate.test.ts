@@ -35,7 +35,7 @@ describe("Property 3: validate is the sole gate to evaluate", () => {
 
     fc.assert(
       fc.property(
-        fc.float({ min: 0.1, max: 1000000, noNaN: true }),
+        fc.float({ min: Math.fround(0.1), max: Math.fround(1000000), noNaN: true }),
         (amount) => {
           const result = validate({ amount }, schema);
           // Valid input should NOT be a CoreError
