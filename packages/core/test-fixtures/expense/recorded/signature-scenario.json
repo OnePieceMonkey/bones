@@ -1,0 +1,22 @@
+{
+  "proposedFields": {
+    "claimedTotalCents": 48000,
+    "lineItemSumCents": 4800,
+    "alcoholLineCents": 650,
+    "alcoholLineItems": [{ "amount": 650 }],
+    "lineItems": [{ "amount": 4800 }],
+    "receiptDate": "2024-03-15",
+    "tripStart": "2024-03-10",
+    "tripEnd": "2024-03-20"
+  },
+  "confidence": {
+    "claimedTotalCents": 0.97,
+    "lineItemSumCents": 0.95,
+    "alcoholLineCents": 0.91,
+    "receiptDate": 0.99
+  },
+  "sources": {
+    "claimedTotalCents": { "kind": "bbox", "x": 0.6, "y": 0.85, "width": 0.2, "height": 0.04 }
+  },
+  "rawModelOutput": "{\"claimedTotalCents\":48000,\"lineItemSumCents\":4800,\"alcoholLineCents\":650,\"receiptDate\":\"2024-03-15\",\"tripStart\":\"2024-03-10\",\"tripEnd\":\"2024-03-20\"}"
+}
