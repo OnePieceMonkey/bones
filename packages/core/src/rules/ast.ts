@@ -13,6 +13,26 @@ export function getPath(fields: ValidatedFields, path: string): unknown {
 
 type ConditionResult = { result: boolean; evidence: Record<string, unknown> };
 
+/**
+ * Ordered comparison helper for `<`, `<=`, `>`, `>=` operators.
+ * Returns a negative number if a < b, 0 if a === b, positive if a > b.
+ *
+ * Strategy:
+ * - If both values are finite numbers (or coerce to finite numbers), compare numerically.
+ * - If both values are strings, compare lexicographically (handles ISO date strings).
+ * - Otherwise convert both to strings and compare lexicographically.
+ */
+function compareOrdered(a: unknown, b: unknown): number {
+  const na = Number(a);
+  const nb = Number(b);
+  if (!isNaN(na) && !isNaN(nb)) {
+    return na - nb;
+  }
+  const sa = typeof a === "string" ? a : String(a);
+  const sb = typeof b === "string" ? b : String(b);
+  return sa < sb ? -1 : sa > sb ? 1 : 0;
+}
+
 /** Evaluates a ConditionNode against ValidatedFields. Returns a result+evidence pair or a CoreError. */
 export function evaluateCondition(
   node: ConditionNode,
@@ -50,10 +70,10 @@ export function evaluateCondition(
       switch (node.op) {
         case "==": result = leftVal === rightVal; break;
         case "!=": result = leftVal !== rightVal; break;
-        case "<":  result = Number(leftVal) < Number(rightVal); break;
-        case "<=": result = Number(leftVal) <= Number(rightVal); break;
-        case ">":  result = Number(leftVal) > Number(rightVal); break;
-        case ">=": result = Number(leftVal) >= Number(rightVal); break;
+        case "<":  result = compareOrdered(leftVal, rightVal) < 0; break;
+        case "<=": result = compareOrdered(leftVal, rightVal) <= 0; break;
+        case ">":  result = compareOrdered(leftVal, rightVal) > 0; break;
+        case ">=": result = compareOrdered(leftVal, rightVal) >= 0; break;
         default:   result = false;
       }
       return { result, evidence };
