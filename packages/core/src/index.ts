@@ -42,3 +42,5 @@ export { RecordedAdapter } from "./extraction/recorded.js";
 export { validate } from "./validation.js";
 export { evaluate } from "./rules/evaluate.js";
 export { createTrace, deepFreeze } from "./trace.js";
+export { replay } from "./replay.js";
+export { override, effectiveResult } from "./override.js";
