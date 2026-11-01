@@ -41,3 +41,4 @@ export { RecordedAdapter } from "./extraction/recorded.js";
 // Core pipeline
 export { validate } from "./validation.js";
 export { evaluate } from "./rules/evaluate.js";
+export { createTrace, deepFreeze } from "./trace.js";
