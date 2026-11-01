@@ -1,0 +1,13 @@
+{
+  "id": "date-blocking-before",
+  "version": "1.0.0",
+  "effect": "blocking",
+  "condition": {
+    "kind": "comparison",
+    "left": { "kind": "path", "segments": ["receiptDate"] },
+    "op": "<",
+    "right": { "kind": "path", "segments": ["tripStart"] }
+  },
+  "effectConfig": {},
+  "messageTemplate": "Receipt date {{receiptDate}} is before trip start {{tripStart}}."
+}

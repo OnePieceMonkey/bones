@@ -1,0 +1,19 @@
+{
+  "id": "alcohol-deducting",
+  "version": "1.0.0",
+  "effect": "deducting",
+  "condition": {
+    "kind": "sum",
+    "collection": "alcoholLineItems",
+    "field": "amount"
+  },
+  "effectConfig": {
+    "deductionAmount": {
+      "kind": "sum",
+      "collection": "alcoholLineItems",
+      "field": "amount"
+    },
+    "scope": "total"
+  },
+  "messageTemplate": "Alcohol line items deducted. Claimed: {{claimedTotalCents}}, line items: {{lineItemSumCents}}"
+}

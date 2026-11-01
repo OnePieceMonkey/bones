@@ -1,0 +1,13 @@
+{
+  "id": "date-blocking-after",
+  "version": "1.0.0",
+  "effect": "blocking",
+  "condition": {
+    "kind": "comparison",
+    "left": { "kind": "path", "segments": ["receiptDate"] },
+    "op": ">",
+    "right": { "kind": "path", "segments": ["tripEnd"] }
+  },
+  "effectConfig": {},
+  "messageTemplate": "Receipt date {{receiptDate}} is after trip end {{tripEnd}}."
+}

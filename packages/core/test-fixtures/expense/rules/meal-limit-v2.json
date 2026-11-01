@@ -1,0 +1,13 @@
+{
+  "id": "meal-limit",
+  "version": "2.0.0",
+  "effect": "capping",
+  "condition": {
+    "kind": "comparison",
+    "left": { "kind": "literal", "value": true },
+    "op": "==",
+    "right": { "kind": "literal", "value": true }
+  },
+  "effectConfig": { "cap": 6000, "scope": "total" },
+  "messageTemplate": "Meal expense capped at 6000 cents (v2). Claimed: {{claimedTotalCents}}"
+}

@@ -104,9 +104,25 @@ export function evaluate(
     if (conditionMet) {
       const scope = config.scope;
       const current = scopeAmounts.get(scope) ?? 0;
-      const next = Math.max(0, current - config.deductionAmount);
+      let deductAmount: number;
+      if (typeof config.deductionAmount === "number") {
+        deductAmount = config.deductionAmount;
+      } else {
+        // Dynamic deductionAmount: evaluate the AST expression
+        const deductResult = evaluateCondition(config.deductionAmount, fields);
+        if (isCoreError(deductResult)) return deductResult;
+        const ev = deductResult.evidence;
+        const sumKey = Object.keys(ev).find((k) => k.includes("_sum"));
+        if (sumKey !== undefined) {
+          deductAmount = Number(ev[sumKey]);
+        } else {
+          const numVal = Object.values(ev).find((v) => typeof v === "number");
+          deductAmount = typeof numVal === "number" ? numVal : 0;
+        }
+      }
+      const next = Math.max(0, current - deductAmount);
       scopeAmounts.set(scope, next);
-      deductedCents = config.deductionAmount;
+      deductedCents = deductAmount;
     }
 
     outcomes.push({

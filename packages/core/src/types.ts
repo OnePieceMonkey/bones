@@ -56,9 +56,9 @@ export interface CappingConfig {
   scope: string;
 }
 
-/** effectConfig for deducting rules — fixed deduction amount in integer cents. */
+/** effectConfig for deducting rules — deduction amount in integer cents (constant or dynamic AST expression). */
 export interface DeductingConfig {
-  deductionAmount: number; // positive integer cents
+  deductionAmount: number | ConditionNode; // positive integer cents, or a ConditionNode whose _sum evidence is used
   scope: string;
 }
 

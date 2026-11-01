@@ -1,0 +1,20 @@
+{
+  "id": "line-item-cap",
+  "version": "1.0.0",
+  "effect": "capping",
+  "condition": {
+    "kind": "comparison",
+    "left": { "kind": "path", "segments": ["claimedTotalCents"] },
+    "op": "!=",
+    "right": { "kind": "path", "segments": ["lineItemSumCents"] }
+  },
+  "effectConfig": {
+    "cap": {
+      "kind": "sum",
+      "collection": "lineItems",
+      "field": "amount"
+    },
+    "scope": "total"
+  },
+  "messageTemplate": "Receipt total {{claimedTotalCents}} does not match line items {{lineItemSumCents}}. Capped to line item sum."
+}
