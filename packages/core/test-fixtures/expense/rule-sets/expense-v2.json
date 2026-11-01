@@ -1,0 +1,11 @@
+{
+  "id": "expense",
+  "version": "2.0.0",
+  "rules": [
+    { "ruleId": "date-blocking-before", "ruleVersion": "1.0.0" },
+    { "ruleId": "date-blocking-after", "ruleVersion": "1.0.0" },
+    { "ruleId": "alcohol-deducting", "ruleVersion": "1.0.0" },
+    { "ruleId": "meal-limit", "ruleVersion": "2.0.0" },
+    { "ruleId": "line-item-cap", "ruleVersion": "1.0.0" }
+  ]
+}
