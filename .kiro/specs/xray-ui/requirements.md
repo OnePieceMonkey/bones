@@ -2,7 +2,7 @@
 
 ## Introduction
 
-`packages/xray-ui` is a new React + Vite library (TypeScript strict, pnpm workspace) that renders any `Trace` produced by `@bones/core` as a 1950s-radiology X-ray. A decision is drawn as a glowing skeleton: each mapped rule is one bone, a rule that fired is a fractured bone, and an ECG line, a film clip, an answer card, a chat panel, a control strip and a result plate complete the view. The library knows nothing about what a rule means. The host app supplies an `Anatomy` (rule-to-bone mapping, field labels, optional value formatter) and a `Trace`.
+`packages/xray-ui` is a new React + Vite library (TypeScript strict, pnpm workspace) that renders any `Trace` produced by `@bones/core` as a 1950s-radiology X-ray. A decision is drawn as a glowing skeleton: each mapped rule is one bone, a rule that changed the decision is a fractured bone, and an ECG line, a film clip, an answer card, a chat panel, a control strip and a result plate complete the view. The library knows nothing about what a rule means. The host app supplies an `Anatomy` (rule-to-bone mapping, field labels, optional value formatter) and a `Trace`.
 
 Key properties of the library:
 
@@ -39,16 +39,17 @@ interface Anatomy {
 - **Xray_UI**: The `@bones/xray-ui` package in `packages/xray-ui`.
 - **Core**: The `@bones/core` package that produces `Trace` objects.
 - **Trace**: The immutable decision record defined in `packages/core/src/types.ts`.
-- **RuleOutcome**: One entry of `Trace.ruleOutcomes` (ruleId, ruleVersion, effect, conditionMet, evidence, renderedMessage, optional deductedCents and appliedCapCents).
+- **RuleOutcome**: One entry of `Trace.ruleOutcomes` (ruleId, ruleVersion, effect, conditionMet, evidence, renderedMessage, optional deductedCents, appliedCapCents, amountBeforeCents and amountAfterCents). The optional `amountBeforeCents` and `amountAfterCents` are the running amount in the rule scope before and after the rule (see Requirement 19).
 - **Anatomy**: The app-supplied object holding `bones`, `fieldLabels` and optional `formatValue`.
 - **Mapped_Rule**: A rule whose `ruleId` has an entry in `Anatomy.bones`.
 - **Bone**: The visual element representing one Mapped_Rule on a Region of the Skeleton.
 - **Region**: One of `skull`, `spine`, `ribs`, `arm-left`, `arm-right`, `pelvis`, `leg-left`, `leg-right`.
 - **Bone_State**: One of `passed`, `not-applicable`, `fractured`.
-- **Passed_Bone**: A Bone whose outcome exists and has `conditionMet` false.
+- **Passed_Bone**: A Bone whose outcome exists and is not a Fractured_Outcome. This covers an outcome with `conditionMet` false and an Applied_No_Change_Outcome.
 - **Not_Applicable_Bone**: A Bone whose `ruleId` has no outcome in the Trace.
-- **Fractured_Bone**: A Bone whose outcome has `conditionMet` true and `effect` in {blocking, capping, deducting}.
-- **Fractured_Outcome**: A RuleOutcome of a Mapped_Rule with `conditionMet` true and `effect` in {blocking, capping, deducting}.
+- **Fractured_Bone**: A Bone whose outcome is a Fractured_Outcome.
+- **Fractured_Outcome**: A RuleOutcome of a Mapped_Rule with `conditionMet` true and either `effect` equal to blocking, or `effect` in {capping, deducting} with both `amountBeforeCents` and `amountAfterCents` present and `amountAfterCents` less than `amountBeforeCents`. A rule fractures a Bone only when it changed the decision. A capping or deducting outcome that lacks either amount field is not a Fractured_Outcome.
+- **Applied_No_Change_Outcome**: A RuleOutcome of a Mapped_Rule with `conditionMet` true and `effect` in {capping, deducting} that is not a Fractured_Outcome, meaning the rule applied but did not lower the amount. Its Bone is shown as passed with the state text "applied, no change".
 - **Evidence_Key**: A key of `RuleOutcome.evidence`, which is a field path and may be a computed key such as `items[*].amount_sum`.
 - **Related_Field**: A field whose path equals (exact match) an Evidence_Key of a Bone's outcome.
 - **Overruled_Field**: A field whose path is an Evidence_Key of at least one Fractured_Outcome.
@@ -98,9 +99,9 @@ interface Anatomy {
 2. THE Skeleton SHALL render exactly one Bone for each entry of `Anatomy.bones`, placed on the Region named in that entry.
 3. WHEN several Anatomy entries share a Region, THE Skeleton SHALL place their Bones inside that Region in the order of `Anatomy.bones`, using a layout that depends only on that order.
 4. THE Skeleton SHALL render no Bone for a rule that is in the Trace but has no entry in `Anatomy.bones`.
-5. WHEN a Mapped_Rule has an outcome with `conditionMet` false, THE Skeleton SHALL render its Bone in the `passed` state with a cyan glow.
+5. WHEN a Mapped_Rule has an outcome that is not a Fractured_Outcome, THE Skeleton SHALL render its Bone in the `passed` state with a cyan glow.
 6. WHEN an Anatomy entry has no outcome with the same `ruleId` in the Trace, THE Skeleton SHALL render its Bone in the `not-applicable` state with a dimmed style.
-7. WHEN a Mapped_Rule has an outcome with `conditionMet` true and `effect` in {blocking, capping, deducting}, THE Skeleton SHALL render its Bone in the `fractured` state with a red glow, a crack line, splinters and a pulse ring.
+7. WHEN a Mapped_Rule has a Fractured_Outcome, THE Skeleton SHALL render its Bone in the `fractured` state with a red glow, a crack line, splinters and a pulse ring.
 8. THE Skeleton SHALL derive splinter positions and angles only from a pure hash function of the `ruleId`.
 9. THE Skeleton SHALL render each Bone as a focusable `<button>` or element with `role="button"`.
 10. THE Skeleton SHALL give each Bone an `aria-label` containing the Anatomy label, the rule version and the Bone_State in words.
@@ -110,6 +111,8 @@ interface Anatomy {
 14. WHEN the tooltip is shown, THE Skeleton SHALL list one evidence row per Evidence_Key, with the label `fieldLabels[path] ?? path` and the value `formatValue(path, value)`.
 15. WHEN the Escape key is pressed while the tooltip is shown, THE Skeleton SHALL close the tooltip.
 16. WHERE `Anatomy.formatValue` is absent, THE Skeleton SHALL format evidence values with the Default_Formatter.
+17. THE Skeleton SHALL use the state text "fractured" for a Fractured_Bone, "applied, no change" for a Bone whose outcome is an Applied_No_Change_Outcome, "passed" for any other Passed_Bone, and "not applicable" for a Not_Applicable_Bone, in the `aria-label`, in the tooltip and in the visible cue.
+18. THE Skeleton SHALL decide the Bone_State only from `conditionMet`, `effect`, `amountBeforeCents` and `amountAfterCents` of the outcome.
 
 ### Requirement 3: ECG Line
 
@@ -261,7 +264,7 @@ interface Anatomy {
 1. THE Xray_UI SHALL contain none of the Domain_Words as whole words, compared case-insensitively, in any file under `packages/xray-ui/src`, excluding `__tests__` directories.
 2. THE Xray_UI SHALL skip the word "case" in the domain-word check, matching the check in `packages/core`.
 3. THE Demo_App SHALL be exempt from the domain-word check.
-4. THE Xray_UI SHALL treat every rule as opaque and SHALL read only `ruleId`, `ruleVersion`, `effect`, `conditionMet`, `evidence`, `renderedMessage` and the Anatomy entry of each rule.
+4. THE Xray_UI SHALL treat every rule as opaque and SHALL read only `ruleId`, `ruleVersion`, `effect`, `conditionMet`, `evidence`, `renderedMessage`, `amountBeforeCents`, `amountAfterCents` and the Anatomy entry of each rule.
 
 ### Requirement 14: Safety and Boundaries
 
@@ -302,7 +305,9 @@ interface Anatomy {
 3. THE Demo_App SHALL define its own Anatomy with expense wording.
 4. THE Demo_App SHALL render an XrayView for the resulting Trace.
 5. WHEN the Version_Knob reports a new version, THE Demo_App SHALL call `evaluate` and `createTrace` for that rule set version and pass the new Trace to the XrayView.
-6. WHEN the Demo_App starts at its default version, THE Demo_App SHALL produce the result `partially_approved` with `amountCents` equal to 4150.
+6. THE Demo_App SHALL use the rule set expense-v1 as its default version, and WHEN it starts at that version, THE Demo_App SHALL produce the result `partially_approved` with `amountCents` equal to 4150.
+7. WHEN the Demo_App renders the Signature_Fixture at the default version, THE XrayView SHALL show exactly two Fractured_Bones, the line-item match bone and the alcohol bone, and SHALL show the meal-limit bone as passed with the state text "applied, no change".
+8. THE Demo_App Anatomy SHALL map the line-item rule, the alcohol rule and the meal-limit rule to Bones.
 
 ### Requirement 17: Documentation
 
@@ -324,12 +329,31 @@ interface Anatomy {
 #### Acceptance Criteria
 
 1. THE Xray_UI SHALL include Vitest tests with `@testing-library/react` on jsdom for every exported component.
-2. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs the number of rendered Fractured_Bones equals the number of outcomes with `conditionMet` true, `effect` in {blocking, capping, deducting} and a `ruleId` mapped in Anatomy.
+2. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs the number of rendered Fractured_Bones equals the number of Fractured_Outcomes whose `ruleId` is mapped in Anatomy, with generated traces that include capping and deducting outcomes whose `amountAfterCents` is equal to and lower than `amountBeforeCents`, outcomes without amount fields, and blocking outcomes.
 3. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs rendering the same inputs twice yields identical HTML.
 4. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs the DrBonesChat text equals the concatenation produced by the Message_Builder from the same Trace and Anatomy.
 5. THE Xray_UI SHALL include a test that fails when `fetch`, `XMLHttpRequest` or `WebSocket` is called during DrBonesChat render and message completion.
 6. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs in Reduced_Motion_Mode the rendered DOM contains no class matching `/(^|\s)anim-/` and the DrBonesChat shows full text without a typing phase.
 7. THE Xray_UI SHALL include a domain-isolation test that scans `packages/xray-ui/src` for the Domain_Words as whole words, case-insensitively, excluding `__tests__` and skipping "case".
 8. THE Xray_UI SHALL include a contrast test that computes WCAG contrast ratios for the text and background pairs defined in the Design_Tokens and requires at least 4.5 for normal text.
-9. THE Xray_UI SHALL include a smoke test that renders the Demo_App XrayView without errors.
+9. THE Xray_UI SHALL include a smoke test that renders the Demo_App XrayView without errors and with exactly two Fractured_Bones at the default version.
 10. THE Xray_UI SHALL run each fast-check property with at least 100 iterations.
+11. THE Xray_UI SHALL include a test that an outcome with `conditionMet` true, `effect` capping and `amountAfterCents` equal to `amountBeforeCents` renders a passed Bone with the state text "applied, no change", and that the same outcome with a lower `amountAfterCents` renders a fractured Bone.
+12. THE Xray_UI SHALL include a test that a capping or deducting outcome with `conditionMet` true and without amount fields renders a passed Bone and not a fractured Bone.
+
+### Requirement 19: Core Prerequisite, Amounts Before and After a Rule
+
+**User Story:** As a developer of the X-ray view, I want every capping and deducting outcome to carry the amount before and after its rule, so that a Bone fractures only when its rule changed the decision.
+
+#### Acceptance Criteria
+
+1. THE Core SHALL add the optional fields `amountBeforeCents` and `amountAfterCents`, both integer cents, to the `RuleOutcome` type in `packages/core/src/types.ts`.
+2. WHEN `evaluate` applies a deducting or capping rule whose `conditionMet` is true, THE Core SHALL set `amountBeforeCents` to the running amount of that rule scope immediately before the rule and `amountAfterCents` to the running amount of that scope immediately after the rule.
+3. WHEN a deducting or capping rule has `conditionMet` false, THE Core SHALL set `amountBeforeCents` and `amountAfterCents` to the same running amount of that scope at that point.
+4. THE Core SHALL leave `amountBeforeCents` and `amountAfterCents` absent on blocking outcomes.
+5. THE Core SHALL apply each capping rule to the running amount as the lower of the running amount and the cap, in the existing evaluation order, so that `result` and `amountCents` of every Decision stay identical to the values produced before this change.
+6. THE Core SHALL keep `traceSchemaVersion` unchanged, because the new fields are optional additions.
+7. THE Core SHALL introduce no domain word into `packages/core/src`.
+8. WHEN `pnpm --filter @bones/core test` and `pnpm typecheck` are run after the change, THE Core SHALL pass all existing tests and report no type errors.
+9. THE Core SHALL include a fast-check property test, as its own test with at least 100 iterations, that for every outcome of every Decision produced by `evaluate` that has both fields, `amountAfterCents` is an integer, is at least 0 and is less than or equal to `amountBeforeCents`.
+10. THE Core change SHALL be implemented and committed before any Xray_UI implementation task that uses the Fractured_Outcome definition.
