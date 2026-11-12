@@ -1,0 +1,25 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "test-on-rule-change",
+      "description": "When a JSON file is saved under rules/ or packages/core/test-fixtures/, run the core test suite and report which rule outcomes changed.",
+      "trigger": "PostFileSave",
+      "matcher": "^(rules/|packages/core/test-fixtures/).*\\.json$",
+      "action": {
+        "type": "agent",
+        "prompt": "A JSON file that affects rule evaluation was just saved. Run the full @bones/core test suite and report any changes to rule outcomes.\n\nSteps:\n1. Run `pnpm --filter @bones/core test --reporter=verbose 2>&1` from the workspace root.\n2. Report the overall result (pass / fail).\n3. If any test changed status (newly failing or newly passing), list those tests by name.\n4. If the integration test \"expense signature scenario\" ran, extract the decision.result and decision.amountCents values from the test output and report them.\n5. Do NOT modify any files. Report only."
+      }
+    },
+    {
+      "name": "steering-compliance",
+      "description": "When a source file is saved in packages/core/src or packages/xray-ui/src, check it against the steering files and report any violations. Do not modify files.",
+      "trigger": "PostFileSave",
+      "matcher": "^packages/(core|xray-ui)/src/.*\\.tsx?$",
+      "action": {
+        "type": "agent",
+        "prompt": "A source file was just saved. Check it against the three steering files and report any violations. Do NOT modify the file or any other file.\n\nSteering rules to enforce:\n\n**1. Domain isolation (packages/core/src only — from structure.md and product.md)**\nScan the saved file for these forbidden domain-specific identifiers as whole words (case-insensitive, word-boundary match): expense, receipt, alcohol, meal, trip, suspect, case.\nReport each match with its line number and the matched term.\n\n**2. Dr. Bones text must come from rule templates, never from LLM judgments (packages/xray-ui/src — from product.md)**\nFlag any pattern suggesting the Dr. Bones chat panel generates or rephrases text via an LLM call: calling an AI completion API, using a prompt template to produce explanations, or building natural-language strings outside of messageTemplate interpolation.\nLegitimate patterns: rendering ruleOutcome.renderedMessage, reading from trace.ruleOutcomes, interpolating messageTemplate slots.\nViolations: any fetch/axios/SDK call to an LLM endpoint, any string concatenation building a user-facing explanation without referencing a rule template field.\n\n**3. No API keys in client code (both packages — from tech.md)**\nScan for hardcoded secrets: strings matching sk-, Bearer, api_key, apiKey, API_KEY, secret, or token assigned directly to a variable or object literal (not a type annotation).\nAlso flag any process.env or import.meta.env reference whose key name suggests an LLM or third-party API key (e.g. OPENAI_API_KEY, ANTHROPIC_API_KEY).\nDo NOT flag environment variable reads that are clearly inside a server-side file (path contains /api/ or /functions/).\n\nFor each violation found, report:\n- File path\n- Line number\n- Violated rule (1, 2, or 3)\n- The offending line content\n\nIf no violations are found, report: ✓ No steering violations found in <filename>."
+      }
+    }
+  ]
+}
