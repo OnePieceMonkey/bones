@@ -308,6 +308,7 @@ interface Anatomy {
 6. THE Demo_App SHALL use the rule set expense-v1 as its default version, and WHEN it starts at that version, THE Demo_App SHALL produce the result `partially_approved` with `amountCents` equal to 4150.
 7. WHEN the Demo_App renders the Signature_Fixture at the default version, THE XrayView SHALL show exactly two Fractured_Bones, the line-item match bone and the alcohol bone, and SHALL show the meal-limit bone as passed with the state text "applied, no change".
 8. THE Demo_App Anatomy SHALL map the line-item rule, the alcohol rule and the meal-limit rule to Bones.
+9. THE Demo_App SHALL start the amount scope at `claimedTotalCents` of the Signature_Fixture (48000), and at each of the versions expense-v1, expense-v2 and expense-v3 the outcomes SHALL be: line-item rule 48000 → 4800 (fractured), meal-limit rule 4800 → 4800 with cap 5000, 6000 and 7500 respectively (applied, no change), alcohol rule 4800 → 4150 (fractured), result `partially_approved` and `amountCents` 4150.
 
 ### Requirement 17: Documentation
 
@@ -336,7 +337,7 @@ interface Anatomy {
 6. THE Xray_UI SHALL include a fast-check property test, as its own test, that for all Trace and Anatomy pairs in Reduced_Motion_Mode the rendered DOM contains no class matching `/(^|\s)anim-/` and the DrBonesChat shows full text without a typing phase.
 7. THE Xray_UI SHALL include a domain-isolation test that scans `packages/xray-ui/src` for the Domain_Words as whole words, case-insensitively, excluding `__tests__` and skipping "case".
 8. THE Xray_UI SHALL include a contrast test that computes WCAG contrast ratios for the text and background pairs defined in the Design_Tokens and requires at least 4.5 for normal text.
-9. THE Xray_UI SHALL include a smoke test that renders the Demo_App XrayView without errors and with exactly two Fractured_Bones at the default version.
+9. THE Xray_UI SHALL include a smoke test that renders the Demo_App XrayView without errors and with exactly two Fractured_Bones at each of the versions expense-v1, expense-v2 and expense-v3.
 10. THE Xray_UI SHALL run each fast-check property with at least 100 iterations.
 11. THE Xray_UI SHALL include a test that an outcome with `conditionMet` true, `effect` capping and `amountAfterCents` equal to `amountBeforeCents` renders a passed Bone with the state text "applied, no change", and that the same outcome with a lower `amountAfterCents` renders a fractured Bone.
 12. THE Xray_UI SHALL include a test that a capping or deducting outcome with `conditionMet` true and without amount fields renders a passed Bone and not a fractured Bone.
@@ -351,9 +352,15 @@ interface Anatomy {
 2. WHEN `evaluate` applies a deducting or capping rule whose `conditionMet` is true, THE Core SHALL set `amountBeforeCents` to the running amount of that rule scope immediately before the rule and `amountAfterCents` to the running amount of that scope immediately after the rule.
 3. WHEN a deducting or capping rule has `conditionMet` false, THE Core SHALL set `amountBeforeCents` and `amountAfterCents` to the same running amount of that scope at that point.
 4. THE Core SHALL leave `amountBeforeCents` and `amountAfterCents` absent on blocking outcomes.
-5. THE Core SHALL apply each capping rule to the running amount as the lower of the running amount and the cap, in the existing evaluation order, so that `result` and `amountCents` of every Decision stay identical to the values produced before this change.
+5. THE Core SHALL keep its existing tests green except where the new evaluation order changes a number, and each test expectation that changes SHALL carry a comment with the new arithmetic.
 6. THE Core SHALL keep `traceSchemaVersion` unchanged, because the new fields are optional additions.
 7. THE Core SHALL introduce no domain word into `packages/core/src`.
 8. WHEN `pnpm --filter @bones/core test` and `pnpm typecheck` are run after the change, THE Core SHALL pass all existing tests and report no type errors.
 9. THE Core SHALL include a fast-check property test, as its own test with at least 100 iterations, that for every outcome of every Decision produced by `evaluate` that has both fields, `amountAfterCents` is an integer, is at least 0 and is less than or equal to `amountBeforeCents`.
 10. THE Core change SHALL be implemented and committed before any Xray_UI implementation task that uses the Fractured_Outcome definition.
+11. THE Core SHALL evaluate in the order blocking rules, then capping rules, then deducting rules, so that the capping pass runs before the deducting pass.
+12. THE Core SHALL apply capping rules one at a time in ascending `rule.id` order, each setting the running amount of its scope to the lower of the running amount and its cap (never below 0), so that every capping outcome has its own `amountBeforeCents` and `amountAfterCents`.
+13. THE Core SHALL apply deducting rules after the capping pass, one at a time in ascending `rule.id` order, each subtracting its deduction from the running amount of its scope (never below 0), so that every deducting outcome has its own `amountBeforeCents` and `amountAfterCents`.
+14. THE Core SHALL list `ruleOutcomes` in evaluation order: blocking outcomes, then capping outcomes, then deducting outcomes.
+15. THE Core SHALL update `.kiro/specs/core/requirements.md` (requirements 4.1 and 4.3) and `.kiro/specs/core/design.md` (the evaluate algorithm) to the new evaluation order.
+16. THE Core SHALL update `packages/core/src/__tests__/fixtures/expense-scenarios.test.ts` so that the amount scope starts at `claimedTotalCents` (48000) and the signature case yields, for each of the rule sets expense-v1, expense-v2 and expense-v3: line-item-cap 48000 → 4800 (fractured), meal-limit cap 5000, 6000 and 7500 respectively 4800 → 4800 (applied, no change), alcohol-deducting 4800 → 4150 (fractured), result `partially_approved` and `amountCents` 4150.

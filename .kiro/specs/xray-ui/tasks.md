@@ -2,7 +2,7 @@
 
 ## Overview
 
-Build `@bones/xray-ui` in strict dependency order: package setup with an empty Lightbox first, then types and tokens, the pure model layer (one function module per task, each with unit tests), hooks, components in dependency order, property tests P1 to P14, guard tests (domain isolation, contrast, source hygiene, no-network, a11y roles), the demo, the public barrel and the README. Each task ends with a commit. No orphaned code: every module is used by a later task or exported by the barrel.
+Build the small `@bones/core` change first (capping before deducting, amounts before and after each rule, requirement 19) and stop at a green checkpoint, then build `@bones/xray-ui` in strict dependency order: package setup with an empty Lightbox first, then types and tokens, the pure model layer (one function module per task, each with unit tests), hooks, components in dependency order, property tests P1 to P14, guard tests (domain isolation, contrast, source hygiene, no-network, a11y roles), the demo, the public barrel and the README. Each task ends with a commit. No orphaned code: every module is used by a later task or exported by the barrel.
 
 **Language**: TypeScript 5.4.5 strict, React 18.3.1, pnpm workspace.
 **Test runner**: Vitest 1.6.0 on jsdom, Testing Library, fast-check 3.19.0 (min 100 runs per property).
@@ -13,6 +13,44 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 ---
 
 ## Tasks
+
+- [ ] 0. Core change: cap before deduct, amounts per rule (requirement 19)
+  - [ ] 0.1 Add the amount fields to `RuleOutcome`
+    - In `packages/core/src/types.ts` add the optional fields `amountBeforeCents?: number` and `amountAfterCents?: number` to `RuleOutcome` with a doc comment (running amount in the rule scope before and after the rule; integer cents; absent on blocking outcomes)
+    - Keep `TRACE_SCHEMA_VERSION` at `"1"`; the type is already exported from `index.ts`
+    - Run `pnpm --filter @bones/core test` and `pnpm typecheck`; both stay green
+    - _Requirements: 19.1, 19.4, 19.6, 19.7_
+    - Commit: `git add packages/core && git commit -m "feat(core): add amountBeforeCents and amountAfterCents to RuleOutcome"`
+  - [ ] 0.2 Run the capping pass before the deducting pass and record per-rule amounts
+    - In `packages/core/src/rules/evaluate.ts` change the order to blocking, capping, deducting; keep a running amount per scope that starts at `claimedCents`
+    - Capping rules in ascending `rule.id` order, one at a time: `before = running[scope]`; when `conditionMet`, `after = max(0, min(before, cap))`, `running[scope] = after` and `appliedCapCents = cap`; otherwise `after = before`; set `amountBeforeCents` and `amountAfterCents` on the outcome. Remove the old step that collects the minimum caps and applies them at the end
+    - Deducting rules afterwards in ascending `rule.id` order: `before = running[scope]`; when `conditionMet`, `after = max(0, before - deduction)`, `running[scope] = after` and `deductedCents = deduction`; otherwise `after = before`; set both fields
+    - Blocking outcomes keep no amount fields; push outcomes in evaluation order (blocking, capping, deducting); the final amount per scope stays clamped to `[0, claimedCents]` and the result stays `partially_approved` when any scope ends below its claimed amount
+    - Add no domain word to `packages/core/src` (the isolation test must stay green)
+    - _Requirements: 19.2, 19.3, 19.4, 19.7, 19.11, 19.12, 19.13, 19.14_
+    - Commit: `git add packages/core && git commit -m "feat(core): cap before deduct with per-rule amounts"`
+  - [ ] 0.3 Update the core tests whose numbers change
+    - Run `pnpm --filter @bones/core test` and list every failing expectation; each one is caused by the new order only
+    - In `packages/core/src/__tests__/fixtures/expense-scenarios.test.ts` start the amount scope at `claimedTotalCents` (48000) instead of `lineItemSumCents` and assert, for expense-v1, expense-v2 and expense-v3 (add catalog entries for the meal-limit versions 2.0.0 and 3.0.0): `line-item-cap` 48000 to 4800, `meal-limit` (cap 5000, 6000, 7500) 4800 to 4800, `alcohol-deducting` 4800 to 4150 on `amountBeforeCents` and `amountAfterCents`, result `partially_approved`, `amountCents` 4150, and `ruleOutcomes` order date-blocking-after, date-blocking-before, line-item-cap, meal-limit, alcohol-deducting; keep the evidence assertions (`claimedTotalCents` 48000, `lineItemSumCents` 4800) and the rejected-date test
+    - Give every changed expectation a comment with the new arithmetic, for example `// cap first: 48000 -> min(48000, 4800) = 4800; then deduct 650: 4800 -> 4150`
+    - Leave all other tests unchanged; if another test fails, change only the number and add the arithmetic comment (never weaken a property)
+    - _Requirements: 19.5, 19.8, 19.16_
+    - Commit: `git add packages/core && git commit -m "test(core): update signature scenario for cap-before-deduct"`
+  - [ ] 0.4 Write the property test for the amount chain
+    - `packages/core/src/__tests__/properties/amount-chain.test.ts`, tag `// Feature: core, amount chain: amountAfterCents is at most amountBeforeCents`
+    - Generate random rule sets of blocking, capping (constant caps) and deducting (constant deductions) rules with always-true or always-false conditions, one or two scopes and random claimed amounts; evaluate; for every outcome that has both fields assert both are integers, at least 0, and `amountAfterCents <= amountBeforeCents`; at least 100 runs
+    - If it fails, fix the implementation, not the property, and add an entry to `.kiro/specs/core/bugs-found.md`
+    - _Requirements: 19.9_
+    - Commit: `git add packages/core .kiro/specs/core && git commit -m "test(core): property test for amount chain"`
+  - [ ] 0.5 Update the core spec documents
+    - `.kiro/specs/core/requirements.md`: requirement 4.1 (order blocking, capping, deducting) and 4.3 (caps applied one rule at a time, each as the lower of the running amount and the cap, before deductions); `.kiro/specs/core/design.md`: the Evaluate Algorithm steps for the capping and deducting passes and the `RuleOutcome` type; mention the new fields and order in `packages/core/README.md` if it describes evaluation
+    - _Requirements: 19.15_
+    - Commit: `git add .kiro/specs/core packages/core && git commit -m "docs(core): document cap-before-deduct and amount fields"`
+  - [ ] 0.6 Checkpoint - core change green
+    - Run `pnpm test` and `pnpm typecheck` from the repo root; both must be green (at this point `pnpm test` runs the core suite only, because xray-ui does not exist yet)
+    - Confirm `git status` shows a clean tree for `packages/core` and `.kiro/specs/core`
+    - Do not start task 1 until this checkpoint is green
+    - _Requirements: 19.8, 19.10_
 
 - [ ] 1. Package setup and empty Lightbox
   - [ ] 1.1 Create the `packages/xray-ui` package files
@@ -47,8 +85,8 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - _Requirements: 12.4, 15.1_
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui/bugs-found.md && git commit -m "feat(xray-ui): add design tokens and bug log"`
   - [ ] 2.3 Create shared test helpers in `src/__tests__/helpers/`
-    - `fixtures.ts`: hand-built `Trace` (all fields from core `types.ts`, `traceSchemaVersion: "1"`), `Anatomy` and a `signatureTrace()` mirroring the demo (3 fractured bones)
-    - `arbitraries.ts`: fast-check generators `arbRuleId`, `arbRegion`, `arbEffect`, `arbEvidence`, `arbOutcome`, `arbFilmSource`, `arbTraceAndAnatomy` (unique rule ids, subset mapped, extra unmapped outcomes, confidence in [0,1], sources `bbox`/`line`/`undefined`, all three results)
+    - `fixtures.ts`: hand-built `Trace` (all fields from core `types.ts`, `traceSchemaVersion: "1"`), `Anatomy` and a `signatureTrace()` mirroring the demo at v1: `ruleOutcomes` in core order (date-blocking-after and date-blocking-before not met; line-item-cap 48000 to 4800 fractured; meal-limit 4800 to 4800 applied, no change; alcohol-deducting 4800 to 4150 fractured), `result` `partially_approved`, `amountCents` 4150 (two fractured bones)
+    - `arbitraries.ts`: fast-check generators `arbRuleId`, `arbRegion`, `arbEffect`, `arbEvidence`, `arbOutcome` (blocking outcomes carry no amount fields; capping and deducting outcomes carry none, equal `amountBeforeCents` and `amountAfterCents`, or a lower `amountAfterCents`), `arbFilmSource`, `arbTraceAndAnatomy` (unique rule ids, subset mapped, extra unmapped outcomes, confidence in [0,1], sources `bbox`/`line`/`undefined`, all three results)
     - `matchMedia.ts`: `installMatchMedia(reduce: boolean)` mock plus restore
     - `netSpy.ts`: stubs for `fetch`, `XMLHttpRequest`, `WebSocket` that throw and record calls, plus restore
     - Add a short sanity test `helpers/arbitraries.test.ts` that generated pairs have unique ids
@@ -81,12 +119,12 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - _Requirements: 2.1, 2.3, 2.12_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): unit tests for skeleton layout"`
   - [ ] 3.7 Implement `src/model/selectors.ts`
-    - `FRACTURE_EFFECTS`, `isFracture`, `fieldLabel` (own-property check), `selectBones` (first outcome per ruleId, region normalised to `"spine"`, per-region index and count, splinters for fractured), `evidenceRows`, `relatedFields`, `relatedBones`, `overruledFields`, `fieldViews`, `sourceMarks`, `countPassed`
-    - _Requirements: 2.2, 2.4, 2.5, 2.6, 2.7, 2.14, 4.6, 4.8, 5.1, 5.2, 5.6, 13.4_
+    - `isFracture` (reads `conditionMet`, `effect`, `amountBeforeCents`, `amountAfterCents`: blocking with `conditionMet` is a fracture; capping and deducting only when both amounts are present and `amountAfterCents < amountBeforeCents`), `isAppliedNoChange`, `stateText`, `fieldLabel` (own-property check), `selectBones` (first outcome per ruleId, region normalised to `"spine"`, per-region index and count, splinters for fractured), `evidenceRows`, `relatedFields`, `relatedBones`, `overruledFields`, `fieldViews`, `sourceMarks`, `countPassed`
+    - _Requirements: 2.2, 2.4, 2.5, 2.6, 2.7, 2.14, 2.17, 2.18, 4.6, 4.8, 5.1, 5.2, 5.6, 13.4_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add view-model selectors"`
   - [ ]* 3.8 Write unit tests for `selectors.ts`
-    - Passed, not-applicable and fractured states; `conditionMet` true with an unknown effect is not a fracture; unmapped outcome ignored; duplicate outcome ids use the first; evidence rows keep key order and use label fallback; `fieldLabel` ignores prototype keys; overruled map ignores computed keys; `sourceMarks` skips undefined and highlights related fields; `fieldViews` gives `"n/a"` without confidence
-    - _Requirements: 2.4, 2.5, 2.6, 2.7, 2.14, 4.6, 4.8, 5.1, 5.2, 5.6_
+    - Passed, not-applicable and fractured states; blocking with `conditionMet` is fractured without amount fields; capping and deducting with `conditionMet` and equal amounts are passed with `stateText` "applied, no change", and with a lower `amountAfterCents` are fractured; capping and deducting without amount fields are not fractured; `conditionMet` false is passed even with a lower `amountAfterCents`; `conditionMet` true with an unknown effect is not a fracture; unmapped outcome ignored; duplicate outcome ids use the first; evidence rows keep key order and use label fallback; `fieldLabel` ignores prototype keys; overruled map ignores computed keys and applied-no-change outcomes; `sourceMarks` skips undefined and highlights related fields; `fieldViews` gives `"n/a"` without confidence
+    - _Requirements: 2.4, 2.5, 2.6, 2.7, 2.14, 2.17, 2.18, 4.6, 4.8, 5.1, 5.2, 5.6_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): unit tests for selectors"`
   - [ ] 3.9 Implement `src/model/gauge.ts` and `src/model/confidence.ts`
     - `SWEEP`, `needleAngle`, `knobAngle`, `stepVersion` in `gauge.ts`; `gaugeValue`, `buildGaugeModel` in `confidence.ts` (min of fractured-evidence confidences, else average, else `null`; text `"n/a"` or two decimals)
@@ -110,7 +148,7 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.12_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add Dr. Bones message builder"`
   - [ ]* 3.14 Write unit tests for `chat.ts`
-    - Message order and count (`3 + fractured`); singular and plural summary; at most two evidence lines; unmapped fractured outcome gives no message; result line uses `formatValue("amountCents", ...)`; signature trace text snapshot
+    - Message order and count (`3 + fractured`); singular and plural summary; at most two evidence lines; unmapped fractured outcome gives no message; an applied-no-change outcome gives no fracture message and counts in the summary; result line uses `formatValue("amountCents", ...)`; the signature trace gives five messages (greeting, line-item cap fracture, alcohol fracture, `3 other bones look healthy.`, result) as a text snapshot
     - _Requirements: 6.3, 6.4, 6.5_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): unit tests for message builder"`
 
@@ -146,8 +184,8 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 
 - [ ] 6. Skeleton, Bone and Tooltip
   - [ ] 6.1 Implement `BoneGlyph` and `BoneButton`
-    - `src/components/Bone.tsx`: SVG glyph per state (cyan/dim/red, icon `✓`/`–`/`✕`, crack polyline, splinter polygons, static pulse ring with `anim-pulse` only when motion allowed) and the HTML button with `aria-label` "label, rule id version v, state", visible cue and state text, `data-rule-id`, `data-state`
-    - _Requirements: 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 11.4, 11.6, 12.3_
+    - `src/components/Bone.tsx`: SVG glyph per state (cyan/dim/red, icon `✓`/`–`/`✕`, crack polyline, splinter polygons, static pulse ring with `anim-pulse` only when motion allowed) and the HTML button with `aria-label` "label, rule id version v, state", visible cue and state text taken from `stateText(bone)` ("fractured", "applied, no change", "passed", "not applicable"), `data-rule-id`, `data-state`
+    - _Requirements: 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 2.17, 11.4, 11.6, 12.3_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add bone glyph and button"`
   - [ ] 6.2 Implement `Tooltip`
     - `src/components/Tooltip.tsx`: `role="tooltip"` with id from `slug(ruleId)`, head `ruleId vVersion`, state text, `renderedMessage`, and a `dl` with one `dt`/`dd` pair per `evidenceRows` entry; flipped side when `position.x > 280`; state text only for not-applicable bones
@@ -158,8 +196,8 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.12, 2.13, 2.15, 4.6, 9.3, 12.1_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add Skeleton"`
   - [ ]* 6.4 Write component tests for Skeleton and Tooltip
-    - `src/__tests__/components/Skeleton.test.tsx` and `Tooltip.test.tsx`: 8 region silhouettes; one button per Anatomy entry; aria-label format; state cues; hover and focus show the tooltip with id, version, state, message and one `dt`/`dd` per evidence key; `aria-describedby`; Escape closes; leader lines; default formatter when `formatValue` is absent; unmapped outcome draws no bone
-    - _Requirements: 2.1, 2.2, 2.4, 2.9, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16_
+    - `src/__tests__/components/Skeleton.test.tsx` and `Tooltip.test.tsx`: 8 region silhouettes; one button per Anatomy entry; aria-label format; state cues including "applied, no change" for a capping outcome that did not lower the amount (requirement 18.11: the same outcome with a lower `amountAfterCents` renders a fractured bone) and a passed bone for capping or deducting outcomes without amount fields (requirement 18.12); hover and focus show the tooltip with id, version, state, message and one `dt`/`dd` per evidence key; `aria-describedby`; Escape closes; leader lines; default formatter when `formatValue` is absent; unmapped outcome draws no bone
+    - _Requirements: 2.1, 2.2, 2.4, 2.9, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 18.11, 18.12_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): component tests for Skeleton and Tooltip"`
 
 - [ ] 7. EcgLine
@@ -278,9 +316,9 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 - [ ] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
   - If a property test fails, fix the implementation, not the property. Keep a short list of bugs found by property tests in `.kiro/specs/xray-ui/bugs-found.md`.
   - [ ] 16.1 Write property test for fractured bone count
-    - `fracture-count.test.tsx`
+    - `fracture-count.test.tsx`: generated traces include blocking outcomes, capping and deducting outcomes with equal and with lower `amountAfterCents`, and such outcomes without amount fields; count `[data-state="fractured"]` against the outcomes that satisfy `isFracture` and whose rule is mapped
     - **Property 1: Fractured bone count equals mapped fractured outcomes**
-    - **Validates: Requirements 2.7, 18.2**
+    - **Validates: Requirements 2.5, 2.7, 18.2, 18.11, 18.12**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 1 fracture count"`
   - [ ] 16.2 Write property test for render determinism
     - `render-determinism.test.tsx`
@@ -318,9 +356,9 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - **Validates: Requirements 7.8, 7.9, 7.10**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 8 gauge value"`
   - [ ] 16.9 Write property test for bone partition
-    - `bone-partition.test.ts`
+    - `bone-partition.test.ts`: passed includes capping and deducting outcomes with `conditionMet` true that did not lower the amount
     - **Property 9: One bone per anatomy entry, partitioned into three states**
-    - **Validates: Requirements 2.2, 2.4, 2.5, 2.6**
+    - **Validates: Requirements 2.2, 2.4, 2.5, 2.6, 2.7, 2.17, 2.18**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 9 bone partition"`
   - [ ] 16.10 Write property test for layout
     - `layout.test.ts`
@@ -375,12 +413,12 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 - [ ] 18. Demo
   - [ ] 18.1 Create `demo/anatomy.ts`
     - Export `demoAnatomy` with the five bones, field labels and the `*Cents` formatter (`EUR 41.50`) from design.md
-    - _Requirements: 16.3_
+    - _Requirements: 16.3, 16.8_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo anatomy"`
   - [ ] 18.2 Create `demo/demoTrace.ts`
-    - Export `VERSIONS`, `DemoVersion`, `buildCatalog()` (seven rule files, keys `id@version`) and `buildTrace(version)`: validate the signature scenario fields with zod, pick the rule set JSON, use `amountScopes = [{ name: "total", claimedCents: lineItemSumCents }]`, call `evaluate` and `createTrace` from `@bones/core` with deterministic stub ports; throw on a `CoreError`
+    - Export `VERSIONS`, `DemoVersion`, `buildCatalog()` (seven rule files, keys `id@version`) and `buildTrace(version)`: validate the signature scenario fields with zod, pick the rule set JSON, use `amountScopes = [{ name: "total", claimedCents: claimedTotalCents }]` (48000), call `evaluate` and `createTrace` from `@bones/core` with deterministic stub ports; throw on a `CoreError`
     - Import the JSON files from `../../core/test-fixtures/expense/...`; confirm the needed functions are exported from `packages/core/src/index.ts`
-    - _Requirements: 16.2, 16.5, 16.6_
+    - _Requirements: 16.2, 16.5, 16.6, 16.9_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo trace builder"`
   - [ ] 18.3 Create the demo page and `dev` script
     - `demo/index.html`, `demo/main.tsx` (import `XrayView` from `../src/components/XrayView` and both CSS files directly; `useState<DemoVersion>("v1")`, `useMemo` trace, film text lines supplied by the demo, replay handler bumping a key, no override handler)
@@ -388,8 +426,8 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
     - _Requirements: 16.1, 16.4, 16.5_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo page"`
   - [ ] 18.4 Write the demo smoke test
-    - `src/__tests__/demo-smoke.test.tsx`: `buildTrace("v1")`, `"v2"`, `"v3"` all give `partially_approved` and `amountCents` 4150; render `XrayView` with `demoAnatomy` without console errors; knob key press changes shown rule-set version from `1.0.0` to `2.0.0`; add `server.deps.inline: ["@bones/core"]` to `vitest.config.ts` only if needed
-    - _Requirements: 16.2, 16.4, 16.5, 16.6, 18.9_
+    - `src/__tests__/demo-smoke.test.tsx`: for `buildTrace("v1")`, `"v2"` and `"v3"` assert `partially_approved`, `amountCents` 4150 and the per-rule amounts (line-item-cap 48000 to 4800, meal-limit 4800 to 4800, alcohol-deducting 4800 to 4150); render `XrayView` with `demoAnatomy` without console errors and assert exactly two bone buttons with `data-state="fractured"` (Line-item cap and Alcohol) at each version, with the Meal limit bone `data-state="passed"` and the text "applied, no change"; a knob key press changes the shown rule-set version from `1.0.0` to `2.0.0`; add `server.deps.inline: ["@bones/core"]` to `vitest.config.ts` only if needed
+    - _Requirements: 16.2, 16.4, 16.5, 16.6, 16.7, 16.9, 18.9_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): demo smoke test"`
 
 - [ ] 19. Public barrel
@@ -418,6 +456,7 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 - Tasks marked with `*` are optional unit or component tests; property tests, domain isolation, contrast, source hygiene, no-network, a11y role and demo smoke tests are required.
 - Every property test is its own file and `it(...)`, uses `numRuns >= 100` and carries the tag comment `// Feature: xray-ui, Property N: <title>`.
 - If a property test fails, fix the implementation, not the property, and log it in `.kiro/specs/xray-ui/bugs-found.md`.
+- Task 0 (the core change) comes first and ends at a green checkpoint (0.6); no xray-ui task starts before it.
 - The demo lives outside `src/`, so it may use expense wording and runtime imports from `@bones/core`; `src/` imports `@bones/core` types only.
 - Waves are ordered so that tasks in one wave touch different files.
 
@@ -426,39 +465,43 @@ Build `@bones/xray-ui` in strict dependency order: package setup with an empty L
 ```json
 {
   "waves": [
-    { "id": 0, "tasks": ["1.1"] },
-    { "id": 1, "tasks": ["1.2"] },
-    { "id": 2, "tasks": ["2.1"] },
-    { "id": 3, "tasks": ["2.2", "2.3"] },
-    { "id": 4, "tasks": ["3.1", "3.3"] },
-    { "id": 5, "tasks": ["3.2", "3.4", "3.5"] },
-    { "id": 6, "tasks": ["3.6", "3.7"] },
-    { "id": 7, "tasks": ["3.8", "3.9", "3.11"] },
-    { "id": 8, "tasks": ["3.10", "3.12", "3.13"] },
-    { "id": 9, "tasks": ["3.14"] },
-    { "id": 10, "tasks": ["5.1", "5.3", "5.5"] },
-    { "id": 11, "tasks": ["5.2", "5.4", "5.6"] },
-    { "id": 12, "tasks": ["6.1", "6.2"] },
-    { "id": 13, "tasks": ["6.3", "7.1", "8.1"] },
-    { "id": 14, "tasks": ["6.4", "7.2", "8.2", "9.1"] },
-    { "id": 15, "tasks": ["9.2", "10.1", "11.1"] },
-    { "id": 16, "tasks": ["10.2", "11.2", "11.3"] },
-    { "id": 17, "tasks": ["11.4", "11.5", "12.1"] },
-    { "id": 18, "tasks": ["11.6", "11.7", "12.2"] },
-    { "id": 19, "tasks": ["11.8", "13.1"] },
-    { "id": 20, "tasks": ["13.2", "14.1"] },
-    { "id": 21, "tasks": ["13.3", "14.2"] },
-    { "id": 22, "tasks": ["16.1", "16.2", "16.3"] },
-    { "id": 23, "tasks": ["16.4", "16.5", "16.6"] },
-    { "id": 24, "tasks": ["16.7", "16.8", "16.9"] },
-    { "id": 25, "tasks": ["16.10", "16.11", "16.12"] },
-    { "id": 26, "tasks": ["16.13", "16.14", "17.1"] },
-    { "id": 27, "tasks": ["17.2", "17.3", "17.4"] },
-    { "id": 28, "tasks": ["17.5", "18.1", "18.2"] },
-    { "id": 29, "tasks": ["18.3"] },
-    { "id": 30, "tasks": ["18.4"] },
-    { "id": 31, "tasks": ["19.1"] },
-    { "id": 32, "tasks": ["19.2", "20.1"] }
+    { "id": 0, "tasks": ["0.1"] },
+    { "id": 1, "tasks": ["0.2"] },
+    { "id": 2, "tasks": ["0.3", "0.4", "0.5"] },
+    { "id": 3, "tasks": ["0.6"] },
+    { "id": 4, "tasks": ["1.1"] },
+    { "id": 5, "tasks": ["1.2"] },
+    { "id": 6, "tasks": ["2.1"] },
+    { "id": 7, "tasks": ["2.2", "2.3"] },
+    { "id": 8, "tasks": ["3.1", "3.3"] },
+    { "id": 9, "tasks": ["3.2", "3.4", "3.5"] },
+    { "id": 10, "tasks": ["3.6", "3.7"] },
+    { "id": 11, "tasks": ["3.8", "3.9", "3.11"] },
+    { "id": 12, "tasks": ["3.10", "3.12", "3.13"] },
+    { "id": 13, "tasks": ["3.14"] },
+    { "id": 14, "tasks": ["5.1", "5.3", "5.5"] },
+    { "id": 15, "tasks": ["5.2", "5.4", "5.6"] },
+    { "id": 16, "tasks": ["6.1", "6.2"] },
+    { "id": 17, "tasks": ["6.3", "7.1", "8.1"] },
+    { "id": 18, "tasks": ["6.4", "7.2", "8.2", "9.1"] },
+    { "id": 19, "tasks": ["9.2", "10.1", "11.1"] },
+    { "id": 20, "tasks": ["10.2", "11.2", "11.3"] },
+    { "id": 21, "tasks": ["11.4", "11.5", "12.1"] },
+    { "id": 22, "tasks": ["11.6", "11.7", "12.2"] },
+    { "id": 23, "tasks": ["11.8", "13.1"] },
+    { "id": 24, "tasks": ["13.2", "14.1"] },
+    { "id": 25, "tasks": ["13.3", "14.2"] },
+    { "id": 26, "tasks": ["16.1", "16.2", "16.3"] },
+    { "id": 27, "tasks": ["16.4", "16.5", "16.6"] },
+    { "id": 28, "tasks": ["16.7", "16.8", "16.9"] },
+    { "id": 29, "tasks": ["16.10", "16.11", "16.12"] },
+    { "id": 30, "tasks": ["16.13", "16.14", "17.1"] },
+    { "id": 31, "tasks": ["17.2", "17.3", "17.4"] },
+    { "id": 32, "tasks": ["17.5", "18.1", "18.2"] },
+    { "id": 33, "tasks": ["18.3"] },
+    { "id": 34, "tasks": ["18.4"] },
+    { "id": 35, "tasks": ["19.1"] },
+    { "id": 36, "tasks": ["19.2", "20.1"] }
   ]
 }
 ```

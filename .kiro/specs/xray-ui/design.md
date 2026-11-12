@@ -2,7 +2,7 @@
 
 ## Overview
 
-`@bones/xray-ui` (`packages/xray-ui`) renders any `Trace` from `@bones/core` as a 1950s-radiology X-ray. The host app supplies a `Trace` and an `Anatomy`. The library treats every rule as opaque: it reads only `ruleId`, `ruleVersion`, `effect`, `conditionMet`, `evidence`, `renderedMessage` and the Anatomy entry.
+`@bones/xray-ui` (`packages/xray-ui`) renders any `Trace` from `@bones/core` as a 1950s-radiology X-ray. The host app supplies a `Trace` and an `Anatomy`. The library treats every rule as opaque: it reads only `ruleId`, `ruleVersion`, `effect`, `conditionMet`, `evidence`, `renderedMessage`, `amountBeforeCents`, `amountAfterCents` and the Anatomy entry.
 
 Key design principle: **all logic lives in pure functions** (selectors, builders, hashes, layout, path generators). These functions take plain data and return plain data, so they are unit- and property-testable without a DOM. React components are thin: they call the pure functions, map the result to JSX and attach event handlers. The only impure code is two small hooks (`useReducedMotion`, `useTypewriter`) and one context (`useHoveredRule`).
 
@@ -24,6 +24,45 @@ Research summary (versions verified with `npm view`, compatibility checked again
 - `@vitejs/plugin-react@4.3.4` supports `vite ^4.2 || ^5 || ^6`.
 - `@testing-library/react@16.0.0` requires `@testing-library/dom@^10` as a peer, so `@testing-library/dom@10.4.0` is also pinned.
 - `jsdom@24.1.0` has no `matchMedia`; tests install a mock.
+
+## Core Prerequisite: Cap Before Deduct, Amounts Per Rule
+
+This change to `@bones/core` is made first (requirement 19). xray-ui depends on it: a Bone is fractured only when its rule changed the decision, which needs the amount before and after each rule.
+
+**Types.** `RuleOutcome` in `packages/core/src/types.ts` gains two optional fields, `amountBeforeCents?: number` and `amountAfterCents?: number` (integer cents: the running amount in the rule scope immediately before and after the rule). `traceSchemaVersion` stays `"1"`.
+
+**Evaluation order.** `evaluate` runs blocking, then capping, then deducting. Each scope keeps a running amount that starts at its `claimedCents`:
+
+```ts
+// blocking pass: unchanged. The first firing rule returns "rejected"; blocking outcomes carry no amount fields.
+// capping pass, rules sorted by rule.id ascending:
+//   before = running[scope]
+//   if conditionMet: cap = resolveCap(rule); after = max(0, min(before, cap)); running[scope] = after; appliedCapCents = cap
+//   else: after = before
+//   outcome.amountBeforeCents = before; outcome.amountAfterCents = after
+// deducting pass, rules sorted by rule.id ascending:
+//   before = running[scope]
+//   if conditionMet: d = resolveDeduction(rule); after = max(0, before - d); running[scope] = after; deductedCents = d
+//   else: after = before
+//   outcome.amountBeforeCents = before; outcome.amountAfterCents = after
+```
+
+`ruleOutcomes` are listed in evaluation order (blocking, capping, deducting). The final amount per scope is the running amount clamped to `[0, claimedCents]`; the result is `partially_approved` when any scope ends below its `claimedCents`.
+
+**Signature walkthrough** (scope `total` starts at `claimedTotalCents` = 48000):
+
+| Step | Rule | Amount before | Amount after | Bone state |
+| --- | --- | --- | --- | --- |
+| 1 | `date-blocking-after`, `date-blocking-before` (not met) | n/a | n/a | passed |
+| 2 | `line-item-cap` (cap 4800, fires because 48000 differs from 4800) | 48000 | 4800 | fractured |
+| 3 | `meal-limit` (cap 5000 at v1, 6000 at v2, 7500 at v3) | 4800 | 4800 | passed, "applied, no change" |
+| 4 | `alcohol-deducting` (deduction 650) | 4800 | 4150 | fractured |
+
+Result `partially_approved`, `amountCents` 4150 at v1, v2 and v3. With the old order (deduct first) the same input would end at 4800 (48000 - 650 = 47350, then cap 4800), which contradicts the expected 4150, so the order changes.
+
+**Tests.** `expense-scenarios.test.ts` starts the scope at `claimedTotalCents` (48000) and asserts the walkthrough above for expense-v1, v2 and v3, with a comment on each changed expectation showing the new arithmetic. The other core tests assert invariants (determinism, bounds, cap monotonicity, rule-order invariance, replay, trace determinism) that still hold under the new order, because the amount is `max(0, min(claimed, cap) - deduction)`; the checkpoint verifies this, and any expectation that does change gets a comment with the new arithmetic. A new property test `packages/core/src/__tests__/properties/amount-chain.test.ts` checks that for every outcome of every Decision from `evaluate` that has both fields, `amountAfterCents` is an integer, at least 0 and at most `amountBeforeCents` (requirement 19.9).
+
+**Core spec documents.** `.kiro/specs/core/requirements.md` (4.1 and 4.3) and `.kiro/specs/core/design.md` (the Evaluate Algorithm steps for deducting and capping) are updated to the new order (requirement 19.15).
 
 ## Architecture
 
@@ -102,7 +141,7 @@ packages/xray-ui/
     index.ts
     types.ts
     model/
-      selectors.ts      selectBones, isFracture, evidenceRows, relatedBones, relatedFields,
+      selectors.ts      selectBones, isFracture, isAppliedNoChange, stateText, evidenceRows, relatedBones, relatedFields,
                         fieldViews, overruledFields, sourceMarks, countPassed
       hash.ts           hashString, nextRandom, splinters, crackPath
       confidence.ts     gaugeValue, buildGaugeModel
@@ -377,10 +416,20 @@ export function resultLabel(result: DecisionResult): string;
 ### Pure model: selectors (`model/selectors.ts`)
 
 ```ts
-export const FRACTURE_EFFECTS = ["blocking", "capping", "deducting"] as const;
+type FractureFields = Pick<RuleOutcome, "conditionMet" | "effect" | "amountBeforeCents" | "amountAfterCents">;
 
-export function isFracture(o: Pick<RuleOutcome, "conditionMet" | "effect">): boolean;
-// o.conditionMet === true && FRACTURE_EFFECTS.includes(o.effect)
+export function isFracture(o: FractureFields): boolean;
+// o.conditionMet === true && (o.effect === "blocking" ||
+//   ((o.effect === "capping" || o.effect === "deducting") &&
+//    o.amountBeforeCents !== undefined && o.amountAfterCents !== undefined &&
+//    o.amountAfterCents < o.amountBeforeCents))
+
+export function isAppliedNoChange(o: FractureFields): boolean;
+// o.conditionMet === true && (o.effect === "capping" || o.effect === "deducting") && !isFracture(o)
+
+export function stateText(bone: Pick<BoneView, "state" | "outcome">): string;
+// fractured -> "fractured"; passed with an outcome for which isAppliedNoChange is true -> "applied, no change";
+// any other passed -> "passed"; not-applicable -> "not applicable"
 
 export function selectBones(trace: Trace, anatomy: Anatomy): BoneView[];
 export function evidenceRows(outcome: RuleOutcome, anatomy: Anatomy): EvidenceRow[];
@@ -417,7 +466,9 @@ Precondition recorded in Error Handling: `ruleId` values are unique within `trac
 
 `sourceMarks(trace, anatomy, active)`: iterate `Object.entries(trace.sources)`, skip entries whose value is `undefined`. `highlighted = active !== undefined && relatedFields(active).includes(path)`. `tag` is the 1-based position among defined sources, as a string. Returns marks in `Object.entries` order.
 
-`countPassed(bones)`: number of bones with `state === "passed"`.
+`countPassed(bones)`: number of bones with `state === "passed"`. This includes bones whose rule applied without lowering the amount (`stateText` "applied, no change").
+
+`isFracture` reads only `conditionMet`, `effect`, `amountBeforeCents` and `amountAfterCents`. A capping or deducting outcome that lacks either amount field (for example a Trace from an older core) is not a fracture, because the comparison needs both values.
 
 ### Pure model: hash (`model/hash.ts`)
 
@@ -558,9 +609,11 @@ Message count is `3 + fracturedMappedOutcomeCount`. For duplicate outcome ids on
 Example (demo, v1), messages in order:
 
 - `Let's take a look at this decision.`
-- `I see a fracture in the Alcohol bone.` plus the rule line and up to two evidence lines (one message per fractured outcome, here three messages).
-- `2 other bones look healthy.` (the two date rules; the count is computed, not fixed).
+- Two fracture messages, in `trace.ruleOutcomes` order (capping before deducting, see the core prerequisite): first `I see a fracture in the Line-item cap bone.` plus its rule line and up to two evidence lines, then `I see a fracture in the Alcohol bone.` plus its rule line and up to two evidence lines. The `meal-limit` rule applied without lowering the amount, so it gets no fracture message.
+- `3 other bones look healthy.` (the two date rules and the meal-limit rule are the passed bones; the count is computed, not fixed).
 - `Result: PARTIALLY APPROVED. Amount: EUR 41.50.`
+
+The signature case therefore has five messages (`3 + 2`).
 
 ### Hooks
 
@@ -605,7 +658,7 @@ Skeleton local state: `tooltipRuleId: string | null` (set on pointer enter and f
 - `not-applicable`: dim stroke, dashed, glyph `–`.
 - `fractured`: red stroke, class `xr-glow-red`; a crack polyline across the capsule (`<polyline class="xr-crack" points="-10,-8 -3,0 -8,4 2,8 6,2 12,8">`), `SPLINTER_COUNT` splinter polygons from `splinters(ruleId)`, a static pulse ring `<circle class="xr-pulse-ring" r="22">` and glyph `✕`. The ring has the extra class `anim-pulse` unless reduced motion. The static ring remains in reduced motion so the fracture is still visible.
 
-**BoneButton**: `<button type="button" class="xr-bone-btn" data-rule-id data-state={state} aria-label="{label}, rule {ruleId} version {version ?? "n/a"}, {stateText}" aria-describedby={tooltipId when open}>` with visible content `<span aria-hidden="true" class="xr-bone-cue">{icon}</span><span class="xr-bone-state">{stateText}</span>`. `stateText`: `passed` gives "passed", `not-applicable` gives "not applicable", `fractured` gives "fractured". The visible text is kept small but present (requirements 2.11, 12.3). Example aria-label: `Line-item cap, rule line-item-cap version 1.0.0, fractured`.
+**BoneButton**: `<button type="button" class="xr-bone-btn" data-rule-id data-state={state} aria-label="{label}, rule {ruleId} version {version ?? "n/a"}, {stateText}" aria-describedby={tooltipId when open}>` with visible content `<span aria-hidden="true" class="xr-bone-cue">{icon}</span><span class="xr-bone-state">{stateText}</span>`. `stateText` is `stateText(bone)` from the selectors: `fractured` gives "fractured"; a `passed` bone whose outcome is an Applied_No_Change_Outcome gives "applied, no change"; any other `passed` bone gives "passed"; `not-applicable` gives "not applicable". The visible text is kept small but present (requirements 2.11, 12.3). Example aria-label: `Line-item cap, rule line-item-cap version 1.0.0, fractured`. A capping rule that did not lower the amount reads `Meal limit, rule meal-limit version 1.0.0, applied, no change`.
 
 **Tooltip**: `<div role="tooltip" id="xr-tip-{slug(ruleId)}" class="xr-tooltip">` containing `<p class="xr-tip-head">{ruleId} v{version}</p>`, `<p class="xr-tip-state">{stateText}</p>`, for bones with an outcome `<p class="xr-tip-msg">{renderedMessage}</p>` and `<dl class="xr-tip-evidence">` with one `<dt>{label}</dt><dd>{value}</dd>` per `evidenceRows`. `slug(s)` replaces non `[A-Za-z0-9_-]` characters with `_`. For not-applicable bones the message line reads the state text only and the list is empty. Position: absolutely placed next to the bone, flipped to the left side when `position.x > 280`.
 
@@ -782,9 +835,9 @@ export function buildTrace(version: DemoVersion): Trace; // throws Error on a Co
 ```
 
 - `buildCatalog` inserts `date-blocking-before@1.0.0`, `date-blocking-after@1.0.0`, `alcohol-deducting@1.0.0`, `meal-limit@1.0.0`, `meal-limit@2.0.0`, `meal-limit@3.0.0` and `line-item-cap@1.0.0` as `Rule` values (JSON cast with `as unknown as Rule`).
-- `buildTrace(version)` follows `packages/core/src/__tests__/fixtures/expense-scenarios.test.ts`: validate `scenario.proposedFields` with the same zod schema (`claimedTotalCents`, `lineItemSumCents`, `alcoholLineCents`, `alcoholLineItems[]`, `lineItems[]`, `receiptDate`, `tripStart`, `tripEnd`), choose the rule set JSON for the version, set `amountScopes = [{ name: "total", claimedCents: scenario.proposedFields.lineItemSumCents }]` (4800, **not** `claimedTotalCents` 48000), call `evaluate(validated, ruleSet, catalog, amountScopes)`, then `createTrace(decision, extractionResult, ruleSet, validated, new TextEncoder().encode(scenario.rawModelOutput), ports)`.
+- `buildTrace(version)` follows `packages/core/src/__tests__/fixtures/expense-scenarios.test.ts`: validate `scenario.proposedFields` with the same zod schema (`claimedTotalCents`, `lineItemSumCents`, `alcoholLineCents`, `alcoholLineItems[]`, `lineItems[]`, `receiptDate`, `tripStart`, `tripEnd`), choose the rule set JSON for the version, set `amountScopes = [{ name: "total", claimedCents: scenario.proposedFields.claimedTotalCents }]` (48000, **not** `lineItemSumCents` 4800), call `evaluate(validated, ruleSet, catalog, amountScopes)`, then `createTrace(decision, extractionResult, ruleSet, validated, new TextEncoder().encode(scenario.rawModelOutput), ports)`.
 - Ports are deterministic: `clock: () => new Date("2024-01-01T00:00:00.000Z")`, `id: () => "demo-decision-001"`, `hasher: () => "a".repeat(64)` (same stub as the core test; `inputHash` in the demo is therefore a placeholder).
-- Results (derived from the rule files): evaluation order is blocking, deducting (alcohol: 4800 - 650 = 4150), capping (line-item-cap cap = 4800, meal-limit cap = 5000 at v1, 6000 at v2, 7500 at v3). All caps are above 4150, so **v1, v2 and v3 all yield `partially_approved` with `amountCents` 4150**. Only the `meal-limit` rule version (1.0.0 / 2.0.0 / 3.0.0) and its rendered message ("capped at 5000 / 6000 / 7500 cents") change between versions. The knob therefore visibly changes the rule version label, the tooltip, the chat text and `trace.ruleSetVersion`, but not the result. Because the meal-limit condition is always true, it counts as a fracture at every version. Requirement 16.6 holds for the default `v1`.
+- Results (derived from the rule files and the core evaluation order blocking, capping, deducting): the scope starts at 48000. `line-item-cap` (fires because 48000 differs from 4800; cap 4800) takes 48000 to 4800: **fractured**. `meal-limit` (always applies; cap 5000 at v1, 6000 at v2, 7500 at v3) takes 4800 to 4800: **passed**, shown as "applied, no change". `alcohol-deducting` takes 4800 to 4150: **fractured**. The two date rules do not fire: passed. **v1, v2 and v3 all yield `partially_approved` with `amountCents` 4150 and exactly two fractured bones (Line-item cap and Alcohol).** Only the `meal-limit` rule version (1.0.0 / 2.0.0 / 3.0.0) and its rendered message change between versions. The knob therefore visibly changes the rule version label, the tooltip, the chat text and `trace.ruleSetVersion`, but not the result or the fracture count. Requirements 16.6, 16.7 and 16.9 hold for the default `v1` and for v2 and v3.
 - The demo's `inputHash` stub and the fixed `createdAt` keep `buildTrace` deterministic and testable in the smoke test.
 
 `demo/anatomy.ts` (expense wording is allowed here because `demo/` is outside `src/`):
@@ -826,9 +879,9 @@ Scope note: properties assume the uniqueness precondition (unique `ruleId` withi
 
 ### Property 1: Fractured bone count equals mapped fractured outcomes
 
-*For any* Trace and Anatomy, the number of Bones rendered in state `fractured` (counted in the DOM by `[data-state="fractured"]` on bone buttons) equals the number of outcomes in `trace.ruleOutcomes` with `conditionMet === true`, `effect` in {blocking, capping, deducting} and a `ruleId` that appears in `anatomy.bones`.
+*For any* Trace and Anatomy, the number of Bones rendered in state `fractured` (counted in the DOM by `[data-state="fractured"]` on bone buttons) equals the number of outcomes in `trace.ruleOutcomes` that satisfy `isFracture` and whose `ruleId` appears in `anatomy.bones`. An outcome satisfies `isFracture` when `conditionMet === true` and either `effect === "blocking"` or `effect` is capping or deducting with both amount fields present and `amountAfterCents < amountBeforeCents`. Generators include capping and deducting outcomes with equal and with lower `amountAfterCents`, such outcomes without amount fields, and blocking outcomes.
 
-**Validates: Requirements 2.7, 18.2**
+**Validates: Requirements 2.5, 2.7, 18.2, 18.11, 18.12**
 
 ### Property 2: Render determinism
 
@@ -874,9 +927,9 @@ Scope note: properties assume the uniqueness precondition (unique `ruleId` withi
 
 ### Property 9: One bone per anatomy entry, partitioned into three states
 
-*For any* Trace and Anatomy, `selectBones` returns exactly `anatomy.bones.length` bones in Anatomy order; adding outcomes whose `ruleId` is not in the Anatomy does not change the result; a bone is `not-applicable` exactly when no outcome shares its `ruleId`, `passed` exactly when its outcome exists and `isFracture(outcome)` is false, and `fractured` exactly when `isFracture(outcome)` is true.
+*For any* Trace and Anatomy, `selectBones` returns exactly `anatomy.bones.length` bones in Anatomy order; adding outcomes whose `ruleId` is not in the Anatomy does not change the result; a bone is `not-applicable` exactly when no outcome shares its `ruleId`, `passed` exactly when its outcome exists and `isFracture(outcome)` is false (this includes a capping or deducting outcome with `conditionMet` true that did not lower the amount, whose `stateText` is "applied, no change"), and `fractured` exactly when `isFracture(outcome)` is true.
 
-**Validates: Requirements 2.2, 2.4, 2.5, 2.6**
+**Validates: Requirements 2.2, 2.4, 2.5, 2.6, 2.7, 2.17, 2.18**
 
 ### Property 10: Layout depends only on region order and stays inside the region
 
@@ -928,6 +981,7 @@ Scope note: properties assume the uniqueness precondition (unique `ruleId` withi
 | `value` not in `versions` | Pointer at detent 0, `aria-valuenow` 0; Arrow keys select `versions[0]` |
 | `window.matchMedia` missing (jsdom, SSR) | `useReducedMotion` returns `false` (or the prop override) |
 | Duplicate `ruleId` in outcomes | First outcome wins (documented precondition, properties assume uniqueness) |
+| Capping or deducting outcome without `amountBeforeCents` or `amountAfterCents` | Not a fracture: bone `passed`; with `conditionMet` true the state text is "applied, no change" |
 | Duplicate `ruleId` in Anatomy | Each entry renders its own bone and shares the same outcome; React keys use `ruleId + ":" + index` |
 | Callbacks (`onVersionChange`, ...) throw | Not caught: errors belong to the host app |
 
@@ -983,9 +1037,9 @@ demo-smoke.test.tsx
 - `arbRegion`: `fc.constantFrom(...REGIONS)`.
 - `arbEffect`: `fc.constantFrom("blocking", "capping", "deducting")`.
 - `arbEvidence`: `fc.dictionary(arbFieldPath, fc.anything())` where `arbFieldPath` mixes plain keys (from a small pool so matches occur) and computed keys such as `"items[*].amount_sum"`.
-- `arbOutcome(ruleId)`: `{ ruleId, ruleVersion: "1.0.0" style semver, effect, conditionMet: fc.boolean(), evidence, renderedMessage: fc.string() }`.
+- `arbOutcome(ruleId)`: `{ ruleId, ruleVersion: "1.0.0" style semver, effect, conditionMet: fc.boolean(), evidence, renderedMessage: fc.string() }` plus amount fields: blocking outcomes carry none; capping and deducting outcomes carry none about one time in five, otherwise `amountBeforeCents: fc.nat()` and `amountAfterCents` drawn from `0..amountBeforeCents` and equal to `amountBeforeCents` about half of the time.
 - `arbTraceAndAnatomy`: first draw a unique id list `ids`; the Anatomy maps a random subset of `ids` plus some extra anatomy-only ids; outcomes are drawn for a random subset of `ids` (including some that are unmapped). `proposedFields` uses keys from the same field pool; `confidence` covers a random subset of those keys with `fc.double({ min: 0, max: 1, noNaN: true })`; `sources` maps some keys to `bbox` / `line` / `undefined`; `result` from the three values; `amountCents` is `fc.nat()`. `decisionId` is `fc.uuid()`. The generated object is typed as the `@bones/core` `Trace` (hand-built with all fields of `types.ts`: `traceSchemaVersion: "1"`, `createdAt`, `inputHash`, `rawModelOutput`, `validatedFields`, `ruleSetId`, `ruleSetVersion`, ...), so no core runtime function is needed for property tests.
-- `fixtures.ts` also offers `signatureTrace()` built by hand to mirror the demo trace (3 fractured, 2 not-applicable/passed) for example tests.
+- `fixtures.ts` also offers `signatureTrace()` built by hand to mirror the demo trace at v1, with `ruleOutcomes` in core order: the two date rules (not met, passed), `line-item-cap` 48000 to 4800 (fractured), `meal-limit` 4800 to 4800 (applied, no change), `alcohol-deducting` 4800 to 4150 (fractured); `result` `partially_approved`, `amountCents` 4150. It is used for example tests (two fractured bones, five chat messages).
 
 ### Test setup and simulation
 
@@ -1011,7 +1065,7 @@ demo-smoke.test.tsx
 - **ResultPlate**: label, icon and amount for each of the three results; default formatter when `formatValue` absent.
 - **XrayView**: all parts present; `xray` false hides the skeleton and keeps FilmClip and AnswerCard; hovering a bone highlights film marks.
 - **useReducedMotion / useTypewriter**: as described above.
-- **Demo smoke** (`demo-smoke.test.tsx`): imports `buildTrace`, asserts `buildTrace("v1")` has `result === "partially_approved"` and `amountCents === 4150` (and the same for v2 and v3), renders `XrayView` with `demoAnatomy` without console errors, and checks that `onVersionChange` from the knob rebuilds the trace (rule set version text changes from `1.0.0` to `2.0.0`). Vite config is not needed in tests because Vitest's own resolver handles JSON and workspace TS imports; if `@bones/core` source cannot be transformed outside the package root, `vitest.config.ts` adds `server.deps.inline: ["@bones/core"]`.
+- **Demo smoke** (`demo-smoke.test.tsx`): imports `buildTrace` and asserts, for `v1`, `v2` and `v3`, `result === "partially_approved"`, `amountCents === 4150` and the per-rule amounts of the signature walkthrough (line-item cap 48000 to 4800, meal-limit 4800 to 4800, alcohol 4800 to 4150); renders `XrayView` with `demoAnatomy` without console errors; checks that exactly two bone buttons have `data-state="fractured"` (Line-item cap and Alcohol) and that the Meal limit bone has `data-state="passed"` with the state text "applied, no change"; checks that `onVersionChange` from the knob rebuilds the trace (rule set version text changes from `1.0.0` to `2.0.0`). Vite config is not needed in tests because the Vitest resolver handles JSON and workspace TS imports; if `@bones/core` source cannot be transformed outside the package root, `vitest.config.ts` adds `server.deps.inline: ["@bones/core"]`.
 
 ### Verification limits
 
@@ -1023,8 +1077,8 @@ Automated tests cover token contrast ratios, ARIA roles and keyboard behaviour o
 2. **"Overruled" is evidence-key based.** A proposed field is overruled only when its path exactly equals an evidence key of a fractured outcome.
 3. **Bone-to-field relation is exact key match.** `relatedFields`/`relatedBones` use own-key equality. No fuzzy or prefix matching.
 4. **Computed evidence keys.** Core evidence can contain computed keys (e.g. `lineItems[*].amount_sum`, `alcoholLineItems[*].amount_sum`). They appear in tooltips and chat rows with the raw key as label (via `fieldLabels` fallback) unless the app adds a label for them, and they never match `confidence` or `sources`.
-5. **Capping always fractures.** A capping rule whose condition is met is a fracture even if the cap did not reduce the amount (for example the demo `meal-limit` at every version).
-6. **Demo results.** All three demo versions yield `partially_approved` at 4150 cents; only the meal-limit rule version and message change.
+5. **Fracture means the rule changed the decision.** A capping or deducting rule fractures a bone only when `amountAfterCents < amountBeforeCents`. A rule that applied without lowering the amount is a passed bone with the state text "applied, no change" (for example the demo `meal-limit` at every version). A capping or deducting outcome without the amount fields, such as one from an older core, is treated as not fractured.
+6. **Demo results.** All three demo versions yield `partially_approved` at 4150 cents with exactly two fractured bones (Line-item cap and Alcohol); only the meal-limit rule version and message change.
 7. **Demo hash.** The demo uses the stub hasher from core's tests, so `inputHash` is a placeholder.
 8. **Rejected decisions.** Core stops after the first firing blocking rule, so later rules have no outcome and their bones are `not-applicable`.
 9. **Unique rule ids.** Selectors assume unique `ruleId` per Trace and per Anatomy; duplicates resolve to the first outcome.
