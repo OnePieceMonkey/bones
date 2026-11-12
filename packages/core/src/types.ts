@@ -103,6 +103,16 @@ export interface RuleOutcome {
   renderedMessage: string;
   deductedCents?: number;   // deducting rules only
   appliedCapCents?: number; // capping rules only
+  /**
+   * Running amount in the rule's scope immediately before this rule is applied.
+   * Integer cents. Absent on blocking outcomes.
+   */
+  amountBeforeCents?: number;
+  /**
+   * Running amount in the rule's scope immediately after this rule is applied.
+   * Integer cents. Absent on blocking outcomes.
+   */
+  amountAfterCents?: number;
 }
 
 export interface Decision {
