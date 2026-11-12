@@ -231,6 +231,10 @@ interface RuleOutcome {
   renderedMessage: string;
   deductedCents?: number;   // deducting rules only
   appliedCapCents?: number; // capping rules only
+  // Running amount in the rule's scope immediately before / after this rule.
+  // Integer cents. Absent on blocking outcomes. traceSchemaVersion stays "1".
+  amountBeforeCents?: number;
+  amountAfterCents?: number;
 }
 
 interface Decision {
@@ -325,8 +329,9 @@ These schemas are used internally during rule catalog resolution and are also ex
 ### Amount arithmetic invariants
 
 - All amounts are integer cents (`number` satisfying `Number.isInteger(n) && n >= 0`).
-- Deduction clamps to 0: `Math.max(0, scopeAmount - deductionAmount)`.
-- Cap clamps to claimed total: `Math.min(claimedCents, Math.min(...applicableCaps))`.
+- Caps apply first, one rule at a time: `Math.max(0, Math.min(runningAmount, cap))`.
+- Deductions apply afterwards, clamped to 0: `Math.max(0, runningAmount - deductionAmount)`.
+- The running amount starts at `claimedCents`, so the final amount never exceeds the claimed total.
 - Final `amountCents` in Decision is the sum of all scope final amounts.
 
 ---
@@ -428,8 +433,8 @@ For every `{ ruleId, ruleVersion }` in `ruleSet.rules`, look up `catalog.get(`${
 
 Partition resolved rules into three buckets:
 - `blocking[]`
-- `deducting[]`
 - `capping[]`
+- `deducting[]`
 
 Within each bucket, sort by `id` lexicographically (ensures deterministic outcome regardless of RuleSet ordering, satisfying Req 4.11 / 11.8).
 
@@ -447,15 +452,19 @@ Iterate `blocking` in sorted order. For each rule, call `evaluateCondition(rule.
 
 Remaining blocking rules that were not evaluated receive `conditionMet: false` with empty evidence in the final `ruleOutcomes` array.
 
-### Step 4: Deducting pass
+Each scope keeps a running amount that starts at its `claimedCents`.
 
-For each deducting rule in sorted order, evaluate its condition. If `conditionMet === true`, subtract `effectConfig.deductionAmount` from the matching `AmountScope` (matched by `ruleId`'s `scope` field in `effectConfig`). Clamp each scope total to `≥ 0`.
+### Step 4: Capping pass
 
-> **Scope matching**: `effectConfig` for a deducting rule also carries a `scope: string` field identifying which `AmountScope.name` to deduct from.
+For each capping rule in ascending `rule.id` order, one rule at a time: `before = running[scope]`. If `conditionMet === true`, evaluate `effectConfig.cap` (a constant or an AST expression over `fields`) to obtain `capCents`, then `after = Math.max(0, Math.min(before, capCents))`, `running[scope] = after` and `appliedCapCents = capCents`. Otherwise `after = before`. Set `amountBeforeCents = before` and `amountAfterCents = after` on the outcome. Caps are not collected or minimised across rules; each one lowers the running amount in turn.
 
-### Step 5: Capping pass
+### Step 5: Deducting pass
 
-For each capping rule in sorted order, evaluate its condition. If `conditionMet === true`, evaluate `effectConfig.cap` (either a constant or an AST expression over `fields`) to obtain `capCents`. Group caps by scope and take the minimum cap per scope. Apply: `scopeAmount = Math.min(scopeAmount, minCapCents)`. Clamp to `≥ 0`.
+For each deducting rule in ascending `rule.id` order, after all caps: `before = running[scope]`. If `conditionMet === true`, `after = Math.max(0, before - deductionAmount)`, `running[scope] = after` and `deductedCents = deductionAmount`. Otherwise `after = before`. Set `amountBeforeCents` and `amountAfterCents` on the outcome.
+
+> **Scope matching**: `effectConfig` for capping and deducting rules also carries a `scope: string` field identifying which `AmountScope.name` the rule applies to.
+
+Because caps run first, a deduction is taken from the already capped amount. Example (signature scenario): scope `total` starts at 48000; `line-item-cap` 48000 → 4800; `meal-limit` 4800 → 4800; `alcohol-deducting` 4800 → 4150.
 
 ### Step 6: Determine result and build Decision
 
@@ -463,7 +472,7 @@ For each capping rule in sorted order, evaluate its condition. If `conditionMet 
 - If any scope's final amount < its `claimedCents`: result is `"partially_approved"`.
 - Otherwise: result is `"approved"`.
 
-Collect `RuleOutcome` entries for all evaluated rules (deducting and capping), including those whose condition was `false`.
+Collect `RuleOutcome` entries for all evaluated rules (capping and deducting), including those whose condition was `false`. Blocking outcomes carry no amount fields.
 
 Return:
 
@@ -471,7 +480,7 @@ Return:
 {
   result,
   amountCents: totalAmountCents,
-  ruleOutcomes: [...blockingOutcomes, ...deductingOutcomes, ...cappingOutcomes]
+  ruleOutcomes: [...blockingOutcomes, ...cappingOutcomes, ...deductingOutcomes]
 }
 ```
 
@@ -695,7 +704,7 @@ This fixture exercises the full pipeline:
 
 **Expected Decision**: `partially_approved`, `amountCents: 4150` (4800 − 650).
 
-The `line-item-cap` rule applies a dynamic cap of 4800 (because `claimedTotalCents` 48000 ≠ `lineItemSumCents` 4800), then `alcohol-deducting` subtracts 650, yielding 4150. Evidence on both outcomes includes both `claimedTotalCents: 48000` and `lineItemSumCents: 4800`.
+The `line-item-cap` rule applies a dynamic cap of 4800 (because `claimedTotalCents` 48000 ≠ `lineItemSumCents` 4800), then `alcohol-deducting` subtracts 650, yielding 4150. With the scope starting at `claimedTotalCents` 48000, the outcomes record `line-item-cap` 48000 → 4800, `meal-limit` 4800 → 4800 and `alcohol-deducting` 4800 → 4150 (`amountBeforeCents` → `amountAfterCents`). Evidence on both outcomes includes both `claimedTotalCents: 48000` and `lineItemSumCents: 4800`.
 
 ---
 

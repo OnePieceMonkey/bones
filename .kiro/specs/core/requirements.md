@@ -93,9 +93,9 @@
 
 #### Acceptance Criteria
 
-1. WHEN `evaluate(fields, ruleSet, catalog, amountScopes)` is called, THE Evaluator SHALL apply every rule referenced by the RuleSet in the order: blocking rules first, then deducting rules, then capping rules, and return a Decision with a final amount in integer cents.
+1. WHEN `evaluate(fields, ruleSet, catalog, amountScopes)` is called, THE Evaluator SHALL apply every rule referenced by the RuleSet in the order: blocking rules first, then capping rules, then deducting rules, and return a Decision with a final amount in integer cents.
 2. WHEN any Blocking_Rule's condition evaluates to `true`, THE Evaluator SHALL immediately return a Decision with result `"rejected"`, attach Evidence for that rule, and skip all remaining rules regardless of type.
-3. IF no Blocking_Rule's condition evaluates to `true`, THEN THE Evaluator SHALL apply all Deducting_Rules and then apply Capping_Rules, taking the lowest cap per AmountScope.
+3. IF no Blocking_Rule's condition evaluates to `true`, THEN THE Evaluator SHALL first apply Capping_Rules one rule at a time in ascending `rule.id` order, each as the lower of the running amount of its AmountScope and the cap (`max(0, min(running, cap))`), and only then apply Deducting_Rules one rule at a time in ascending `rule.id` order.
 4. IF the final amount for any AmountScope after applying Deducting_Rules and Capping_Rules is less than the claimed total supplied for that scope in `amountScopes`, THEN THE Evaluator SHALL return a Decision with result `"partially_approved"`.
 5. IF no Deducting_Rule or Capping_Rule reduces the amount below the claimed total for any AmountScope, THEN THE Evaluator SHALL return a Decision with result `"approved"`.
 6. THE Evaluator SHALL ensure the final amount per AmountScope is always an integer number of cents that is greater than or equal to zero and less than or equal to the claimed total for that scope.

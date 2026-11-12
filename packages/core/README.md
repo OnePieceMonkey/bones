@@ -16,7 +16,7 @@ pnpm add @bones/core
 
 **Port injection** — `createTrace`, `replay`, and `override` receive a `KernelPorts` object (`{ clock, id, hasher }`). This keeps `evaluate()` a pure function — no I/O, no randomness, no `Date.now()`. Tests inject deterministic stubs so every trace is reproducible.
 
-**Rules as data** — Rules are plain JSON objects versioned with `MAJOR.MINOR.PATCH`. A `RuleSet` pins exact rule versions by `{ ruleId, ruleVersion }` references. The same `ValidatedFields` + same `RuleSet` version always produces the same `Decision`.
+**Rules as data** — Rules are plain JSON objects versioned with `MAJOR.MINOR.PATCH`. A `RuleSet` pins exact rule versions by `{ ruleId, ruleVersion }` references. The same `ValidatedFields` + same `RuleSet` version always produces the same `Decision`. Rules are evaluated in the order blocking, capping, deducting (ascending `rule.id` within each group). Capping and deducting outcomes carry `amountBeforeCents` and `amountAfterCents`, the running amount in the rule's scope before and after that rule (integer cents; absent on blocking outcomes).
 
 **Trace immutability** — `createTrace` returns a deep-frozen `Trace` object. Any mutation attempt throws in strict mode (or silently no-ops). Overrides never touch the original trace — they are separate linked records.
 
