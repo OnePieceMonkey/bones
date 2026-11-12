@@ -23,14 +23,14 @@ const deterministicPorts = {
   hasher: (_bytes: Uint8Array) => "a".repeat(64),
 };
 
-/** Load all 5 rules referenced by expense-v1 into a RuleCatalog. */
-function buildCatalog(): RuleCatalog {
+/** Load all 5 rules referenced by the given expense rule set into a RuleCatalog. */
+function buildCatalog(mealLimitVersion = "1.0.0"): RuleCatalog {
   const catalog: RuleCatalog = new Map<string, Rule>();
   const ruleFiles: Record<string, string> = {
     "date-blocking-before@1.0.0": "rules/date-blocking-before.json",
     "date-blocking-after@1.0.0": "rules/date-blocking-after.json",
     "alcohol-deducting@1.0.0": "rules/alcohol-deducting.json",
-    "meal-limit@1.0.0": "rules/meal-limit-v1.json",
+    [`meal-limit@${mealLimitVersion}`]: `rules/meal-limit-v${mealLimitVersion[0]}.json`,
     "line-item-cap@1.0.0": "rules/line-item-cap.json",
   };
   for (const [key, file] of Object.entries(ruleFiles)) {
@@ -51,10 +51,13 @@ const expenseFieldSchema = z.object({
 });
 
 describe("expense signature scenario (integration)", () => {
-  it("produces partially_approved with amountCents 4150", () => {
-    // Load rule set
-    const ruleSet = loadJSON<RuleSet>("rule-sets/expense-v1.json");
-    const catalog = buildCatalog();
+  it.each([
+    ["expense-v1", "1.0.0", 5000],
+    ["expense-v2", "2.0.0", 6000],
+    ["expense-v3", "3.0.0", 7500],
+  ])("%s produces partially_approved with amountCents 4150", (ruleSetName, mealVersion, mealCap) => {
+    const ruleSet = loadJSON<RuleSet>(`rule-sets/${ruleSetName}.json`);
+    const catalog = buildCatalog(mealVersion);
 
     // Load signature scenario fixture (what RecordedAdapter would return)
     const scenarioFixture = loadJSON<{
@@ -69,16 +72,14 @@ describe("expense signature scenario (integration)", () => {
     expect(isCoreError(validated)).toBe(false);
     if (isCoreError(validated)) return;
 
-    // The scope starts at lineItemSumCents (4800), not claimedTotalCents (48000).
-    // Evaluation order: deducting first, then capping.
-    //   1. alcohol-deducting fires (sum alcoholLineItems = 650 > 0) → 4800 - 650 = 4150
-    //   2. line-item-cap fires (claimedTotalCents 48000 ≠ lineItemSumCents 4800) → cap = 4800, min(4150, 4800) = 4150
-    //   3. meal-limit v1 fires (always-true) → cap = 5000, min(4150, 5000) = 4150
-    // Final: 4150, partially_approved (4150 < 4800 claimed)
+    // The scope starts at claimedTotalCents (48000). Order: blocking, capping, deducting.
+    //   1. line-item-cap: 48000 -> min(48000, 4800) = 4800
+    //   2. meal-limit: 4800 -> min(4800, cap) = 4800 (cap 5000 / 6000 / 7500 all above 4800)
+    //   3. alcohol-deducting: 4800 -> 4800 - 650 = 4150
     const amountScopes: AmountScope[] = [
       {
         name: "total",
-        claimedCents: scenarioFixture.proposedFields["lineItemSumCents"] as number,
+        claimedCents: scenarioFixture.proposedFields["claimedTotalCents"] as number,
       },
     ];
 
@@ -89,7 +90,30 @@ describe("expense signature scenario (integration)", () => {
 
     // Core assertions
     expect(decision.result).toBe("partially_approved");
+    // cap first: 48000 -> min(48000, 4800) = 4800; meal-limit no-op; then deduct 650: 4800 -> 4150
     expect(decision.amountCents).toBe(4150);
+    expect(mealCap).toBeGreaterThan(4800);
+
+    // Evaluation order: blocking, capping, deducting
+    expect(decision.ruleOutcomes.map((o) => o.ruleId)).toEqual([
+      "date-blocking-after",
+      "date-blocking-before",
+      "line-item-cap",
+      "meal-limit",
+      "alcohol-deducting",
+    ]);
+
+    // Per-rule amount flow
+    const byId = (id: string) => decision.ruleOutcomes.find((o) => o.ruleId === id)!;
+    // cap first: 48000 -> min(48000, 4800) = 4800
+    expect(byId("line-item-cap").amountBeforeCents).toBe(48000);
+    expect(byId("line-item-cap").amountAfterCents).toBe(4800);
+    // meal-limit: 4800 -> min(4800, cap) = 4800
+    expect(byId("meal-limit").amountBeforeCents).toBe(4800);
+    expect(byId("meal-limit").amountAfterCents).toBe(4800);
+    // then deduct 650: 4800 -> 4150
+    expect(byId("alcohol-deducting").amountBeforeCents).toBe(4800);
+    expect(byId("alcohol-deducting").amountAfterCents).toBe(4150);
 
     // Assert evidence on the line-item-cap outcome contains both totals
     const capOutcome = decision.ruleOutcomes.find((o) => o.ruleId === "line-item-cap");
@@ -126,8 +150,9 @@ describe("expense signature scenario (integration)", () => {
     if (isCoreError(trace)) return;
 
     expect(trace.result).toBe("partially_approved");
+    // 48000 -> cap 4800 -> meal-limit 4800 -> deduct 650 -> 4150
     expect(trace.amountCents).toBe(4150);
-    expect(trace.ruleSetVersion).toBe("1.0.0");
+    expect(trace.ruleSetVersion).toBe(ruleSet.version);
   });
 
   it("rejects when receipt date is before trip start", () => {
