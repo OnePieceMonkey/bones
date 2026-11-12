@@ -30,8 +30,8 @@ function renderTemplate(template: string, fields: ValidatedFields): string {
  * 1. Resolve all rule refs from catalog (fail fast on missing).
  * 2. Partition into blocking / deducting / capping; sort each bucket by rule.id.
  * 3. Blocking pass: first-fail-wins → "rejected".
- * 4. Deducting pass: subtract deductionAmount per scope, clamp ≥ 0.
- * 5. Capping pass: lowest cap per scope wins, then clamp ≥ 0.
+ * 4. Capping pass (by rule.id): running amount = max(0, min(running, cap)).
+ * 5. Deducting pass (by rule.id): running amount = max(0, running - deduction).
  * 6. Build Decision: "partially_approved" if any scope reduced, else "approved".
  */
 export function evaluate(
@@ -92,18 +92,66 @@ export function evaluate(
     }
   }
 
-  // ── Step 4: Deducting pass ─────────────────────────────────────────────────
+  // ── Step 4: Capping pass (before deducting; running amount per scope) ─────
+  for (const rule of capping) {
+    const condResult = evaluateCondition(rule.condition, fields);
+    if (isCoreError(condResult)) return condResult;
+    const { result: conditionMet, evidence } = condResult;
+    const renderedMessage = renderTemplate(rule.messageTemplate, fields);
+    const config = rule.effectConfig as CappingConfig;
+    const scope = config.scope;
+    const before = scopeAmounts.get(scope) ?? 0;
+    let after = before;
+    let appliedCapCents: number | undefined;
+
+    if (conditionMet) {
+      let capCents: number;
+      if (typeof config.cap === "number") {
+        capCents = config.cap;
+      } else {
+        // Dynamic cap: evaluate the AST expression
+        const capResult = evaluateCondition(config.cap, fields);
+        if (isCoreError(capResult)) return capResult;
+        const ev = capResult.evidence;
+        const sumKey = Object.keys(ev).find((k) => k.includes("_sum"));
+        if (sumKey !== undefined) {
+          capCents = Number(ev[sumKey]);
+        } else {
+          const numVal = Object.values(ev).find((v) => typeof v === "number");
+          capCents = typeof numVal === "number" ? numVal : 0;
+        }
+      }
+      after = Math.max(0, Math.min(before, capCents));
+      scopeAmounts.set(scope, after);
+      appliedCapCents = capCents;
+    }
+
+    outcomes.push({
+      ruleId: rule.id,
+      ruleVersion: rule.version,
+      effect: rule.effect,
+      conditionMet,
+      evidence,
+      renderedMessage,
+      amountBeforeCents: before,
+      amountAfterCents: after,
+      ...(appliedCapCents !== undefined ? { appliedCapCents } : {}),
+    });
+  }
+
+  // ── Step 5: Deducting pass ─────────────────────────────────────────────────
   for (const rule of deducting) {
     const condResult = evaluateCondition(rule.condition, fields);
     if (isCoreError(condResult)) return condResult;
     const { result: conditionMet, evidence } = condResult;
     const renderedMessage = renderTemplate(rule.messageTemplate, fields);
     const config = rule.effectConfig as DeductingConfig;
+    const scope = config.scope;
+    const before = scopeAmounts.get(scope) ?? 0;
+    let after = before;
     let deductedCents: number | undefined;
 
     if (conditionMet) {
-      const scope = config.scope;
-      const current = scopeAmounts.get(scope) ?? 0;
       let deductAmount: number;
       if (typeof config.deductionAmount === "number") {
         deductAmount = config.deductionAmount;
@@ -120,8 +168,8 @@ export function evaluate(
           deductAmount = typeof numVal === "number" ? numVal : 0;
         }
       }
-      const next = Math.max(0, current - deductAmount);
-      scopeAmounts.set(scope, next);
+      after = Math.max(0, before - deductAmount);
+      scopeAmounts.set(scope, after);
       deductedCents = deductAmount;
     }
 
@@ -132,64 +180,10 @@ export function evaluate(
       conditionMet,
       evidence,
       renderedMessage,
+      amountBeforeCents: before,
+      amountAfterCents: after,
       ...(deductedCents !== undefined ? { deductedCents } : {}),
     });
-  }
-
-  // ── Step 5: Capping pass (lowest cap per scope wins) ──────────────────────
-  const minCapsPerScope = new Map<string, number>();
-
-  for (const rule of capping) {
-    const condResult = evaluateCondition(rule.condition, fields);
-    if (isCoreError(condResult)) return condResult;
-    const { result: conditionMet, evidence } = condResult;
-    const renderedMessage = renderTemplate(rule.messageTemplate, fields);
-    const config = rule.effectConfig as CappingConfig;
-    let appliedCapCents: number | undefined;
-
-    if (conditionMet) {
-      let capCents: number;
-      if (typeof config.cap === "number") {
-        capCents = config.cap;
-      } else {
-        // Dynamic cap: evaluate the AST expression
-        const capResult = evaluateCondition(config.cap, fields);
-        if (isCoreError(capResult)) return capResult;
-        // Find the computed sum in evidence (keyed with "_sum" suffix from ast.ts)
-        const ev = capResult.evidence;
-        const sumKey = Object.keys(ev).find((k) => k.includes("_sum"));
-        if (sumKey !== undefined) {
-          capCents = Number(ev[sumKey]);
-        } else {
-          // Fall back: first numeric value in evidence
-          const numVal = Object.values(ev).find((v) => typeof v === "number");
-          capCents = typeof numVal === "number" ? numVal : 0;
-        }
-      }
-
-      const scope = config.scope;
-      const existing = minCapsPerScope.get(scope);
-      if (existing === undefined || capCents < existing) {
-        minCapsPerScope.set(scope, capCents);
-      }
-      appliedCapCents = capCents;
-    }
-
-    outcomes.push({
-      ruleId: rule.id,
-      ruleVersion: rule.version,
-      effect: rule.effect,
-      conditionMet,
-      evidence,
-      renderedMessage,
-      ...(appliedCapCents !== undefined ? { appliedCapCents } : {}),
-    });
-  }
-
-  // Apply minimum caps
-  for (const [scope, cap] of minCapsPerScope) {
-    const current = scopeAmounts.get(scope) ?? 0;
-    scopeAmounts.set(scope, Math.min(current, Math.max(0, cap)));
   }
 
   // ── Step 6: Build Decision ─────────────────────────────────────────────────
