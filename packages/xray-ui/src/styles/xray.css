@@ -183,3 +183,64 @@
 .xr-tip-row { display: flex; gap: var(--xr-space-2); }
 .xr-tip-row dt { color: var(--xr-text-dim); }
 .xr-tip-row dd { margin: 0; }
+
+/* Answer card */
+.xr-answer {
+  position: relative;
+  padding: var(--xr-space-3);
+  background: rgba(10, 24, 32, 0.7);
+  border: 1px solid var(--xr-cyan-glow);
+  border-radius: var(--xr-radius);
+  color: var(--xr-text);
+  overflow: hidden;
+}
+.xr-answer-head { margin-bottom: var(--xr-space-2); font-weight: 700; letter-spacing: 0.08em; }
+.xr-answer-fields { margin: 0; }
+.xr-field { display: flex; gap: var(--xr-space-3); padding: var(--xr-space-1) 0; }
+.xr-field dt { min-width: 30%; color: var(--xr-text-dim); }
+.xr-field dd { margin: 0; }
+.xr-conf { margin-left: var(--xr-space-2); font-size: 11px; color: var(--xr-text-muted); }
+.xr-badge {
+  margin-left: var(--xr-space-2);
+  padding: 0 var(--xr-space-1);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--xr-bg-red-fill);
+  color: var(--xr-text-on-red);
+  border-radius: 2px;
+}
+.xr-crack-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.xr-crack-overlay path { fill: none; vector-effect: non-scaling-stroke; }
+.xr-crack-line { stroke: var(--xr-red); stroke-width: 2; filter: drop-shadow(0 0 4px var(--xr-red-glow)); }
+.xr-crack-glass { stroke: #ffffff; stroke-width: 1; opacity: 0.6; transform: translate(1px, 1px); }
+.xr-stamp {
+  position: absolute;
+  right: var(--xr-space-3);
+  bottom: var(--xr-space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--xr-space-1) var(--xr-space-3);
+  background: var(--xr-bg-stamp);
+  color: var(--xr-text-stamp);
+  border: 3px double var(--xr-text-stamp);
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.xr-stamp-title { font-weight: 700; letter-spacing: 0.12em; }
+.xr-stamp-bones { font-size: 11px; }
+
+@keyframes xr-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+@keyframes xr-stamp-in {
+  from { transform: rotate(-12deg) scale(2); opacity: 0; }
+  to { transform: rotate(-12deg) scale(1); opacity: 1; }
+}
+.anim-shake { animation: xr-shake 0.35s ease-in-out 1; }
+.anim-stamp { animation: xr-stamp-in 0.3s ease-out 1 both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-shake, .anim-stamp { animation: none; }
+}
