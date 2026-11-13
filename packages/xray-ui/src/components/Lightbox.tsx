@@ -1,12 +1,9 @@
-import type { ReactNode } from "react";
+import type { LightboxProps } from "../types";
 
-export interface LightboxProps {
-  title?: string;
-  children?: ReactNode;
-  className?: string;
-}
+// `xray` stays optional until task 13.1 wires XrayView to it.
+export type LightboxComponentProps = Omit<LightboxProps, "xray"> & { xray?: boolean };
 
-export function Lightbox({ title, children, className }: LightboxProps) {
+export function Lightbox({ title, children, className }: LightboxComponentProps) {
   const classes = ["xr-lightbox", className].filter(Boolean).join(" ");
   return (
     <section className={classes} aria-label={title ?? "X-ray viewer"}>
