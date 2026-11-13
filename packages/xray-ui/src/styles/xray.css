@@ -244,3 +244,52 @@
 @media (prefers-reduced-motion: reduce) {
   .anim-shake, .anim-stamp { animation: none; }
 }
+/* Dr. Bones chat */
+.xr-chat {
+  display: flex;
+  flex-direction: column;
+  background: var(--xr-bg-panel);
+  border: 1px solid var(--xr-cyan-glow);
+  border-radius: var(--xr-radius);
+  color: var(--xr-text);
+}
+.xr-chat-head { display: flex; align-items: center; gap: var(--xr-space-2); padding: var(--xr-space-2) var(--xr-space-3); border-bottom: 1px solid var(--xr-cyan-glow); }
+.xr-chat-title { margin: 0; font-size: 14px; letter-spacing: 0.06em; }
+.xr-avatar-ring { fill: var(--xr-bg-plate); stroke: var(--xr-cyan); stroke-width: 1.5; }
+.xr-avatar-skull { fill: var(--xr-text); }
+.xr-avatar-eye { fill: var(--xr-bg-deep); }
+.xr-avatar-teeth { fill: none; stroke: var(--xr-bg-deep); stroke-width: 1.2; }
+.xr-chat-log { display: flex; flex-direction: column; gap: var(--xr-space-2); padding: var(--xr-space-3); overflow-y: auto; }
+.xr-bubble {
+  align-self: flex-start;
+  max-width: 90%;
+  padding: var(--xr-space-2) var(--xr-space-3);
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+  border-radius: var(--xr-radius);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.xr-bubble--fracture { border-left: 3px solid var(--xr-red); }
+.xr-bubble--result { border-left: 3px solid var(--xr-cyan); }
+.xr-typing-dots { display: inline-flex; gap: 4px; align-items: center; min-height: 1em; }
+.xr-typing-dots > span { width: 6px; height: 6px; border-radius: 50%; background: var(--xr-text-dim); }
+@keyframes xr-dots-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+}
+.anim-dots > span { animation: xr-dots-bounce 1s ease-in-out infinite; }
+.anim-dots > span:nth-child(2) { animation-delay: 0.15s; }
+.anim-dots > span:nth-child(3) { animation-delay: 0.3s; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-dots > span { animation: none; }
+}
+.xr-chat-actions { display: flex; gap: var(--xr-space-2); padding: var(--xr-space-2) var(--xr-space-3); border-top: 1px solid var(--xr-cyan-glow); }
+.xr-chat-btn {
+  padding: var(--xr-space-1) var(--xr-space-3);
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+  border: 1px solid var(--xr-cyan);
+  border-radius: var(--xr-radius);
+  cursor: pointer;
+}
