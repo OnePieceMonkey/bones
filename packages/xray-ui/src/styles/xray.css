@@ -1,0 +1,52 @@
+/* Bone glyph and button */
+.xr-bone-body,
+.xr-bone-end {
+  fill: rgba(5, 9, 13, 0.6);
+  stroke-width: 2;
+}
+.xr-bone--passed .xr-bone-body,
+.xr-bone--passed .xr-bone-end { stroke: var(--xr-cyan); }
+.xr-bone--not-applicable .xr-bone-body,
+.xr-bone--not-applicable .xr-bone-end { stroke: var(--xr-text-muted); stroke-dasharray: 4 3; }
+.xr-bone--fractured .xr-bone-body,
+.xr-bone--fractured .xr-bone-end { stroke: var(--xr-red); }
+
+.xr-glow-cyan { filter: drop-shadow(0 0 4px var(--xr-cyan-glow)); }
+.xr-glow-red { filter: drop-shadow(0 0 6px var(--xr-red-glow)); }
+
+.xr-bone-icon { font-size: 12px; fill: var(--xr-text); }
+.xr-bone--not-applicable .xr-bone-icon { fill: var(--xr-text-muted); }
+.xr-bone--fractured .xr-bone-icon { fill: var(--xr-red); }
+
+.xr-crack { stroke: var(--xr-red); stroke-width: 1.5; }
+.xr-splinter { fill: var(--xr-red); }
+.xr-pulse-ring { stroke: var(--xr-red); stroke-width: 2; opacity: 0.6; }
+
+.xr-bone-btn {
+  position: absolute;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 56px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--xr-text);
+  font: inherit;
+  cursor: pointer;
+}
+.xr-bone-btn:focus-visible { outline: 2px solid var(--xr-focus); outline-offset: 2px; }
+.xr-bone-cue { font-size: 12px; line-height: 1; }
+.xr-bone-state { font-size: 9px; line-height: 1.1; text-align: center; margin-top: 14px; }
+.xr-bone-btn[data-state="not-applicable"] { color: var(--xr-text-muted); }
+.xr-bone-btn[data-state="fractured"] { color: var(--xr-red); }
+
+@keyframes xr-pulse {
+  from { transform: scale(0.8); opacity: 0.8; }
+  to { transform: scale(1.3); opacity: 0; }
+}
+.anim-pulse { transform-box: fill-box; transform-origin: center; animation: xr-pulse 1.4s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-pulse { animation: none; }
+}
