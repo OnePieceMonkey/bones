@@ -1,0 +1,31 @@
+:root,
+.xr-root {
+  --xr-bg-deep: #05090d;        /* lightbox viewing area */
+  --xr-bg-panel: #0b1620;       /* chat, answer card, strip background */
+  --xr-bg-plate: #1b2a35;       /* result plate, tooltip, chips */
+  --xr-bg-paper: #f1ead8;       /* "ordinary document" mode */
+  --xr-bg-metal-light: #c9d1d6; /* title plate */
+  --xr-bg-metal-dark: #3a444b;
+  --xr-bg-stamp: #3a0f14;       /* stamp / badge background */
+  --xr-bg-cyan-fill: #7fe9ff;   /* "X-RAY ON" pill, lit lamp label */
+  --xr-bg-red-fill: #a3121f;    /* strong red label background */
+
+  --xr-text: #d6f6ff;
+  --xr-text-dim: #9cc2d0;
+  --xr-text-muted: #8fa9b5;     /* not-applicable bones */
+  --xr-text-on-plate: #e8f4f8;
+  --xr-text-on-metal: #14202a;
+  --xr-text-on-paper: #1a1a1a;
+  --xr-text-on-cyan: #0a1218;
+  --xr-text-on-red: #ffffff;
+  --xr-text-stamp: #ffd0d0;
+
+  --xr-cyan: #3de8ff;
+  --xr-cyan-glow: rgba(61, 232, 255, 0.55);
+  --xr-red: #ff7a7a;
+  --xr-red-glow: rgba(255, 90, 90, 0.65);
+  --xr-focus: #ffffff;
+
+  --xr-space-1: 4px; --xr-space-2: 8px; --xr-space-3: 16px; --xr-space-4: 24px;
+  --xr-radius: 6px;
+}
