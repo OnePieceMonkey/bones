@@ -72,6 +72,48 @@
 }
 .xr-bone-slot .xr-bone-btn { position: static; width: 100%; height: 100%; }
 
+/* ECG line */
+.xr-ecg { position: relative; width: 100%; aspect-ratio: 560 / 60; }
+.xr-ecg-svg { display: block; width: 100%; height: 100%; overflow: hidden; }
+.xr-ecg-line { stroke: var(--xr-cyan); stroke-width: 1.5; filter: drop-shadow(0 0 3px var(--xr-cyan-glow)); }
+.xr-ecg-line--flat { stroke: var(--xr-text-muted); filter: none; }
+.xr-ecg-spike { stroke: var(--xr-red); stroke-width: 2; filter: drop-shadow(0 0 5px var(--xr-red-glow)); }
+.xr-ecg-label {
+  position: absolute;
+  right: var(--xr-space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--xr-red);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.xr-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes xr-ecg-scroll {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -24; }
+}
+@keyframes xr-ecg-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.anim-ecg-scroll { stroke-dasharray: 560; animation: xr-ecg-scroll 3s linear infinite; }
+.anim-ecg-flash { animation: xr-ecg-flash 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-ecg-scroll, .anim-ecg-flash { animation: none; }
+}
+
 /* Tooltip */
 .xr-tooltip {
   position: absolute;
