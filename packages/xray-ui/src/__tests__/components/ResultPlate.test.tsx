@@ -24,6 +24,46 @@ describe("ResultPlate", () => {
     expect(iconEl).toHaveTextContent(icon);
   });
 
+  it.each(cases)("renders the exact label text for %s", (result, _icon, label) => {
+    const trace = { ...signatureTrace(), result };
+    const { container } = render(<ResultPlate trace={trace} anatomy={signatureAnatomy()} />);
+    expect(container.querySelector(".xr-result-label")?.textContent).toBe(label);
+  });
+
+  it("calls formatValue with path amountCents and the integer cents value", () => {
+    const calls: Array<[string, unknown]> = [];
+    const anatomy = {
+      ...signatureAnatomy(),
+      formatValue: (p: string, v: unknown) => {
+        calls.push([p, v]);
+        return "custom";
+      },
+    };
+    const trace = { ...signatureTrace(), amountCents: 4200 };
+    const { container } = render(<ResultPlate trace={trace} anatomy={anatomy} />);
+    expect(calls).toContainEqual(["amountCents", 4200]);
+    expect(container.querySelector(".xr-result-amount")?.textContent).toBe("custom");
+  });
+
+  it("falls back to the default formatter when formatValue throws", () => {
+    const anatomy = {
+      ...signatureAnatomy(),
+      formatValue: () => {
+        throw new Error("boom");
+      },
+    };
+    const trace = { ...signatureTrace(), amountCents: 777 };
+    const { container } = render(<ResultPlate trace={trace} anatomy={anatomy} />);
+    expect(container.querySelector(".xr-result-amount")?.textContent).toBe("777");
+  });
+
+  it("renders a zero amount", () => {
+    const { formatValue: _omit, ...anatomy } = signatureAnatomy();
+    const trace = { ...signatureTrace(), result: "rejected" as const, amountCents: 0 };
+    const { container } = render(<ResultPlate trace={trace} anatomy={anatomy} />);
+    expect(container.querySelector(".xr-result-amount")?.textContent).toBe("0");
+  });
+
   it("uses the default formatter when formatValue is absent", () => {
     const { formatValue: _omit, ...anatomy } = signatureAnatomy();
     const trace = { ...signatureTrace(), amountCents: 500 };
