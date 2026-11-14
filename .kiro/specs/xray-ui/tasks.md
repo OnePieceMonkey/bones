@@ -345,32 +345,32 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - **Property 6: Needle angle is monotone and bounded**
     - **Validates: Requirements 7.10, 7.11**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 6 needle angle"`
-  - [-] 16.7 Write property test for hash visuals
+  - [x] 16.7 Write property test for hash visuals
     - `hash.test.ts`
     - **Property 7: Hash-derived visuals are deterministic and bounded**
     - **Validates: Requirements 2.8, 5.3, 10.2**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 7 hash visuals"`
-  - [-] 16.8 Write property test for gauge value
+  - [x] 16.8 Write property test for gauge value
     - `gauge-value.test.ts`
     - **Property 8: Gauge value is a valid confidence or null**
     - **Validates: Requirements 7.8, 7.9, 7.10**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 8 gauge value"`
-  - [-] 16.9 Write property test for bone partition
+  - [x] 16.9 Write property test for bone partition
     - `bone-partition.test.ts`: passed includes capping and deducting outcomes with `conditionMet` true that did not lower the amount
     - **Property 9: One bone per anatomy entry, partitioned into three states**
     - **Validates: Requirements 2.2, 2.4, 2.5, 2.6, 2.7, 2.17, 2.18**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 9 bone partition"`
-  - [ ] 16.10 Write property test for layout
+  - [-] 16.10 Write property test for layout
     - `layout.test.ts`
     - **Property 10: Layout depends only on region order and stays inside the region**
     - **Validates: Requirements 2.3**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 10 layout"`
-  - [ ] 16.11 Write property test for the ECG model
+  - [-] 16.11 Write property test for the ECG model
     - `ecg-model.test.ts`
     - **Property 11: ECG model matches fractures and rejection**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 11 ECG model"`
-  - [ ] 16.12 Write property test for knob stepping
+  - [-] 16.12 Write property test for knob stepping
     - `step-version.test.ts`
     - **Property 12: Knob stepping never leaves the version list**
     - **Validates: Requirements 7.3, 7.4, 7.5**
