@@ -315,32 +315,32 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
 
 - [~] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
   - If a property test fails, fix the implementation, not the property. Keep a short list of bugs found by property tests in `.kiro/specs/xray-ui/bugs-found.md`.
-  - [-] 16.1 Write property test for fractured bone count
+  - [x] 16.1 Write property test for fractured bone count
     - `fracture-count.test.tsx`: generated traces include blocking outcomes, capping and deducting outcomes with equal and with lower `amountAfterCents`, and such outcomes without amount fields; count `[data-state="fractured"]` against the outcomes that satisfy `isFracture` and whose rule is mapped
     - **Property 1: Fractured bone count equals mapped fractured outcomes**
     - **Validates: Requirements 2.5, 2.7, 18.2, 18.11, 18.12**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 1 fracture count"`
-  - [-] 16.2 Write property test for render determinism
+  - [x] 16.2 Write property test for render determinism
     - `render-determinism.test.tsx`
     - **Property 2: Render determinism**
     - **Validates: Requirements 10.1, 10.4, 18.3**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 2 render determinism"`
-  - [-] 16.3 Write property test for chat text source
+  - [x] 16.3 Write property test for chat text source
     - `chat-source.test.tsx` (reduced motion, DOM order equals `buildChatMessages` texts; each text equals a `TEMPLATES` output; builder is deterministic; network spy records zero calls)
     - **Property 3: Chat text comes only from the builder and fixed templates**
     - **Validates: Requirements 6.2, 6.3, 6.4, 6.5, 6.12, 14.1, 18.4, 18.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 3 chat text source"`
-  - [-] 16.4 Write property test for reduced motion
+  - [x] 16.4 Write property test for reduced motion
     - `reduced-motion.test.tsx` (no `/(^|\s)anim-/` class anywhere, no typing dots, full text, `onMessagesComplete` called, each bone has icon and text cue)
     - **Property 4: Reduced motion removes all animation and shows full text**
     - **Validates: Requirements 11.3, 11.4, 11.5, 11.6, 6.7, 18.6**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 4 reduced motion"`
-  - [ ] 16.5 Write property test for reorder invariance
+  - [-] 16.5 Write property test for reorder invariance
     - `reorder-invariance.test.ts`
     - **Property 5: Bone states are invariant under reordering of outcomes**
     - **Validates: Requirements 2.5, 2.6, 2.7, 10.4**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 5 reorder invariance"`
-  - [ ] 16.6 Write property test for needle angle
+  - [-] 16.6 Write property test for needle angle
     - `needle-angle.test.ts`
     - **Property 6: Needle angle is monotone and bounded**
     - **Validates: Requirements 7.10, 7.11**
