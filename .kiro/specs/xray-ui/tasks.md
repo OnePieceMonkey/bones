@@ -335,27 +335,27 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - **Property 4: Reduced motion removes all animation and shows full text**
     - **Validates: Requirements 11.3, 11.4, 11.5, 11.6, 6.7, 18.6**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 4 reduced motion"`
-  - [-] 16.5 Write property test for reorder invariance
+  - [x] 16.5 Write property test for reorder invariance
     - `reorder-invariance.test.ts`
     - **Property 5: Bone states are invariant under reordering of outcomes**
     - **Validates: Requirements 2.5, 2.6, 2.7, 10.4**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 5 reorder invariance"`
-  - [-] 16.6 Write property test for needle angle
+  - [x] 16.6 Write property test for needle angle
     - `needle-angle.test.ts`
     - **Property 6: Needle angle is monotone and bounded**
     - **Validates: Requirements 7.10, 7.11**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 6 needle angle"`
-  - [ ] 16.7 Write property test for hash visuals
+  - [-] 16.7 Write property test for hash visuals
     - `hash.test.ts`
     - **Property 7: Hash-derived visuals are deterministic and bounded**
     - **Validates: Requirements 2.8, 5.3, 10.2**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 7 hash visuals"`
-  - [ ] 16.8 Write property test for gauge value
+  - [-] 16.8 Write property test for gauge value
     - `gauge-value.test.ts`
     - **Property 8: Gauge value is a valid confidence or null**
     - **Validates: Requirements 7.8, 7.9, 7.10**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 8 gauge value"`
-  - [ ] 16.9 Write property test for bone partition
+  - [-] 16.9 Write property test for bone partition
     - `bone-partition.test.ts`: passed includes capping and deducting outcomes with `conditionMet` true that did not lower the amount
     - **Property 9: One bone per anatomy entry, partitioned into three states**
     - **Validates: Requirements 2.2, 2.4, 2.5, 2.6, 2.7, 2.17, 2.18**
