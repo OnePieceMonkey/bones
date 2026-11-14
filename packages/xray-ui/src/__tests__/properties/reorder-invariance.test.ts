@@ -6,7 +6,7 @@ import { arbTraceAndAnatomy } from "../helpers/arbitraries";
 
 const arbCase = arbTraceAndAnatomy.chain((c) =>
   fc
-    .shuffledSubarray(c.trace.ruleOutcomes, {
+    .shuffledSubarray([...c.trace.ruleOutcomes], {
       minLength: c.trace.ruleOutcomes.length,
       maxLength: c.trace.ruleOutcomes.length,
     })
