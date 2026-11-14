@@ -360,27 +360,27 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - **Property 9: One bone per anatomy entry, partitioned into three states**
     - **Validates: Requirements 2.2, 2.4, 2.5, 2.6, 2.7, 2.17, 2.18**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 9 bone partition"`
-  - [-] 16.10 Write property test for layout
+  - [x] 16.10 Write property test for layout
     - `layout.test.ts`
     - **Property 10: Layout depends only on region order and stays inside the region**
     - **Validates: Requirements 2.3**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 10 layout"`
-  - [-] 16.11 Write property test for the ECG model
+  - [x] 16.11 Write property test for the ECG model
     - `ecg-model.test.ts`
     - **Property 11: ECG model matches fractures and rejection**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 11 ECG model"`
-  - [-] 16.12 Write property test for knob stepping
+  - [x] 16.12 Write property test for knob stepping
     - `step-version.test.ts`
     - **Property 12: Knob stepping never leaves the version list**
     - **Validates: Requirements 7.3, 7.4, 7.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 12 knob stepping"`
-  - [ ] 16.13 Write property test for overruled fields
+  - [-] 16.13 Write property test for overruled fields
     - `overruled-fields.test.tsx` (selector sets, `fieldViews` flags, `n/a` confidence, AnswerCard overlay and stamp iff non-empty)
     - **Property 13: Overruled fields are exactly the evidence keys of fractured bones**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 13 overruled fields"`
-  - [ ] 16.14 Write property test for the default formatter
+  - [-] 16.14 Write property test for the default formatter
     - `default-format.test.ts` (use `fc.anything()` plus cyclic and symbol values; throwing `formatValue`)
     - **Property 14: Default formatter is total**
     - **Validates: Requirements 2.16, 8.5**

@@ -887,6 +887,11 @@
         "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
         "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
         "timestamp": 1794693818280
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693883138
       }
     ],
     "16.11 Write property test for the ECG model": [
@@ -894,6 +899,11 @@
         "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
         "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
         "timestamp": 1794693818944
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693883886
       }
     ],
     "16.12 Write property test for knob stepping": [
@@ -901,6 +911,25 @@
         "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
         "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
         "timestamp": 1794693819435
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693884437
+      }
+    ],
+    "16.13 Write property test for overruled fields": [
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693887550
+      }
+    ],
+    "16.14 Write property test for the default formatter": [
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693887636
       }
     ]
   }
