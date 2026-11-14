@@ -3,6 +3,10 @@
     "16.2 Write property test for render determinism": {
       "status": "passed",
       "lastRunTimestamp": 1794693675142
+    },
+    "16.4 Write property test for reduced motion": {
+      "status": "passed",
+      "lastRunTimestamp": 1794693695595
     }
   },
   "executionHistory": {
