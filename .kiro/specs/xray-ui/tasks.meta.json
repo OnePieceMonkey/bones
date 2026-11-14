@@ -1,5 +1,10 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "16.2 Write property test for render determinism": {
+      "status": "passed",
+      "lastRunTimestamp": 1794693675142
+    }
+  },
   "executionHistory": {
     "0.1 Add the amount fields to `RuleOutcome`": [
       {
@@ -721,6 +726,76 @@
         "executionId": "64543865-0116-4a6a-989f-714399f1f822",
         "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
         "timestamp": 1794638125440
+      }
+    ],
+    "10.2 Write component tests for DrBonesChat": [
+      {
+        "executionId": "2f14190a-9272-480c-a7c3-b24ac755a62b",
+        "chatSessionId": "sess_c8aa8db4-a3aa-480e-a726-2db3e6b45997",
+        "timestamp": 1794638152101
+      },
+      {
+        "executionId": "2f14190a-9272-480c-a7c3-b24ac755a62b",
+        "chatSessionId": "sess_c8aa8db4-a3aa-480e-a726-2db3e6b45997",
+        "timestamp": 1794638257080
+      }
+    ],
+    "16.1 Write property test for fractured bone count": [
+      {
+        "executionId": "f63efe55-dbc3-46c2-933a-e7694aa7160a",
+        "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
+        "timestamp": 1794693117067
+      }
+    ],
+    "16.2 Write property test for render determinism": [
+      {
+        "executionId": "f63efe55-dbc3-46c2-933a-e7694aa7160a",
+        "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
+        "timestamp": 1794693117156
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693646638
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693647318
+      }
+    ],
+    "16.3 Write property test for chat text source": [
+      {
+        "executionId": "f63efe55-dbc3-46c2-933a-e7694aa7160a",
+        "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
+        "timestamp": 1794693117208
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693646702
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693648112
+      }
+    ],
+    "16.4 Write property test for reduced motion": [
+      {
+        "executionId": "f63efe55-dbc3-46c2-933a-e7694aa7160a",
+        "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
+        "timestamp": 1794693117257
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693646752
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693648534
       }
     ]
   }

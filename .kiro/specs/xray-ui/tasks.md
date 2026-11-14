@@ -235,7 +235,7 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - `src/components/DrBonesChat.tsx`: panel with avatar and "Dr. Bones · Radiologist"; `role="log"` with `aria-live="polite"`; inner component keyed by `messagesKey`; typing-dots phase (`DOTS_MS = 600`) then `useTypewriter`; reduced motion shows all bubbles at once and calls `onMessagesComplete` once; bubbles use `white-space: pre-line`; optional "Replay decision" and "Human override" buttons, no footer when neither callback is given; no I/O imports
     - _Requirements: 6.1, 6.6, 6.7, 6.8, 6.9, 6.10, 6.11, 6.12, 11.3_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add DrBonesChat"`
-  - [~] 10.2 Write component tests for DrBonesChat
+  - [x] 10.2 Write component tests for DrBonesChat
     - `src/__tests__/components/DrBonesChat.test.tsx` with fake timers: title text; log role and `aria-live`; dots then characters; no text node for a message during its dots phase; completion callback fires once; buttons conditional and calling their callbacks; no footer without callbacks; reduced motion shows full text immediately
     - _Requirements: 6.1, 6.6, 6.7, 6.8, 6.9, 6.10, 6.11, 11.3_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): component tests for DrBonesChat"`
@@ -313,24 +313,24 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
 - [x] 15. Checkpoint - components
   - Run `pnpm --filter @bones/xray-ui test` and `pnpm typecheck` from the repo root. Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
+- [~] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
   - If a property test fails, fix the implementation, not the property. Keep a short list of bugs found by property tests in `.kiro/specs/xray-ui/bugs-found.md`.
-  - [ ] 16.1 Write property test for fractured bone count
+  - [-] 16.1 Write property test for fractured bone count
     - `fracture-count.test.tsx`: generated traces include blocking outcomes, capping and deducting outcomes with equal and with lower `amountAfterCents`, and such outcomes without amount fields; count `[data-state="fractured"]` against the outcomes that satisfy `isFracture` and whose rule is mapped
     - **Property 1: Fractured bone count equals mapped fractured outcomes**
     - **Validates: Requirements 2.5, 2.7, 18.2, 18.11, 18.12**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 1 fracture count"`
-  - [ ] 16.2 Write property test for render determinism
+  - [-] 16.2 Write property test for render determinism
     - `render-determinism.test.tsx`
     - **Property 2: Render determinism**
     - **Validates: Requirements 10.1, 10.4, 18.3**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 2 render determinism"`
-  - [ ] 16.3 Write property test for chat text source
+  - [-] 16.3 Write property test for chat text source
     - `chat-source.test.tsx` (reduced motion, DOM order equals `buildChatMessages` texts; each text equals a `TEMPLATES` output; builder is deterministic; network spy records zero calls)
     - **Property 3: Chat text comes only from the builder and fixed templates**
     - **Validates: Requirements 6.2, 6.3, 6.4, 6.5, 6.12, 14.1, 18.4, 18.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 3 chat text source"`
-  - [ ] 16.4 Write property test for reduced motion
+  - [-] 16.4 Write property test for reduced motion
     - `reduced-motion.test.tsx` (no `/(^|\s)anim-/` class anywhere, no typing dots, full text, `onMessagesComplete` called, each bone has icon and text cue)
     - **Property 4: Reduced motion removes all animation and shows full text**
     - **Validates: Requirements 11.3, 11.4, 11.5, 11.6, 6.7, 18.6**
