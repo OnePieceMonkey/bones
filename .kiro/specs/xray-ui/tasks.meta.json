@@ -923,6 +923,11 @@
         "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
         "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
         "timestamp": 1794693887550
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693939414
       }
     ],
     "16.14 Write property test for the default formatter": [
@@ -930,6 +935,185 @@
         "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
         "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
         "timestamp": 1794693887636
+      },
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693939885
+      }
+    ],
+    "16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)": [
+      {
+        "executionId": "88b18d2e-5759-47a7-93e0-bd221ba0aea2",
+        "chatSessionId": "sess_862347d4-0b9c-48bd-a103-c562b38f0ab5",
+        "timestamp": 1794693939941
+      }
+    ],
+    "17.1 Write the domain-isolation test": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694000124
+      },
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694053351
+      }
+    ],
+    "17.2 Write the contrast test": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694053779
+      },
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694085658
+      }
+    ],
+    "17.3 Write the source-hygiene test": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694086101
+      },
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694114053
+      }
+    ],
+    "17.4 Write the no-network test": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694113704
+      },
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694149512
+      }
+    ],
+    "17.5 Write the accessibility role test": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694149998
+      },
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694493137
+      }
+    ],
+    "17. Guard tests": [
+      {
+        "executionId": "8ddeba4a-3111-456f-9c35-e41edabd2b0d",
+        "chatSessionId": "sess_fac353e9-53d9-420c-9983-63e041acfae7",
+        "timestamp": 1794694493227
+      }
+    ],
+    "18.1 Create `demo/anatomy.ts`": [
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694595819
+      },
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694631193
+      }
+    ],
+    "18.2 Create `demo/demoTrace.ts`": [
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694631644
+      },
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694678921
+      }
+    ],
+    "18.3 Create the demo page and `dev` script": [
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694679359
+      },
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694718156
+      }
+    ],
+    "18.4 Write the demo smoke test": [
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694718714
+      },
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694825784
+      }
+    ],
+    "18. Demo": [
+      {
+        "executionId": "64d9c411-30aa-4898-a83b-b08076e45a04",
+        "chatSessionId": "sess_8e98d7a7-e8cd-4852-bbca-7f9a77a2faa2",
+        "timestamp": 1794694825857
+      }
+    ],
+    "19.1 Write the final `src/index.ts`": [
+      {
+        "executionId": "dab2cfc8-8943-4932-851b-3d64ca0b3446",
+        "chatSessionId": "sess_6266ff0f-7ba1-459b-9cc2-3c918c68c661",
+        "timestamp": 1794694839113
+      },
+      {
+        "executionId": "dab2cfc8-8943-4932-851b-3d64ca0b3446",
+        "chatSessionId": "sess_6266ff0f-7ba1-459b-9cc2-3c918c68c661",
+        "timestamp": 1794694893852
+      }
+    ],
+    "19. Public barrel": [
+      {
+        "executionId": "dab2cfc8-8943-4932-851b-3d64ca0b3446",
+        "chatSessionId": "sess_6266ff0f-7ba1-459b-9cc2-3c918c68c661",
+        "timestamp": 1794694893943
+      }
+    ],
+    "20.1 Write `packages/xray-ui/README.md`": [
+      {
+        "executionId": "34bccc3b-fe8a-42a0-84b9-1d3977a80d32",
+        "chatSessionId": "sess_4f6d0508-124b-43fc-a227-2b52f4aba8f0",
+        "timestamp": 1794696463135
+      },
+      {
+        "executionId": "34bccc3b-fe8a-42a0-84b9-1d3977a80d32",
+        "chatSessionId": "sess_4f6d0508-124b-43fc-a227-2b52f4aba8f0",
+        "timestamp": 1794696507915
+      }
+    ],
+    "20. Documentation": [
+      {
+        "executionId": "34bccc3b-fe8a-42a0-84b9-1d3977a80d32",
+        "chatSessionId": "sess_4f6d0508-124b-43fc-a227-2b52f4aba8f0",
+        "timestamp": 1794696507953
+      }
+    ],
+    "21. Final checkpoint": [
+      {
+        "executionId": "e187e978-f135-473c-a0bb-b6fca627c42e",
+        "chatSessionId": "sess_bba3637a-85a2-4991-a57d-f530f6694eb5",
+        "timestamp": 1794696531855
       }
     ]
   }

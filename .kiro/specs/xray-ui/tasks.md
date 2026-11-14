@@ -313,7 +313,7 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
 - [x] 15. Checkpoint - components
   - Run `pnpm --filter @bones/xray-ui test` and `pnpm typecheck` from the repo root. Ensure all tests pass, ask the user if questions arise.
 
-- [~] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
+- [x] 16. Property tests (each in its own file under `src/__tests__/properties/`, `numRuns >= 100`, tag comment `// Feature: xray-ui, Property N: <title>`)
   - If a property test fails, fix the implementation, not the property. Keep a short list of bugs found by property tests in `.kiro/specs/xray-ui/bugs-found.md`.
   - [x] 16.1 Write property test for fractured bone count
     - `fracture-count.test.tsx`: generated traces include blocking outcomes, capping and deducting outcomes with equal and with lower `amountAfterCents`, and such outcomes without amount fields; count `[data-state="fractured"]` against the outcomes that satisfy `isFracture` and whose rule is mapped
@@ -375,63 +375,63 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - **Property 12: Knob stepping never leaves the version list**
     - **Validates: Requirements 7.3, 7.4, 7.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 12 knob stepping"`
-  - [-] 16.13 Write property test for overruled fields
+  - [x] 16.13 Write property test for overruled fields
     - `overruled-fields.test.tsx` (selector sets, `fieldViews` flags, `n/a` confidence, AnswerCard overlay and stamp iff non-empty)
     - **Property 13: Overruled fields are exactly the evidence keys of fractured bones**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 13 overruled fields"`
-  - [-] 16.14 Write property test for the default formatter
+  - [x] 16.14 Write property test for the default formatter
     - `default-format.test.ts` (use `fc.anything()` plus cyclic and symbol values; throwing `formatValue`)
     - **Property 14: Default formatter is total**
     - **Validates: Requirements 2.16, 8.5**
     - Commit: `git add packages/xray-ui .kiro/specs/xray-ui && git commit -m "test(xray-ui): property 14 default formatter"`
 
-- [ ] 17. Guard tests
-  - [ ] 17.1 Write the domain-isolation test
+- [x] 17. Guard tests
+  - [x] 17.1 Write the domain-isolation test
     - `src/__tests__/domain-isolation.test.ts`: walk `packages/xray-ui/src` with `node:fs`, skip `__tests__` directories, scan `.ts`, `.tsx`, `.css` files for `/\b(receipt|expense|alcohol|meal|trip|suspect)\b/i`; the word "case" is not checked; `demo/` is not scanned
     - Fix any offending source file found
     - _Requirements: 13.1, 13.2, 13.3, 18.7_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): domain isolation"`
-  - [ ] 17.2 Write the contrast test
+  - [x] 17.2 Write the contrast test
     - `src/__tests__/helpers/contrast.ts` (`relativeLuminance`, `contrastRatio`) and `src/__tests__/contrast.test.ts` with the typed `TOKEN_PAIRS` (15 pairs from design.md); read hex values from `tokens.css` by regex; require every ratio >= 4.5 and every token name to exist in the CSS
     - Adjust token values (not the threshold) if a pair fails
     - _Requirements: 12.4, 18.8_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): token contrast"`
-  - [ ] 17.3 Write the source-hygiene test
+  - [x] 17.3 Write the source-hygiene test
     - `src/__tests__/source-hygiene.test.ts`: scan `src` (excluding `__tests__`) for `Math.random`, `Date.now`, `new Date(`, `fetch(`, `XMLHttpRequest`, `WebSocket`, `<canvas`, `getContext(`, `new Audio`, `AudioContext`, `api[_-]?key` (case-insensitive), and imports of `openai` or `anthropic`; expect none; also assert `package.json` has `react` and `react-dom` as peerDependencies and exact versions (no `^` or `~`) for devDependencies
     - _Requirements: 10.3, 14.2, 14.3, 15.2, 15.4, 15.5_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): source hygiene"`
-  - [ ] 17.4 Write the no-network test
+  - [x] 17.4 Write the no-network test
     - `src/__tests__/no-network.test.tsx`: install `netSpy`, render `DrBonesChat` and `XrayView` with fake timers, advance to completion, assert zero recorded calls and `onMessagesComplete` called; restore in `afterEach`
     - _Requirements: 6.12, 14.1, 18.5_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): no network calls"`
-  - [ ] 17.5 Write the accessibility role test
+  - [x] 17.5 Write the accessibility role test
     - `src/__tests__/a11y-roles.test.tsx`: render `XrayView` with the signature trace; assert roles `slider` (named), `meter`, `switch` with `aria-checked`, `log` with `aria-live="polite"`, `tooltip` on hover, `status` for the result plate, `aria-hidden="true"` on ECG svg; every bone button has an accessible name; every bone state has visible text; Tab order visits bones in Anatomy order
     - _Requirements: 2.9, 2.10, 2.11, 3.4, 6.8, 7.6, 7.12, 12.1, 12.3_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): accessibility roles"`
 
-- [ ] 18. Demo
-  - [ ] 18.1 Create `demo/anatomy.ts`
+- [x] 18. Demo
+  - [x] 18.1 Create `demo/anatomy.ts`
     - Export `demoAnatomy` with the five bones, field labels and the `*Cents` formatter (`EUR 41.50`) from design.md
     - _Requirements: 16.3, 16.8_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo anatomy"`
-  - [ ] 18.2 Create `demo/demoTrace.ts`
+  - [x] 18.2 Create `demo/demoTrace.ts`
     - Export `VERSIONS`, `DemoVersion`, `buildCatalog()` (seven rule files, keys `id@version`) and `buildTrace(version)`: validate the signature scenario fields with zod, pick the rule set JSON, use `amountScopes = [{ name: "total", claimedCents: claimedTotalCents }]` (48000), call `evaluate` and `createTrace` from `@bones/core` with deterministic stub ports; throw on a `CoreError`
     - Import the JSON files from `../../core/test-fixtures/expense/...`; confirm the needed functions are exported from `packages/core/src/index.ts`
     - _Requirements: 16.2, 16.5, 16.6, 16.9_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo trace builder"`
-  - [ ] 18.3 Create the demo page and `dev` script
+  - [x] 18.3 Create the demo page and `dev` script
     - `demo/index.html`, `demo/main.tsx` (import `XrayView` from `../src/components/XrayView` and both CSS files directly; `useState<DemoVersion>("v1")`, `useMemo` trace, film text lines supplied by the demo, replay handler bumping a key, no override handler)
     - Confirm `dev` = `vite --config demo/vite.config.ts` in `package.json` and that `pnpm typecheck` passes
     - _Requirements: 16.1, 16.4, 16.5_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo page"`
-  - [ ] 18.4 Write the demo smoke test
+  - [x] 18.4 Write the demo smoke test
     - `src/__tests__/demo-smoke.test.tsx`: for `buildTrace("v1")`, `"v2"` and `"v3"` assert `partially_approved`, `amountCents` 4150 and the per-rule amounts (line-item-cap 48000 to 4800, meal-limit 4800 to 4800, alcohol-deducting 4800 to 4150); render `XrayView` with `demoAnatomy` without console errors and assert exactly two bone buttons with `data-state="fractured"` (Line-item cap and Alcohol) at each version, with the Meal limit bone `data-state="passed"` and the text "applied, no change"; a knob key press changes the shown rule-set version from `1.0.0` to `2.0.0`; add `server.deps.inline: ["@bones/core"]` to `vitest.config.ts` only if needed
     - _Requirements: 16.2, 16.4, 16.5, 16.6, 16.7, 16.9, 18.9_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): demo smoke test"`
 
-- [ ] 19. Public barrel
-  - [ ] 19.1 Write the final `src/index.ts`
+- [x] 19. Public barrel
+  - [x] 19.1 Write the final `src/index.ts`
     - Export all components, hooks, model functions, `TEMPLATES`, constants and types listed in design.md; import `./styles/tokens.css` and `./styles/xray.css`; export no audio symbol
     - _Requirements: 9.2, 14.3, 15.3_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add public exports"`
@@ -440,13 +440,13 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - _Requirements: 9.2, 14.3_
     - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): barrel exports"`
 
-- [ ] 20. Documentation
-  - [ ] 20.1 Write `packages/xray-ui/README.md`
+- [x] 20. Documentation
+  - [x] 20.1 Write `packages/xray-ui/README.md`
     - Sections: installation in the pnpm workspace; the Anatomy contract with an example; the list of exported components; reduced-motion behaviour; accessibility notes including the statement that automated tests cover token contrast ratios and ARIA roles only and full WCAG validation needs manual testing with assistive technologies; the "no LLM, no network, no rule evaluation" guarantee; how to run the demo (`pnpm --filter @bones/xray-ui dev`)
     - _Requirements: 12.5, 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
     - Commit: `git add packages/xray-ui && git commit -m "docs(xray-ui): add README"`
 
-- [ ] 21. Final checkpoint
+- [-] 21. Final checkpoint
   - Run `pnpm test` and `pnpm typecheck` from the repo root; both must pass for all packages
   - Run `git status` and confirm a clean working tree (everything committed, `.kiro/` tracked)
   - Ensure all tests pass, ask the user if questions arise.
