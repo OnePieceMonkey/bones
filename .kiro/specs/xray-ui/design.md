@@ -369,7 +369,11 @@ interface FilmClipProps extends CommonProps {
   trace: Trace; anatomy: Anatomy; source: FilmSource;
   activeRuleId?: string | null;   // overrides the context value when provided
 }
-interface AnswerCardProps extends CommonProps { trace: Trace; anatomy: Anatomy }
+interface AnswerCardProps extends CommonProps {
+  trace: Trace; anatomy: Anatomy;
+  showUnlabelled?: boolean;       // default false; true restores the path-as-label fallback
+}
+interface EffectiveResult { result: DecisionResult; reviewerName: string }
 interface DrBonesChatProps extends CommonProps {
   trace: Trace; anatomy: Anatomy;
   speedMs?: number;               // per character, default 24
@@ -387,7 +391,10 @@ interface ControlStripProps extends CommonProps {
   versions: string[]; value: string; onVersionChange: (version: string) => void;
   xray: boolean; onXrayChange: (next: boolean) => void;
 }
-interface ResultPlateProps extends CommonProps { trace: Trace; anatomy: Anatomy }
+interface ResultPlateProps extends CommonProps {
+  trace: Trace; anatomy: Anatomy;
+  effective?: EffectiveResult;    // result after a human override; XrayView forwards it unchanged
+}
 interface XrayViewProps extends CommonProps {
   trace: Trace; anatomy: Anatomy; source: FilmSource; title?: string;
   versions: string[]; version: string; onVersionChange: (v: string) => void;
@@ -673,10 +680,23 @@ Keyboard: `Escape` on any bone button (keydown) closes the tooltip. Tab moves be
 - Marks from `sourceMarks(trace, anatomy, activeBone)` where `activeBone = bones.find(b => b.ruleId === (activeRuleId ?? hoveredRuleId))`. For a `bbox` mark on an image source: `<span class="xr-mark xr-mark--bbox" data-highlighted style="left:{x*100}%;top:{y*100}%;width:{width*100}%;height:{height*100}%">` with a tag label `<span class="xr-mark-tag">{tag}: {label}</span>`. For a `line` mark on a text source: the matching `xr-film-line` receives class `xr-mark--line` and a trailing tag label. `bbox` marks over a text source and `line` marks over an image source are skipped. Highlighted marks get a thicker outline (3px solid vs 1px dashed) and `data-highlighted="true"`, so identification does not depend on colour (requirement 4.7).
 - A source of kind `text` where `lineIndex` is out of range draws no band.
 
-**AnswerCard**: `<article class="xr-answer" aria-label="AI answer">` with a header "AI answer", a `<dl>` where each `FieldView` renders `<div class="xr-field" data-overruled>`: `<dt>{label}</dt><dd><span class="xr-field-value">{value}</span> <span class="xr-conf">confidence {confidenceText}</span>{overruled && <span class="xr-badge">⚠ OVERRULED</span>}</dd>`. When at least one field is overruled:
+**AnswerCard**: `<article class="xr-answer" aria-label="AI answer" data-overruled>`. The DOM order is: the crack layer first (only when a field is overruled), then `<div class="xr-answer-body">` holding the header "AI answer", the `<dl class="xr-answer-fields">` and, when overruled, the stamp area.
 
-- `<svg class="xr-crack-overlay" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true"><path d={crackPath(trace.decisionId, 400, 300)} /></svg>`
-- `<div class="xr-stamp" role="note">` with text `OVERRULED BY RULE` and a second line with the distinct `overruledBy` labels joined by `, ` (Anatomy order). The class `xr-stamp` has `transform: rotate(-12deg)`; the stamp-in animation class `anim-stamp` is added unless reduced motion; the card shake class `anim-shake` likewise.
+- Rows: one `<div class="xr-field" data-path data-overruled>` per visible field: `<dt>{label}</dt><dd><span class="xr-field-value">{summariseValue(raw, value)}</span> <span class="xr-conf">confidence {confidenceText}</span>{overruled && <span class="xr-badge">⚠ OVERRULED</span>}</dd>`.
+- Visible fields: `showUnlabelled` (default `false`) decides. When false, only fields for which `hasFieldLabel(anatomy, path)` is true get a row. When true, every field gets a row and a field without a label uses its path as label (the old fallback). `anyOverruled`, the crack, the stamp, the shake class and the stamp's bone labels are computed from ALL fields, so hiding a row never changes them.
+- Crack layer (when overruled): `<svg class="xr-crack-overlay" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">` with two paths from `crackPath(trace.decisionId, 400, 300)`: `.xr-crack-glass` (white, offset 1px) and `.xr-crack-line` (red glow).
+- Stamp (when overruled): `<div class="xr-stamp-area"><div class="xr-stamp" role="note">` with `<span class="xr-stamp-title">OVERRULED BY RULE</span>` and `<span class="xr-stamp-bones">` holding the distinct labels of the fractured bones that overrule a field, joined by `, ` (Anatomy order). The area is rendered only when overruled. The stamp has `rotate(-8deg)`, the `anim-stamp` entry animation (ends at `rotate(-12deg)`) is added unless reduced motion; the card shake class `anim-shake` likewise.
+
+Helpers:
+
+- `hasFieldLabel(anatomy, path): boolean` (`model/selectors.ts`): true when `anatomy.fieldLabels` has an own, non-empty entry for `path`. Total, never throws; prototype keys such as `constructor` count as unlabelled.
+- `summariseValue(value, formatted): string` (`model/format.ts`): returns `formatted` unchanged when it contains neither `{` nor `[`. Otherwise an array gives `"1 item"` or `"N items"` and a plain object (prototype `Object.prototype` or `null`) gives `"1 field"` or `"N fields"`. Any other value, and any thrown error, gives `formatted`. Total.
+
+CSS summary (`styles/xray.css`, tokens in `tokens.css`):
+
+- `.xr-answer` is the positioning context with `overflow: hidden`. `.xr-crack-overlay` is `position: absolute; inset: 0; z-index: 0; pointer-events: none`. `.xr-answer-body` is `position: relative; z-index: 1`, so the crack lies behind the rows and never over text.
+- `.xr-answer-fields` is a grid with `gap: var(--xr-space-1)`. `.xr-field` has `padding: var(--xr-space-1) var(--xr-space-2)`, `border-radius: var(--xr-radius)` and the opaque `background: var(--xr-bg-row)`. In plain paper mode (`.xr--plain`) `--xr-bg-row` is set to `--xr-bg-row-paper`.
+- `.xr-stamp-area` reserves `min-height: 72px` with padding, `display: flex; justify-content: flex-end; overflow: visible`. The stamp sits inside this reserved area, below the rows, so it never covers a field value. `.xr-stamp` is `position: relative` with `max-width: 100%`, `overflow-wrap: anywhere` and `pointer-events: none`.
 
 **DrBonesChat**: `<section class="xr-chat" aria-label="Dr. Bones chat">` with `<header>` containing an avatar `<svg aria-hidden>` and `<h3>Dr. Bones · Radiologist</h3>`; `<div class="xr-chat-log" role="log" aria-live="polite">`; and an optional action row. Chat sequencing:
 
@@ -697,6 +717,8 @@ Keyboard: `Escape` on any bone button (keydown) closes the tooltip. Tab moves be
 **ControlStrip**: `<div class="xr-strip" role="group" aria-label="Controls">` composing `KnobControl` ("RULE VERSION"), `GaugeControl` and `ToggleSwitch`, laid out bottom-left in `XrayView`.
 
 **ResultPlate**: `<div class="xr-result" data-result={trace.result} role="status">` with an icon (`✓`, `◐`, `✕` as `aria-hidden` SVG/text), `<span class="xr-result-label">{resultLabel(trace.result)}</span>` and `<span class="xr-result-amount">{safeFormat(anatomy)("amountCents", trace.amountCents)}</span>`.
+
+With the optional `effective: { result, reviewerName }` prop (the result after a human override) the plate shows `shown = effective?.result ?? trace.result`: icon and `xr-result-label` use `shown`, `data-result` stays `trace.result` and the plate adds `data-effective={effective.result}`. Three extra spans render only when `effective` is set: `<span class="xr-result-overruled">overruled by {reviewerName}</span>`, `<span class="xr-result-rules">Rules decided: {resultLabel(trace.result)}</span>` and `<span class="xr-result-amount-label">Amount by rules</span>` before the amount. The amount is always the formatted `trace.amountCents`; the plate never invents an amount for the effective result. `XrayView` accepts the same `effective` prop and forwards it to `ResultPlate` only when it is defined.
 
 **XrayView**: wraps everything in `HoveredRuleProvider` and `Lightbox`. Layout (CSS grid):
 
@@ -737,6 +759,8 @@ Design tokens (`styles/tokens.css`, CSS custom properties on `:root` and `.xr-ro
 :root {
   --xr-bg-deep: #05090d;        /* lightbox viewing area */
   --xr-bg-panel: #0b1620;       /* chat, answer card, strip background */
+  --xr-bg-row: #132636;         /* answer card rows, opaque */
+  --xr-bg-row-paper: #e6dec6;   /* answer card rows in plain paper mode */
   --xr-bg-plate: #1b2a35;       /* result plate, tooltip, chips */
   --xr-bg-paper: #f1ead8;       /* "ordinary document" mode */
   --xr-bg-metal-light: #c9d1d6; /* title plate */
@@ -785,6 +809,9 @@ Contrast pairs (ratios computed with the WCAG relative-luminance formula; the co
 | 13 | `--xr-text-on-plate` | `--xr-bg-plate` | #e8f4f8 | #1b2a35 | 13.10 |
 | 14 | `--xr-text-on-red` | `--xr-bg-red-fill` | #ffffff | #a3121f | 7.88 |
 | 15 | `--xr-text-stamp` | `--xr-bg-stamp` | #ffd0d0 | #3a0f14 | 12.07 |
+| 16 | `--xr-text` | `--xr-bg-row` | #d6f6ff | #132636 | 13.61 |
+| 17 | `--xr-text-dim` | `--xr-bg-row` | #9cc2d0 | #132636 | 8.13 |
+| 18 | `--xr-text-on-paper` | `--xr-bg-row-paper` | #1a1a1a | #e6dec6 | 12.95 |
 
 The test keeps this table as a typed constant `TOKEN_PAIRS: { fg: string; bg: string }[]` holding token names, reads the hex values from `tokens.css` by regex (`--name:\s*(#[0-9a-fA-F]{6})`) and asserts each ratio is at least 4.5. A second assertion verifies that every pair token exists in the CSS, so the table cannot drift. Non-text glows (`--xr-cyan-glow`, `--xr-red-glow`) are decorative and excluded.
 
@@ -953,7 +980,9 @@ Scope note: properties assume the uniqueness precondition (unique `ruleId` withi
 
 *For any* Trace and Anatomy, the set of keys of `overruledFields(trace, bones)` equals the set of own keys of `trace.proposedFields` that are evidence keys of at least one fractured bone; `fieldViews` marks a field `overruled` exactly when it is in that set; a field without an entry in `trace.confidence` has `confidenceText` equal to `"n/a"`; and the AnswerCard renders crack overlay and stamp exactly when the set is non-empty.
 
-**Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6**
+Note: overruled detection reads ALL of `trace.proposedFields`, not only the rows shown. Hiding unlabelled rows (`showUnlabelled` false) changes the visible rows only. An overruled field without an Anatomy label still triggers the crack, the stamp and `data-overruled="true"` on the card.
+
+**Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10**
 
 ### Property 14: Default formatter is total
 
@@ -1047,7 +1076,7 @@ demo-smoke.test.tsx
 - **Reduced motion**: `installMatchMedia(reduce)` sets `window.matchMedia = (q) => ({ matches: q.includes("prefers-reduced-motion") ? reduce : false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })`. Property 4 and component tests use both the mock and the `reducedMotion` prop. A hook test verifies the prop overrides the mock and that `change` events update the value.
 - **Typewriter**: `vi.useFakeTimers()`; `vi.advanceTimersByTime(...)` drives the chat, verifying dots phase, partial text and completion callback.
 - **Network spy**: `netSpy.ts` replaces `globalThis.fetch`, `globalThis.XMLHttpRequest` and `globalThis.WebSocket` with functions that throw `Error("network call: <name>")` and record calls; the test renders `DrBonesChat` and `XrayView`, advances timers to completion, and asserts zero calls and a successful `onMessagesComplete`. It restores the originals in `afterEach`.
-- **Contrast**: `helpers/contrast.ts` implements `relativeLuminance(hex)` (sRGB linearisation `c <= 0.03928 ? c/12.92 : ((c+0.055)/1.055)^2.4`, weights 0.2126/0.7152/0.0722) and `contrastRatio(a, b) = (L1 + 0.05) / (L2 + 0.05)` with `L1 >= L2`. `contrast.test.ts` iterates `TOKEN_PAIRS` (the 15 pairs above) and requires `>= 4.5`; it also asserts every token name exists in `tokens.css`.
+- **Contrast**: `helpers/contrast.ts` implements `relativeLuminance(hex)` (sRGB linearisation `c <= 0.03928 ? c/12.92 : ((c+0.055)/1.055)^2.4`, weights 0.2126/0.7152/0.0722) and `contrastRatio(a, b) = (L1 + 0.05) / (L2 + 0.05)` with `L1 >= L2`. `contrast.test.ts` iterates `TOKEN_PAIRS` (the 18 pairs above) and requires `>= 4.5`; it also asserts every token name exists in `tokens.css`.
 - **Domain isolation**: `domain-isolation.test.ts` mirrors core's test. It walks `packages/xray-ui/src` recursively with `node:fs`, skipping directories named `__tests__` and files not ending in `.ts`, `.tsx` or `.css`, and checks each file against `/\b(receipt|expense|alcohol|meal|trip|suspect)\b/i`. The word "case" is not in the list. `demo/` is not scanned.
 - **Source hygiene** (`source-hygiene.test.ts`): scans `src` (excluding `__tests__`) for `Math.random`, `Date.now`, `new Date(`, `fetch(`, `XMLHttpRequest`, `WebSocket`, `<canvas`, `getContext(`, `new Audio`, `AudioContext`, `api[_-]?key` (case-insensitive) and LLM client imports (`openai`, `anthropic`); expects none. Validates requirements 10.3, 14.1 to 14.3 and 15.2.
 

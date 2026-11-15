@@ -148,12 +148,16 @@ interface Anatomy {
 
 #### Acceptance Criteria
 
-1. THE AnswerCard SHALL render each entry of `trace.proposedFields` with the label `fieldLabels[path] ?? path`, the value `formatValue(path, value)` and the confidence from `trace.confidence` as text.
+1. THE AnswerCard SHALL render one row for each entry of `trace.proposedFields` whose path has a non-empty entry in `Anatomy.fieldLabels`, with the label `fieldLabels[path]`, the value text and the confidence from `trace.confidence` as text, where the value text is `formatValue(path, value)` and, WHEN that text contains "{" or "[" and the value is an array or a plain object, is replaced by the fixed summary "N item(s)" for an array ("1 item", "N items") or "N field(s)" for an object ("1 field", "N fields"). WHERE the `showUnlabelled` prop is true, THE AnswerCard SHALL also render a row for each field without a label, using the path as label (the previous fallback `fieldLabels[path] ?? path`).
 2. WHEN a field path is an Evidence_Key of at least one Fractured_Outcome, THE AnswerCard SHALL mark that field as an Overruled_Field with a text badge and an icon.
 3. WHEN at least one Overruled_Field exists, THE AnswerCard SHALL render an SVG crack overlay derived deterministically from a hash of `decisionId`.
 4. WHEN at least one Overruled_Field exists, THE AnswerCard SHALL render a tilted stamp "OVERRULED BY RULE" together with the Anatomy label of the fractured Bone.
 5. WHEN no Overruled_Field exists, THE AnswerCard SHALL render no crack overlay and no stamp.
 6. IF a proposed field has no entry in `trace.confidence`, THEN THE AnswerCard SHALL render the confidence text "n/a" for that field.
+7. WHEN at least one Overruled_Field exists, THE AnswerCard SHALL render the crack overlay behind the field rows, so that the overlay has a lower z-index than the rows and never covers a field value.
+8. THE AnswerCard SHALL give each field row a solid background taken from the Design_Token `--xr-bg-row` (and `--xr-bg-row-paper` in plain document mode), with a gap between rows and padding inside each row.
+9. WHEN at least one Overruled_Field exists, THE AnswerCard SHALL render the stamp inside a reserved `.xr-stamp-area` placed after the rows, so that the stamp never covers a field value, and WHEN no Overruled_Field exists, THE AnswerCard SHALL render no `.xr-stamp-area`.
+10. THE AnswerCard SHALL decide the Overruled_Field state, the crack overlay and the stamp from all entries of `trace.proposedFields`, including fields whose row is hidden because they have no label.
 
 ### Requirement 6: Dr. Bones Chat
 
@@ -208,6 +212,9 @@ interface Anatomy {
 3. WHEN the Trace result is `rejected`, THE ResultPlate SHALL show the text "REJECTED" and a rejection icon.
 4. THE ResultPlate SHALL show the amount produced by `formatValue("amountCents", trace.amountCents)`.
 5. WHERE `Anatomy.formatValue` is absent, THE ResultPlate SHALL format the amount with the Default_Formatter.
+6. WHERE the optional `effective` prop (`{ result, reviewerName }`) is provided, THE ResultPlate SHALL show the label and icon of `effective.result` instead of those of `trace.result`.
+7. WHERE the `effective` prop is provided, THE ResultPlate SHALL show the text "overruled by" followed by `effective.reviewerName`, the text "Rules decided:" followed by the label of `trace.result`, and the text "Amount by rules" next to the amount.
+8. THE ResultPlate SHALL show only the amount produced from `trace.amountCents` and SHALL NOT show or compute an amount for `effective.result`.
 
 ### Requirement 9: XrayView Composition
 
@@ -218,6 +225,7 @@ interface Anatomy {
 1. THE XrayView SHALL compose Lightbox, Skeleton, EcgLine, FilmClip, AnswerCard, DrBonesChat, ControlStrip and ResultPlate in the reference layout.
 2. THE Xray_UI SHALL export every component so that each one renders without XrayView.
 3. WHEN a Bone is hovered or focused in the XrayView, THE XrayView SHALL pass the active Bone to the FilmClip so that the related source boxes are highlighted.
+4. WHERE the optional `effective` prop is provided, THE XrayView SHALL pass it unchanged to the ResultPlate, and WHERE it is absent, THE XrayView SHALL render the ResultPlate as without the prop.
 
 ### Requirement 10: Deterministic Rendering
 
