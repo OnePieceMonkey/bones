@@ -8,16 +8,16 @@ import type {
   RuleSet,
   Trace,
 } from "@bones/core";
-import dateBlockingBefore from "../../core/test-fixtures/expense/rules/date-blocking-before.json";
-import dateBlockingAfter from "../../core/test-fixtures/expense/rules/date-blocking-after.json";
-import alcoholDeducting from "../../core/test-fixtures/expense/rules/alcohol-deducting.json";
-import mealLimitV1 from "../../core/test-fixtures/expense/rules/meal-limit-v1.json";
-import mealLimitV2 from "../../core/test-fixtures/expense/rules/meal-limit-v2.json";
-import mealLimitV3 from "../../core/test-fixtures/expense/rules/meal-limit-v3.json";
-import lineItemCap from "../../core/test-fixtures/expense/rules/line-item-cap.json";
-import expenseV1 from "../../core/test-fixtures/expense/rule-sets/expense-v1.json";
-import expenseV2 from "../../core/test-fixtures/expense/rule-sets/expense-v2.json";
-import expenseV3 from "../../core/test-fixtures/expense/rule-sets/expense-v3.json";
+import dateBlockingBefore from "../../../rules/expense-auditor/rules/date-blocking-before.json";
+import dateBlockingAfter from "../../../rules/expense-auditor/rules/date-blocking-after.json";
+import alcoholDeducting from "../../../rules/expense-auditor/rules/alcohol-deducting.json";
+import mealLimitV1 from "../../../rules/expense-auditor/rules/meal-limit-v1.json";
+import mealLimitV2 from "../../../rules/expense-auditor/rules/meal-limit-v2.json";
+import mealLimitV3 from "../../../rules/expense-auditor/rules/meal-limit-v3.json";
+import lineItemCap from "../../../rules/expense-auditor/rules/line-item-cap.json";
+import expenseV1 from "../../../rules/expense-auditor/rule-sets/expense-v1.json";
+import expenseV2 from "../../../rules/expense-auditor/rule-sets/expense-v2.json";
+import expenseV3 from "../../../rules/expense-auditor/rule-sets/expense-v3.json";
 import scenario from "../../core/test-fixtures/expense/recorded/signature-scenario.json";
 
 export const VERSIONS = ["v1", "v2", "v3"] as const;

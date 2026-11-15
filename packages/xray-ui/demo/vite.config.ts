@@ -9,6 +9,6 @@ export default defineConfig({
   root: here,
   plugins: [react()],
   server: {
-    fs: { allow: [resolve(here, "../..")] }, // packages/ so ../../core fixtures and @bones/core src load
+    fs: { allow: [resolve(here, "../../..")] }, // repo root: rules/, packages/ and the demo
   },
 });

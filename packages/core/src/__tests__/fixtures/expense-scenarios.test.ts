@@ -16,6 +16,12 @@ function loadJSON<T>(relPath: string): T {
   return JSON.parse(readFileSync(join(fixturesRoot, relPath), "utf-8")) as T;
 }
 
+const rulesRoot = join(__dirname, "../../../../../rules/expense-auditor");
+
+function loadRuleJSON<T>(rel: string): T {
+  return JSON.parse(readFileSync(join(rulesRoot, rel), "utf-8")) as T;
+}
+
 // Deterministic ports for testing
 const deterministicPorts = {
   clock: () => new Date("2024-01-01T00:00:00.000Z"),
@@ -34,7 +40,7 @@ function buildCatalog(mealLimitVersion = "1.0.0"): RuleCatalog {
     "line-item-cap@1.0.0": "rules/line-item-cap.json",
   };
   for (const [key, file] of Object.entries(ruleFiles)) {
-    catalog.set(key, loadJSON<Rule>(file));
+    catalog.set(key, loadRuleJSON<Rule>(file));
   }
   return catalog;
 }
@@ -56,7 +62,7 @@ describe("expense signature scenario (integration)", () => {
     ["expense-v2", "2.0.0", 6000],
     ["expense-v3", "3.0.0", 7500],
   ])("%s produces partially_approved with amountCents 4150", (ruleSetName, mealVersion, mealCap) => {
-    const ruleSet = loadJSON<RuleSet>(`rule-sets/${ruleSetName}.json`);
+    const ruleSet = loadRuleJSON<RuleSet>(`rule-sets/${ruleSetName}.json`);
     const catalog = buildCatalog(mealVersion);
 
     // Load signature scenario fixture (what RecordedAdapter would return)
@@ -156,7 +162,7 @@ describe("expense signature scenario (integration)", () => {
   });
 
   it("rejects when receipt date is before trip start", () => {
-    const ruleSet = loadJSON<RuleSet>("rule-sets/expense-v1.json");
+    const ruleSet = loadRuleJSON<RuleSet>("rule-sets/expense-v1.json");
     const catalog = buildCatalog();
 
     // Date BEFORE trip start → date-blocking-before fires
