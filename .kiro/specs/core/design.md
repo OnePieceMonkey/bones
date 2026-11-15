@@ -346,8 +346,11 @@ type CoreError =
   | { kind: "input_empty";                  message: string }
   | { kind: "input_too_large";              message: string; byteLength: number; maxBytes: number }
   | { kind: "invalid_replay_arguments";     message: string; missingField: string }
-  | { kind: "invalid_override_input";       message: string; field: "reviewerName" | "reason" };
+  | { kind: "invalid_override_input";       message: string; field: "reviewerName" | "reason" }
+  | { kind: "extraction_failed";            message: string; reason: "disabled" | "network" | "bad_response" | "upstream" };
 ```
+
+`"extraction_failed"` is the sixteenth variant. A live extraction adapter needs a way to report that its call failed: `disabled` (live mode is off), `network` (the request did not complete), `bad_response` (the reply was not a valid extraction) and `upstream` (the model provider reported an error). Without it the adapter could only reuse an unrelated variant.
 
 **Design rationale**: extra fields (e.g. `fixturePath`, `fieldErrors`, `ruleId`) give callers everything needed for programmatic handling and user-facing messages without a second lookup. The union is sealed — adding a variant is a breaking change requiring a new major version of `@bones/core`.
 
