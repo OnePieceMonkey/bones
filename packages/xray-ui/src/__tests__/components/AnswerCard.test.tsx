@@ -101,4 +101,110 @@ describe("AnswerCard", () => {
     expect(allClasses(container).some((c) => ANIM.test(c))).toBe(false);
     expect(container.querySelector(".xr-stamp")).not.toBeNull();
   });
+
+  describe("readability and layout", () => {
+    const lineItems = [{ amount: 650 }, { amount: 100 }];
+
+    /** Clean trace plus unlabelled camelCase array fields and one labelled array field. */
+    function withArrays(overrule: boolean): Trace {
+      const t = cleanTrace();
+      return {
+        ...t,
+        proposedFields: {
+          ...t.proposedFields,
+          "receipt.alcoholLineItems": [{ amount: 650 }],
+          "receipt.lineItems": lineItems,
+          "receipt.items": lineItems,
+        },
+        confidence: { ...t.confidence, "receipt.lineItems": 0.8 },
+        ruleOutcomes: t.ruleOutcomes.map((o) =>
+          overrule && o.ruleId === "line-item-cap"
+            ? { ...o, conditionMet: true, evidence: { "receipt.lineItems": lineItems } }
+            : o,
+        ),
+      };
+    }
+
+    function arrayAnatomy() {
+      const a = signatureAnatomy();
+      return { ...a, fieldLabels: { ...a.fieldLabels, "receipt.items": "Items" } };
+    }
+
+    it("renders no row for unlabelled fields by default", () => {
+      const { container } = render(<AnswerCard trace={withArrays(false)} anatomy={arrayAnatomy()} />);
+      expect(container.querySelector('[data-path="receipt.alcoholLineItems"]')).toBeNull();
+      expect(container.querySelector('[data-path="receipt.lineItems"]')).toBeNull();
+      expect(container.querySelectorAll(".xr-field")).toHaveLength(4);
+    });
+
+    it("renders unlabelled fields with their path as label under showUnlabelled", () => {
+      const { container } = render(
+        <AnswerCard trace={withArrays(false)} anatomy={arrayAnatomy()} showUnlabelled />,
+      );
+      const row = container.querySelector('[data-path="receipt.alcoholLineItems"]') as HTMLElement;
+      expect(row.querySelector("dt")?.textContent).toBe("receipt.alcoholLineItems");
+      expect(container.querySelector('[data-path="receipt.lineItems"] dt')?.textContent).toBe(
+        "receipt.lineItems",
+      );
+      expect(container.querySelectorAll(".xr-field")).toHaveLength(6);
+    });
+
+    it("never shows braces, brackets or camelCase labels with the default formatter", () => {
+      const { container } = render(<AnswerCard trace={withArrays(false)} anatomy={arrayAnatomy()} />);
+      const cells = Array.from(container.querySelectorAll(".xr-field dt, .xr-field dd"));
+      expect(cells.length).toBeGreaterThan(0);
+      for (const cell of cells) {
+        expect(cell.textContent).not.toMatch(/[{[]/);
+      }
+      for (const dt of container.querySelectorAll(".xr-field dt")) {
+        expect(dt.textContent).not.toMatch(/[a-z][A-Z]/);
+      }
+    });
+
+    it("summarises a labelled array field as N item(s)", () => {
+      const { container } = render(<AnswerCard trace={withArrays(false)} anatomy={arrayAnatomy()} />);
+      const value = container.querySelector('[data-path="receipt.items"] .xr-field-value');
+      expect(value?.textContent).toBe("2 items");
+    });
+
+    it("counts hidden fields for data-overruled, crack overlay and stamp", () => {
+      const { container } = render(<AnswerCard trace={withArrays(true)} anatomy={arrayAnatomy()} />);
+      expect(container.querySelector('[data-path="receipt.lineItems"]')).toBeNull();
+      expect(container.querySelector("article")?.getAttribute("data-overruled")).toBe("true");
+      expect(container.querySelector(".xr-crack-overlay")).not.toBeNull();
+      expect(container.querySelector(".xr-stamp")).not.toBeNull();
+      expect(container.querySelector(".xr-badge")).toBeNull();
+    });
+
+    it("places the crack overlay first, before the answer body", () => {
+      const { container } = render(<AnswerCard trace={overruledTrace()} anatomy={signatureAnatomy()} />);
+      const article = container.querySelector("article") as HTMLElement;
+      const overlay = container.querySelector(".xr-crack-overlay") as Element;
+      const body = container.querySelector(".xr-answer-body") as Element;
+      expect(article.firstElementChild).toBe(overlay);
+      expect(overlay.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it("puts the stamp inside .xr-stamp-area and outside every .xr-field", () => {
+      const { container } = render(<AnswerCard trace={overruledTrace()} anatomy={signatureAnatomy()} />);
+      const stamp = container.querySelector(".xr-stamp") as HTMLElement;
+      expect(stamp.closest(".xr-stamp-area")).not.toBeNull();
+      expect(stamp.closest(".xr-field")).toBeNull();
+      for (const field of container.querySelectorAll(".xr-field")) {
+        expect(field.querySelector(".xr-stamp")).toBeNull();
+      }
+    });
+
+    it("omits .xr-stamp-area when not overruled", () => {
+      const { container } = render(<AnswerCard trace={cleanTrace()} anatomy={signatureAnatomy()} />);
+      expect(container.querySelector(".xr-stamp-area")).toBeNull();
+    });
+
+    it("emits no anim- class with reducedMotion even with hidden overruled fields", () => {
+      const { container } = render(
+        <AnswerCard trace={withArrays(true)} anatomy={arrayAnatomy()} reducedMotion showUnlabelled />,
+      );
+      expect(allClasses(container).some((c) => ANIM.test(c))).toBe(false);
+    });
+  });
 });
