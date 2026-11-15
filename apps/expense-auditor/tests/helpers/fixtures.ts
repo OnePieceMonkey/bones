@@ -30,9 +30,11 @@ import type { Trace } from "@bones/core";
 import { RecordedSampleAdapter } from "../../src/extraction/RecordedSampleAdapter";
 import { SAMPLES, sampleSchema } from "../../src/extraction/samples";
 import type { Sample, SampleId } from "../../src/extraction/samples";
-import { runPipeline } from "../../src/pipeline/runPipeline";
+import { replayTrace, runPipeline } from "../../src/pipeline/runPipeline";
 import type { VersionLabel } from "../../src/pipeline/runPipeline";
 import { makePortFactory } from "../../src/pipeline/ports";
+import { initialReplayStore, putReplay } from "../../src/pipeline/replayStore";
+import type { DecisionState } from "../../src/state/reducer";
 import { counterPorts } from "./fakes";
 
 /** Parses a bundled Sample. Throws when the id is unknown (test setup error). */
@@ -70,3 +72,42 @@ export const testAnatomy: Anatomy = {
   ],
   fieldLabels: {},
 };
+
+/**
+ * DecisionState for the signature sample at v1 with the v2 and v3 replays stored.
+ * One port factory is shared, so the three Traces have distinct decisionIds.
+ */
+export async function signatureDecisionState(): Promise<DecisionState> {
+  const sample = loadSample("signature");
+  const bundle = loadTestBundle();
+  if (isCoreError(bundle)) throw new Error(JSON.stringify(bundle));
+  const factory = makePortFactory(counterPorts());
+  const original = await runPipeline({
+    input: { raw: sample.receiptText, bytes: new TextEncoder().encode(sample.receiptText) },
+    adapter: new RecordedSampleAdapter("signature"),
+    trip: sample.trip,
+    ruleSetLabel: "v1",
+    bundle,
+    portFactory: factory,
+  });
+  if (isCoreError(original)) throw new Error(JSON.stringify(original));
+  let replays = initialReplayStore(original);
+  for (const label of ["v2", "v3"] as const) {
+    const t = replayTrace({ original, label, bundle, ports: factory.base });
+    if (isCoreError(t)) throw new Error(JSON.stringify(t));
+    replays = putReplay(replays, label, t);
+  }
+  return {
+    screen: "decision",
+    sessionId: "session-1",
+    origin: { kind: "sample", sampleId: "signature" },
+    trip: sample.trip,
+    source: { kind: "text", text: sample.receiptText },
+    original,
+    replays,
+    selected: "v1",
+    overrides: [],
+    intro: { xray: false, pending: true },
+    notice: null,
+  };
+}
