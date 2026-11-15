@@ -179,7 +179,8 @@ export type CoreError =
   | { kind: "input_empty";                  message: string }
   | { kind: "input_too_large";              message: string; byteLength: number; maxBytes: number }
   | { kind: "invalid_replay_arguments";     message: string; missingField: string }
-  | { kind: "invalid_override_input";       message: string; field: "reviewerName" | "reason" };
+  | { kind: "invalid_override_input";       message: string; field: "reviewerName" | "reason" }
+  | { kind: "extraction_failed";            message: string; reason: "disabled" | "network" | "bad_response" | "upstream" };
 
 const CORE_ERROR_KINDS = new Set<string>([
   "live_adapter_not_implemented",
@@ -197,6 +198,7 @@ const CORE_ERROR_KINDS = new Set<string>([
   "input_too_large",
   "invalid_replay_arguments",
   "invalid_override_input",
+  "extraction_failed",
 ]);
 
 export function isCoreError(v: unknown): v is CoreError {
