@@ -459,6 +459,36 @@
   border-color: var(--xr-red);
   box-shadow: 0 0 10px var(--xr-red-glow);
 }
+/* Effective (overruling) result: same treatment as the three result rules, placed after them so it wins. */
+.xr-result[data-effective="approved"] {
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+  border-style: solid;
+  border-color: var(--xr-cyan);
+  box-shadow: 0 0 10px var(--xr-cyan-glow);
+}
+.xr-result[data-effective="partially_approved"] {
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+  border-style: dashed;
+  border-color: var(--xr-cyan);
+  box-shadow: none;
+}
+.xr-result[data-effective="rejected"] {
+  background: var(--xr-bg-red-fill);
+  color: var(--xr-text-on-red);
+  border-style: solid;
+  border-color: var(--xr-red);
+  box-shadow: 0 0 10px var(--xr-red-glow);
+}
+.xr-result-overruled,
+.xr-result-rules,
+.xr-result-amount-label {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: inherit;
+}
+.xr-result-overruled { font-weight: 700; }
 
 /* ===== Focus ring ===== */
 :where(button, [role="slider"], [role="switch"], [tabindex]):focus-visible {

@@ -216,9 +216,15 @@ export interface ControlStripProps extends CommonProps {
   onXrayChange: (next: boolean) => void;
 }
 
+export interface EffectiveResult {
+  result: DecisionResult;
+  reviewerName: string;
+}
+
 export interface ResultPlateProps extends CommonProps {
   trace: Trace;
   anatomy: Anatomy;
+  effective?: EffectiveResult;
 }
 
 export interface XrayViewProps extends CommonProps {
@@ -235,4 +241,5 @@ export interface XrayViewProps extends CommonProps {
   onReplay?: () => void;
   onOverride?: () => void;
   onMessagesComplete?: () => void;
+  effective?: EffectiveResult;
 }

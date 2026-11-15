@@ -13,14 +13,27 @@ function resultIcon(result: string): string {
   }
 }
 
-export function ResultPlate({ trace, anatomy, className }: ResultPlateProps) {
+export function ResultPlate({ trace, anatomy, effective, className }: ResultPlateProps) {
   const format = safeFormat(anatomy);
+  const shown = effective?.result ?? trace.result;
   return (
-    <div className={cx("xr-result", className)} data-result={trace.result} role="status">
+    <div
+      className={cx("xr-result", className)}
+      data-result={trace.result}
+      {...(effective === undefined ? {} : { "data-effective": effective.result })}
+      role="status"
+    >
       <span className="xr-result-icon" aria-hidden="true">
-        {resultIcon(trace.result)}
+        {resultIcon(shown)}
       </span>
-      <span className="xr-result-label">{resultLabel(trace.result)}</span>
+      <span className="xr-result-label">{resultLabel(shown)}</span>
+      {effective !== undefined && (
+        <span className="xr-result-overruled">overruled by {effective.reviewerName}</span>
+      )}
+      {effective !== undefined && (
+        <span className="xr-result-rules">Rules decided: {resultLabel(trace.result)}</span>
+      )}
+      {effective !== undefined && <span className="xr-result-amount-label">Amount by rules</span>}
       <span className="xr-result-amount">{format("amountCents", trace.amountCents)}</span>
     </div>
   );
