@@ -84,8 +84,8 @@ The kernel exposes eight public entry points, each a standalone function or clas
 | `validate` | `validation.ts` | `(proposedFields, schema) → ValidatedFields \| CoreError` |
 | `evaluate` | `rules/evaluate.ts` | `(fields, ruleSet, catalog, amountScopes) → Decision \| CoreError` |
 | `evaluateCondition` | `rules/ast.ts` | `(node, fields) → { result, evidence } \| CoreError` |
-| `createTrace` | `trace.ts` | `(decision, extractionResult, ruleSet, ports) → Trace \| CoreError` |
-| `replay` | `replay.ts` | `(trace, ruleSetVersion, ruleSet, catalog, ports) → Trace \| CoreError` |
+| `createTrace` | `trace.ts` | `(decision, extractionResult, ruleSet, validatedFields, rawInputBytes, ports, options?: { inputHash?: string }) → Trace \| CoreError` |
+| `replay` | `replay.ts` | `(trace, ruleSetVersion, ruleSet, catalog, amountScopes, ports) → Trace \| CoreError` |
 | `override` | `override.ts` | `(trace, input, ports) → Override \| CoreError` |
 | `effectiveResult` | `override.ts` | `(trace, overrides[]) → DecisionResult \| CoreError` |
 
@@ -542,6 +542,15 @@ function deepFreeze<T>(obj: T): Readonly<T> {
 ```
 
 The returned value is typed as `Readonly<Trace>`. In strict mode with `noUncheckedIndexedAccess`, TypeScript surfaces attempted mutation as a type error. At runtime, assignments to frozen object properties throw a `TypeError` in strict mode and silently no-op in sloppy mode — satisfying the requirement that mutation "raises an error or has no effect."
+
+### Replay algorithm
+
+`replay` in `src/replay.ts`:
+
+1. Return `invalid_replay_arguments` if `ruleSetVersion`, `ruleSet` or `catalog` is absent, or if `trace.inputHash` is empty (`missingField: "inputHash"`).
+2. Return `trace_schema_mismatch` if `trace.traceSchemaVersion !== TRACE_SCHEMA_VERSION`.
+3. Re-run `evaluate` on `trace.validatedFields` with the supplied rule set, catalog and amount scopes.
+4. Call `createTrace(decision, extraction, replayRuleSet, trace.validatedFields, new Uint8Array(0), ports, { inputHash: trace.inputHash })`. With `options.inputHash` set, `createTrace` uses that value as-is, never calls the Hasher_Port and does not read `rawInputBytes`, so the replayed Trace keeps the original `inputHash`. The original input bytes are not available during replay, and the encoded `rawModelOutput` must not be hashed in their place (Bug 2 in `bugs-found.md`).
 
 `traceSchemaVersion` is the module-level constant `"1"`. A `trace_schema_mismatch` CoreError is returned during `replay` whenever `trace.traceSchemaVersion !== TRACE_SCHEMA_VERSION`.
 

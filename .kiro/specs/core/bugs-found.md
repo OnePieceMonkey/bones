@@ -37,3 +37,34 @@ Introduced a `compareOrdered(a, b)` helper in `rules/ast.ts`:
 - Otherwise compare lexicographically as strings.
 
 ISO date strings in `YYYY-MM-DD` format are lexicographically ordered, so string comparison gives the correct result.
+
+---
+
+## Bug 2: replay hashed the encoded rawModelOutput instead of keeping the original inputHash
+
+**Discovered by:** the strengthened replay property test, `packages/core/src/__tests__/properties/replay-round-trip.test.ts` (Property 2). Found while writing the expense-auditor spec, by running the test against the unfixed code before the fix.
+
+**Failing counterexample** (verbatim from the unfixed run):
+```
+Property failed after 1 tests
+{ seed: 355815302, path: "0:0:0:0", endOnFailure: true }
+Counterexample: [100,"",{}]
+Shrunk 3 time(s)
+Got AssertionError: expected 'ccccccccccccccccccccccccccccccccccccc…' to be 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…' // Object.is equality
+    at /Users/patrickwerle/Projekte/bones/packages/core/src/__tests__/properties/replay-round-trip.test.ts:113:38
+
+ ❯ src/__tests__/properties/replay-round-trip.test.ts:113:38
+    111|           expect(isCoreError(replayed)).toBe(false);
+    112|           if (isCoreError(replayed)) return;
+    113|           expect(replayed.inputHash).toBe(trace.inputHash);
+       |                                      ^
+    114|           expect(hashCalls).toBe(0);
+    115|           expect(replayed.decisionId).toBe("replay-id");
+```
+(Long stack frames omitted.) The original trace had `inputHash` "a"×64. The replayed trace got "c"×64, because replay hashed the model output again.
+
+**Root cause:**
+`replay()` passed `TextEncoder(trace.rawModelOutput)` to `createTrace`. `createTrace` hashes whatever bytes it receives with the port hasher, so the replayed trace's `inputHash` was a hash of the model output, not of the original input. This violated core requirement 6.2 (extraction fields, including `inputHash`, are copied without modification). The earlier Property 2 compared only `result` and `amountCents`, so it did not catch this.
+
+**Fix applied:**
+`createTrace` takes an optional `{ inputHash }` argument. `replay()` passes `trace.inputHash`, never calls the hasher, and returns `invalid_replay_arguments` with `missingField: "inputHash"` when the stored `inputHash` is empty. Property 2 now also asserts that `inputHash` is kept, the hasher is called 0 times, and the extraction fields are unchanged.

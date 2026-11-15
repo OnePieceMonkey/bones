@@ -129,10 +129,11 @@
 #### Acceptance Criteria
 
 1. WHEN `replay(trace, ruleSetVersion, ruleSet, catalog)` is called, THE Kernel SHALL re-evaluate the `validatedFields` stored in the Trace using the supplied RuleSet and Rule_Catalog without calling any Extraction_Port adapter.
-2. WHEN `replay(trace, ruleSetVersion, ruleSet, catalog)` is called successfully, THE Kernel SHALL return a new Trace containing: a fresh `decisionId` and `createdAt` sourced from injected ports; the supplied `ruleSetVersion`; all extraction fields from the original Trace (`rawModelOutput`, `proposedFields`, `confidence`, `sources`, `validatedFields`, `inputHash`) copied without modification; and rule-outcome fields (`ruleOutcomes`, `result`, `amountCents`) recomputed from the supplied RuleSet and Rule_Catalog.
+2. WHEN `replay(trace, ruleSetVersion, ruleSet, catalog)` is called successfully, THE Kernel SHALL return a new Trace containing: a fresh `decisionId` and `createdAt` sourced from injected ports; the supplied `ruleSetVersion`; all extraction fields from the original Trace (`rawModelOutput`, `proposedFields`, `confidence`, `sources`, `validatedFields`, `inputHash`) copied without modification, where `inputHash` is the original value kept as-is and the Hasher_Port is never called during replay; and rule-outcome fields (`ruleOutcomes`, `result`, `amountCents`) recomputed from the supplied RuleSet and Rule_Catalog.
 3. IF the `traceSchemaVersion` of the input Trace does not match the current Kernel schema version, THEN THE Kernel SHALL return a CoreError with variant `"trace_schema_mismatch"` without performing any rule evaluation.
 4. THE Kernel SHALL never modify or overwrite the original Trace object during replay.
 5. IF any of `ruleSet`, `catalog`, or `ruleSetVersion` supplied to `replay` is absent or null, THEN THE Kernel SHALL return a CoreError with variant `"invalid_replay_arguments"` without performing any rule evaluation.
+6. IF the `inputHash` of the input Trace is empty, THEN THE Kernel SHALL return a CoreError with variant `"invalid_replay_arguments"` and `missingField: "inputHash"` without performing any rule evaluation.
 
 ---
 
