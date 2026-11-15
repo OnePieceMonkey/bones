@@ -35,6 +35,13 @@ describe("Domain isolation: src/ files must not contain domain-specific identifi
     expect(srcFiles.length).toBeGreaterThan(0);
   });
 
+  it("no src file references rules/expense-auditor", () => {
+    const offenders = srcFiles.filter((f) =>
+      readFileSync(f, "utf-8").includes("rules/expense-auditor"),
+    );
+    expect(offenders).toEqual([]);
+  });
+
   for (const filePath of srcFiles) {
     const relPath = relative(srcRoot, filePath);
     const content = readFileSync(filePath, "utf-8");
