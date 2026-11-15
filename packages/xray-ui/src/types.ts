@@ -177,6 +177,8 @@ export interface FilmClipProps extends CommonProps {
 export interface AnswerCardProps extends CommonProps {
   trace: Trace;
   anatomy: Anatomy;
+  /** When true, fields without an Anatomy label render too, using their path as label. Default false. */
+  showUnlabelled?: boolean;
 }
 
 export interface DrBonesChatProps extends CommonProps {

@@ -1,14 +1,17 @@
 import { cx } from "../cx";
 import { animClass, useReducedMotion } from "../hooks/useReducedMotion";
 import { crackPath } from "../model/hash";
-import { fieldViews, selectBones } from "../model/selectors";
+import { summariseValue } from "../model/format";
+import { fieldViews, hasFieldLabel, selectBones } from "../model/selectors";
 import type { AnswerCardProps } from "../types";
 
-export function AnswerCard({ trace, anatomy, reducedMotion, className }: AnswerCardProps) {
+export function AnswerCard({ trace, anatomy, reducedMotion, className, showUnlabelled = false }: AnswerCardProps) {
   const reduced = useReducedMotion(reducedMotion);
   const bones = selectBones(trace, anatomy);
   const fields = fieldViews(trace, anatomy, bones);
+  // Overrule state uses ALL fields; hiding a row never changes the crack or stamp.
   const anyOverruled = fields.some((f) => f.overruled);
+  const visibleFields = showUnlabelled ? fields : fields.filter((f) => hasFieldLabel(anatomy, f.path));
 
   // Distinct bone labels, in Anatomy order.
   const overruledLabels: string[] = [];
@@ -31,11 +34,11 @@ export function AnswerCard({ trace, anatomy, reducedMotion, className }: AnswerC
     >
       <header className="xr-answer-head">AI answer</header>
       <dl className="xr-answer-fields">
-        {fields.map((f) => (
+        {visibleFields.map((f) => (
           <div key={f.path} className="xr-field" data-path={f.path} data-overruled={f.overruled ? "true" : "false"}>
             <dt>{f.label}</dt>
             <dd>
-              <span className="xr-field-value">{f.value}</span>{" "}
+              <span className="xr-field-value">{summariseValue(trace.proposedFields[f.path], f.value)}</span>{" "}
               <span className="xr-conf">confidence {f.confidenceText}</span>
               {f.overruled && <span className="xr-badge">⚠ OVERRULED</span>}
             </dd>
