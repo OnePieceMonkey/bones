@@ -11,16 +11,9 @@ import type {
   CappingConfig,
   DeductingConfig,
 } from "../types.js";
-import { evaluateCondition, getPath } from "./ast.js";
+import { evaluateCondition } from "./ast.js";
 import { isCoreError } from "../types.js";
-
-/** Renders a messageTemplate by substituting {{fieldPath}} slots with field values. Missing paths → "". */
-function renderTemplate(template: string, fields: ValidatedFields): string {
-  return template.replace(/\{\{([^}]+)\}\}/g, (_, path: string) => {
-    const val = getPath(fields, path.trim());
-    return val === undefined ? "" : String(val);
-  });
-}
+import { renderTemplate, DEFAULT_CURRENCY_SYMBOL } from "./template.js";
 
 /**
  * Pure rule evaluation function. No I/O, no randomness, no current time.
@@ -56,6 +49,8 @@ export function evaluate(
     resolved.push(rule);
   }
 
+  const symbol = ruleSet.currencySymbol ?? DEFAULT_CURRENCY_SYMBOL;
+
   // ── Step 2: Partition and sort by id (deterministic regardless of RuleSet order) ──
   const blocking = resolved
     .filter((r) => r.effect === "blocking")
@@ -78,7 +73,7 @@ export function evaluate(
     const condResult = evaluateCondition(rule.condition, fields);
     if (isCoreError(condResult)) return condResult;
     const { result: conditionMet, evidence } = condResult;
-    const renderedMessage = renderTemplate(rule.messageTemplate, fields);
+    const renderedMessage = renderTemplate(rule.messageTemplate, fields, symbol);
     outcomes.push({
       ruleId: rule.id,
       ruleVersion: rule.version,
@@ -97,7 +92,7 @@ export function evaluate(
     const condResult = evaluateCondition(rule.condition, fields);
     if (isCoreError(condResult)) return condResult;
     const { result: conditionMet, evidence } = condResult;
-    const renderedMessage = renderTemplate(rule.messageTemplate, fields);
+    const renderedMessage = renderTemplate(rule.messageTemplate, fields, symbol);
     const config = rule.effectConfig as CappingConfig;
     const scope = config.scope;
     const before = scopeAmounts.get(scope) ?? 0;
@@ -144,7 +139,7 @@ export function evaluate(
     const condResult = evaluateCondition(rule.condition, fields);
     if (isCoreError(condResult)) return condResult;
     const { result: conditionMet, evidence } = condResult;
-    const renderedMessage = renderTemplate(rule.messageTemplate, fields);
+    const renderedMessage = renderTemplate(rule.messageTemplate, fields, symbol);
     const config = rule.effectConfig as DeductingConfig;
     const scope = config.scope;
     const before = scopeAmounts.get(scope) ?? 0;
