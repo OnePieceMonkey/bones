@@ -4,6 +4,10 @@ import type { CoreError, Rule, RuleCatalog, RuleSet } from "@bones/core";
 export type VersionLabel = "v1" | "v2" | "v3";
 export const VERSION_LABELS: readonly VersionLabel[] = ["v1", "v2", "v3"];
 
+export function isVersionLabel(v: string): v is VersionLabel {
+  return (VERSION_LABELS as readonly string[]).includes(v);
+}
+
 export interface RuleBundle {
   catalog: RuleCatalog;
   ruleSets: Record<VersionLabel, RuleSet>;
