@@ -126,7 +126,7 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 4.6_
     - Commit: `git add .kiro/specs/core packages/core/README.md && git commit -m "docs(core): record replay inputHash bug and fix"`
 
-- [ ] 5. xray-ui: `effective` prop on ResultPlate and XrayView
+- [ ] 5. xray-ui: `effective` prop on ResultPlate and XrayView, AnswerCard visual fixes
   - [ ] 5.1 Capture the baseline ResultPlate markup
     - Touches `packages/xray-ui` (tests only)
     - Add `packages/xray-ui/src/__tests__/components/ResultPlate.baseline.test.tsx`: render `ResultPlate` without `effective` for each of the three results with the signature fixture and assert `innerHTML` equals a stored string literal captured now, before any change
@@ -158,12 +158,55 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 5.8, 5.9_
     - Commit: `git add packages/xray-ui && git commit -m "docs(xray-ui): document effective prop"`
 
+  - [ ] 5.7 Add the label and summary helpers
+    - Touches `packages/xray-ui`
+    - In `src/model/selectors.ts` add `hasFieldLabel(anatomy, path)` (own-property check, non-empty string; additive, leave `fieldViews` and its output shape untouched); in `src/model/format.ts` add `summariseValue(value, formatted)`: arrays or plain objects whose `formatted` contains "{" or "[" give "<n> item(s)" or "<n> field(s)" (`1 item`, `3 items`), every other case returns `formatted`; both are total and never throw
+    - Do not change `defaultFormat`, `fieldViews` or any existing export
+    - _Requirements: 21.7, 21.10, 21.12_
+    - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add hasFieldLabel and summariseValue"`
+  - [ ] 5.8 Write unit tests for the helpers
+    - `src/__tests__/model/answer-helpers.test.ts`: `hasFieldLabel` for a present label, an empty string, an absent key and prototype keys (`constructor`); `summariseValue` for an array with JSON output, an array with a custom summary text (returned unchanged), an object, a string, a number, `null`, `undefined`
+    - _Requirements: 21.7, 21.10_
+    - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): AnswerCard helpers"`
+  - [ ] 5.9 Show only labelled rows and summarise values in AnswerCard
+    - Touches `packages/xray-ui`
+    - In `src/components/AnswerCard.tsx` render a row only for fields with `hasFieldLabel` (new optional prop `showUnlabelled?: boolean`, default false, added to `AnswerCardProps` and passed through `XrayView` only if `XrayViewProps` gets it; otherwise leave `XrayView` as it is); use `summariseValue(rawValue, f.value)` as the value text; compute `anyOverruled`, the overruled labels, the crack layer and the stamp from ALL fields, including hidden ones
+    - Run `pnpm --filter @bones/xray-ui test`: where an existing AnswerCard or property test needs an unlabelled row, add a label to its fixture or pass `showUnlabelled`; never weaken an assertion and never touch the `overruled-fields` property
+    - _Requirements: 21.7, 21.8, 21.9, 21.10, 21.12_
+    - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): AnswerCard shows labelled rows and value summaries"`
+  - [ ] 5.10 Restructure the AnswerCard DOM: crack layer behind, stamp in its own area
+    - Touches `packages/xray-ui`
+    - In `src/components/AnswerCard.tsx` render the crack overlay SVG as the first child of the article, wrap header, `dl.xr-answer-fields` and the new `div.xr-stamp-area` in `div.xr-answer-body`; put the stamp inside `.xr-stamp-area` after the rows (only when overruled); keep the class names `xr-answer`, `xr-field`, `xr-field-value`, `xr-crack-overlay`, `xr-stamp`, the `role="note"` and the `data-overruled` attributes
+    - Run `pnpm --filter @bones/xray-ui test`; all existing tests stay green
+    - _Requirements: 21.1, 21.5_
+    - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): AnswerCard crack layer behind rows, stamp area"`
+  - [ ] 5.11 Style the fixes: layering, solid rows, reserved stamp area
+    - Touches `packages/xray-ui`
+    - In `src/styles/tokens.css` add `--xr-bg-row` (opaque; `--xr-text` on it >= 4.5:1); in `src/styles/xray.css`: `.xr-crack-overlay` z-index 0, `.xr-answer-body` relative with z-index 1, `.xr-answer-fields` as a grid with `gap: var(--xr-space-1)`, `.xr-field` with `background: var(--xr-bg-row)`, padding and radius, `.xr-answer` padding, `.xr-stamp-area` with `min-height`, padding and `justify-content: flex-end`, `.xr-stamp` no longer absolutely positioned, with a rotation that fits the reserved room; keep `.xr--plain` paper mode readable (rows use the paper token there) and leave all `anim-*` rules and the reduced-motion rule untouched
+    - Extend `src/__tests__/contrast.test.ts` `TOKEN_PAIRS` with `--xr-text` on `--xr-bg-row` and `--xr-text-dim` on `--xr-bg-row` (>= 4.5); no domain words, no `url(`
+    - _Requirements: 21.2, 21.3, 21.4, 21.6_
+    - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): readable AnswerCard rows and reserved stamp area"`
+  - [ ] 5.12 Write the AnswerCard component and stylesheet tests
+    - In `src/__tests__/components/AnswerCard.test.tsx` add: a trace with unlabelled camelCase fields (`alcoholLineItems`, `lineItems` as arrays of objects) renders no row for the unlabelled ones; with `showUnlabelled` they appear with their path; the REQUIRED unit test: for labelled and unlabelled fields, with arrays of objects and the default formatter, no rendered row text (label cell and value cell) contains "{" or "[" and no row label matches `/[a-z][A-Z]/`; hidden fields still count for `data-overruled`, the crack layer and the stamp; DOM order (the `.xr-crack-overlay` precedes `.xr-answer-body`); the stamp is inside `.xr-stamp-area` and not inside any `.xr-field`; with `reducedMotion` no `anim-` class
+    - In `src/__tests__/components/AnswerCard.styles.test.ts` read `xray.css` with `node:fs` and assert: the z-index of `.xr-crack-overlay` is lower than that of `.xr-answer-body`; `.xr-field` has a `background` that is a `var(--xr-bg-` token; `.xr-stamp` has no `position: absolute`; `.xr-stamp-area` has a `min-height`
+    - _Requirements: 21.1, 21.2, 21.4, 21.5, 21.7, 21.8, 21.9, 21.11_
+    - Commit: `git add packages/xray-ui && git commit -m "test(xray-ui): AnswerCard readability and layout"`
+  - [ ] 5.13 Dollars in the xray-ui demo and README
+    - Touches `packages/xray-ui`
+    - In `demo/anatomy.ts` format `*Cents` values as `$41.50` (comma thousands separators, two decimals, integer arithmetic) instead of `EUR 41.50`, give every shown AI-card field a label in `fieldLabels` and make `lineItems` and `alcoholLineItems` return a summary such as "1 line item · $6.50"; in `README.md` change the `formatValue` example from `EUR` to `$`; adjust `demo-smoke.test.tsx` to expect `$41.50` and to assert the text "EUR" appears nowhere in the rendered demo and in `demo/anatomy.ts`
+    - Run `pnpm --filter @bones/xray-ui build:demo`; it succeeds
+    - _Requirements: 21.13_
+    - Commit: `git add packages/xray-ui && git commit -m "fix(xray-ui): show dollars in demo and README"`
+  - [ ] 5.14 Update the xray-ui spec documents
+    - `.kiro/specs/xray-ui/requirements.md`: criterion 5.1 (labelled rows only, `showUnlabelled`, value summary) and new criteria for the crack layer, solid rows and the stamp area; `.kiro/specs/xray-ui/design.md`: the AnswerCard section (DOM, CSS, helpers) and the properties note; `.kiro/specs/xray-ui/tasks.md` is not edited
+    - _Requirements: 21.14_
+    - Commit: `git add .kiro/specs/xray-ui/requirements.md .kiro/specs/xray-ui/design.md && git commit -m "docs(xray-ui): spec the AnswerCard visual fixes"`
 - [ ] 6. Prerequisite checkpoint
   - [ ] 6.1 Checkpoint - prerequisites green at the repo root
     - Run `pnpm test` and `pnpm typecheck` from the repo root; both must be green (core and xray-ui suites, including domain-isolation and browser-barrel)
     - Confirm `git status` shows a clean tree for `rules`, `packages` and `.kiro/specs/core|xray-ui`
-    - Do not start task 7 until this checkpoint is green; ensure all tests pass, ask the user if questions arise
-    - _Requirements: 1.9, 2.12, 3.5, 4.5, 5.8_
+    - Confirm the xray-ui suite (including the existing AnswerCard and `overruled-fields` tests) and `pnpm --filter @bones/xray-ui build:demo` are green; do not start task 7 until this checkpoint is green; ensure all tests pass, ask the user if questions arise
+    - _Requirements: 1.9, 2.12, 3.5, 4.5, 5.8, 21.12_
     - Commit: none (verification only; if a fix is needed, commit it with the matching `fix(...)` message)
 
 - [ ] 7. App package scaffold
@@ -201,12 +244,12 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 11.3_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add money helpers"`
   - [ ] 8.3 Implement `formatValue`
-    - `src/format/formatValue.ts` with the five ordered rules from design.md (line item lists as `description $x.xx` joined by ", " and "none" when empty; cents paths; date paths; booleans "Yes"/"No"; else `defaultFormat` from `@bones/xray-ui`); never throws
-    - _Requirements: 11.3, 11.4, 11.5, 11.6, 11.7_
+    - `src/format/formatValue.ts` with the five ordered rules from design.md (line item lists as a Value_Summary `<n> line item(s) · <sum as dollars>`, "No line items · $0.00" when empty, never raw JSON and no descriptions; cents paths; date paths; booleans "Yes"/"No"; else `defaultFormat` from `@bones/xray-ui`); never throws; no output contains "EUR"
+    - _Requirements: 11.3, 11.4, 11.5, 11.6, 11.7, 11.11_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add formatValue"`
   - [ ]* 8.4 Write unit tests for the format helpers
-    - `tests/unit/format.node.test.ts`: `formatCents(4150)` "$41.50"; `formatDate("2024-03-15")` "Mar 15, 2024"; leap day 2024-02-29 real and 2023-02-29 not; `formatTripWindow` for the default window and across years; `formatValue` for line items ("Grilled salmon $22.00, Caesar salad $11.00"), empty list, booleans, an unknown path
-    - _Requirements: 7.5, 11.3, 11.4, 11.5, 11.6, 11.7_
+    - `tests/unit/format.node.test.ts`: `formatCents(4150)` "$41.50"; `formatDate("2024-03-15")` "Mar 15, 2024"; leap day 2024-02-29 real and 2023-02-29 not; `formatTripWindow` for the default window and across years; `formatValue` for line items ("4 line items · $48.00", "1 line item · $6.50", "No line items · $0.00" for an empty list, no `{` or `[` in any output), booleans, an unknown path; no output of `formatCents` or `formatValue` contains "EUR"
+    - _Requirements: 7.5, 11.3, 11.4, 11.5, 11.6, 11.7, 11.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): unit tests for format helpers"`
   - [ ] 8.5 Write property test for money formatting
     - Create `tests/helpers/money.ts` (`parseMoney(text, symbol)`) and `tests/properties/money-roundtrip.node.test.ts`, tag `// Feature: expense-auditor, Property 4: App money formatting round trip`; cents 0 to 10^12; `formatValue` for a `*Cents` path equals `formatCents`; `numRuns: 200`
@@ -411,11 +454,11 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
 - [ ] 18. Anatomy and field labels
   - [ ] 18.1 Implement the anatomy
     - `src/anatomy.ts`: `anatomy` with the five bones (`date-blocking-before` "Date before trip" and `date-blocking-after` "Date after trip" on `spine`, `alcohol-deducting` "Alcohol" on `pelvis`, `meal-limit` "Meal limit" on `ribs`, `line-item-cap` "Line-item match" on `arm-right`), `fieldLabels` for every Rule_Field, `amountCents` and the computed keys `lineItems[*].amount_sum` and `alcoholLineItems[*].amount_sum` ("Alcohol total"), and `formatValue`
-    - _Requirements: 11.1, 11.2_
+    - _Requirements: 11.1, 11.2, 11.12_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add anatomy and field labels"`
   - [ ] 18.2 Write anatomy tests
-    - `tests/unit/anatomy.node.test.ts`: region mapping per rule id; a label exists for each key of the Rule_Fields, `amountCents` and both computed keys; every rule id used by the three rule sets has a bone; `anatomy.formatValue` equals `formatValue`
-    - _Requirements: 11.1, 11.2_
+    - `tests/unit/anatomy.node.test.ts`: region mapping per rule id; a label exists for each key of the Rule_Fields, `amountCents` and both computed keys; every rule id used by the three rule sets has a bone; `anatomy.formatValue` equals `formatValue`; every key of the proposed fields of the three recorded samples (`merchant`, `receiptDate`, `claimedTotalCents`, `lineItems`) has a label, so no AI card row is hidden or falls back to a raw key; no label matches `/[a-z][A-Z]/`
+    - _Requirements: 11.1, 11.2, 11.12_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): anatomy"`
 
 - [ ] 19. UI components
@@ -622,6 +665,10 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 18.2_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): contrast guard"`
 
+  - [ ] 23.6 Write the no-EUR guard
+    - `tests/guards/no-eur.node.test.ts`: whole-word `EUR` (case-sensitive) does not appear in `src`, `recorded`, `e2e` and in the `dist` of the programmatic build used by the secret scan; `packages/xray-ui/demo/anatomy.ts` and `packages/xray-ui/README.md` do not contain it either; the guard file itself builds the pattern from two string parts so it does not match itself
+    - _Requirements: 11.11, 19.15, 21.13_
+    - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): no EUR guard"`
 - [ ] 24. Deploy files and README
   - [ ] 24.1 Add `vercel.json`, `.env.example` and the config smoke test
     - `apps/expense-auditor/vercel.json` exactly as in design.md (framework `vite`, `installCommand` `pnpm install --frozen-lockfile`, `buildCommand` `pnpm build`, `outputDirectory` `dist`, `functions` `api/extract.ts` with `maxDuration` 30, the security headers and CSP); `.env.example` with `LIVE_EXTRACTION=off`, `ANTHROPIC_API_KEY=` (empty) and `EXTRACTION_MODEL=claude-haiku-5-5`
@@ -641,8 +688,9 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Commit: `git add apps/expense-auditor/playwright.config.ts && git commit -m "test(expense-auditor): add playwright config"`
   - [ ] 25.2 Write the signature-flow e2e spec
     - `apps/expense-auditor/e2e/signature.spec.ts`, the single test of design.md: load "Signature case"; the X-RAY switch (`role="switch"`) is on right after the decision appears (reduced motion); `.xr-result-label` "PARTIALLY APPROVED" and `.xr-result-amount` "$41.50"; exactly two `button.xr-bone-btn[data-state='fractured']` inside the group "Decision skeleton" named "Line-item match, rule line-item-cap version 1.0.0, fractured" and "Alcohol, rule alcohol-deducting version 1.0.0, fractured"; the meal-limit bone `data-state="passed"` with the text "applied, no change"; the stamp "OVERRULED BY RULE" visible; focus the `slider` named "RULE VERSION", press ArrowRight twice, `aria-valuetext` "v3", "Replayed with v3" visible, plate unchanged; "Overrule" with "Dana Reviewer", a reason and "approved"; plate "APPROVED", "overruled by Dana Reviewer", "Rules decided: PARTIALLY APPROVED", still two fractured bones; "Download trace" file name `expense-trace-<8 hex>.json` whose JSON has `format`, `trace.result` `partially_approved`, `trace.amountCents` 4150, one override with `reviewerName`, `replacementResult` and matching `decisionId`, and `replayedFrom.ruleSetVersion` "1.0.0"
+    - Layout and readability checks in the same test, after the stamp is visible: at viewport 1280x800 and again at 390x844, the bounding box of the stamp (`getByRole("note").filter({ hasText: "OVERRULED BY RULE" })`) intersects no `.xr-field-value` bounding box of the AI card; `getComputedStyle` gives a lower numeric `z-index` for `.xr-crack-overlay` than for `.xr-answer-body`, and every `.xr-field` has a background colour with alpha 1; the text of every AI card row contains neither "{" nor "[", and no row label matches `/[a-z][A-Z]/`; the page text contains "$480.00" and "$41.50" and never "EUR"
     - Run `pnpm e2e` from the repo root; it passes
-    - _Requirements: 12.4, 12.6, 12.7, 13.6, 14.5, 15.1, 15.2, 15.3, 19.5, 19.6, 19.7, 19.8, 19.9_
+    - _Requirements: 12.4, 12.6, 12.7, 13.6, 14.5, 15.1, 15.2, 15.3, 19.5, 19.6, 19.7, 19.8, 19.9, 19.13, 19.14, 21.1, 21.2, 21.5, 21.6, 21.7, 21.10_
     - Commit: `git add apps/expense-auditor/e2e && git commit -m "test(expense-auditor): signature flow e2e"`
 
 - [ ] 26. Manual verification checklist
@@ -665,6 +713,7 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
 - Tasks marked with `*` are optional unit tests. All property tests, the money filter, error-model, replay, guard, component, intro-timing and e2e tests are required.
 - Every property test is its own file and a single `it(...)`, uses `numRuns >= 100` and carries the tag comment `// Feature: expense-auditor, Property N: <title>` (core tests may use the `// Feature: core, ...` style as well). Property numbers are those of design.md.
 - If a property test fails, fix the implementation, not the property. Keep a short list of bugs found by property tests in .kiro/specs/expense-auditor/bugs-found.md (format `Property N | Counterexample | Root cause | Fix`; core bugs go to `.kiro/specs/core/bugs-found.md`).
+- Group 5 also holds the three AnswerCard visual fixes found in the running demo (5.7 to 5.14, Requirement 21). They come right after the money filter (group 2) and before the start screen (19.8) on purpose, so sample (a) looks clean in the first ten seconds. Existing xray-ui tests stay green: adapt only fixtures (add a label or pass `showUnlabelled`), never weaken an assertion.
 - Tasks 1 to 5 are the only tasks that may touch `packages/core`, `packages/xray-ui` and `rules/`. Each of them keeps `pnpm --filter @bones/core test`, the core domain-isolation test and the core browser-barrel test green. Task 6.1 is the repo-root checkpoint; no task from 7 on starts before it is green, and no task from 7 on changes `packages/core` or `packages/xray-ui`.
 - Checkpoints are written as leaf sub-tasks (6.1, 20.1, 27.1) so that they appear in the dependency graph.
 - The spec bookkeeping files `tasks.md` and `tasks.meta.json` are committed separately by the user's runner. No task stages them.
@@ -678,482 +727,83 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
 ```json
 {
   "waves": [
-    {
-      "id": 0,
-      "tasks": [
-        "1.1"
-      ]
-    },
-    {
-      "id": 1,
-      "tasks": [
-        "1.2",
-        "1.3",
-        "1.4"
-      ]
-    },
-    {
-      "id": 2,
-      "tasks": [
-        "2.1"
-      ]
-    },
-    {
-      "id": 3,
-      "tasks": [
-        "2.2",
-        "2.3"
-      ]
-    },
-    {
-      "id": 4,
-      "tasks": [
-        "2.4",
-        "2.5",
-        "2.6",
-        "2.7",
-        "2.8"
-      ]
-    },
-    {
-      "id": 5,
-      "tasks": [
-        "2.9"
-      ]
-    },
-    {
-      "id": 6,
-      "tasks": [
-        "3.1"
-      ]
-    },
-    {
-      "id": 7,
-      "tasks": [
-        "3.2",
-        "3.3"
-      ]
-    },
-    {
-      "id": 8,
-      "tasks": [
-        "4.1"
-      ]
-    },
-    {
-      "id": 9,
-      "tasks": [
-        "4.2"
-      ]
-    },
-    {
-      "id": 10,
-      "tasks": [
-        "5.1"
-      ]
-    },
-    {
-      "id": 11,
-      "tasks": [
-        "5.2"
-      ]
-    },
-    {
-      "id": 12,
-      "tasks": [
-        "5.3"
-      ]
-    },
-    {
-      "id": 13,
-      "tasks": [
-        "5.4",
-        "5.5",
-        "5.6"
-      ]
-    },
-    {
-      "id": 14,
-      "tasks": [
-        "6.1"
-      ]
-    },
-    {
-      "id": 15,
-      "tasks": [
-        "7.1"
-      ]
-    },
-    {
-      "id": 16,
-      "tasks": [
-        "7.2"
-      ]
-    },
-    {
-      "id": 17,
-      "tasks": [
-        "7.3"
-      ]
-    },
-    {
-      "id": 18,
-      "tasks": [
-        "7.4"
-      ]
-    },
-    {
-      "id": 19,
-      "tasks": [
-        "8.1",
-        "8.2"
-      ]
-    },
-    {
-      "id": 20,
-      "tasks": [
-        "8.3"
-      ]
-    },
-    {
-      "id": 21,
-      "tasks": [
-        "8.4",
-        "8.5",
-        "8.6",
-        "8.7"
-      ]
-    },
-    {
-      "id": 22,
-      "tasks": [
-        "9.1",
-        "10.1"
-      ]
-    },
-    {
-      "id": 23,
-      "tasks": [
-        "9.2",
-        "10.2"
-      ]
-    },
-    {
-      "id": 24,
-      "tasks": [
-        "10.3",
-        "11.1"
-      ]
-    },
-    {
-      "id": 25,
-      "tasks": [
-        "11.2"
-      ]
-    },
-    {
-      "id": 26,
-      "tasks": [
-        "11.3"
-      ]
-    },
-    {
-      "id": 27,
-      "tasks": [
-        "11.4",
-        "11.5"
-      ]
-    },
-    {
-      "id": 28,
-      "tasks": [
-        "11.6"
-      ]
-    },
-    {
-      "id": 29,
-      "tasks": [
-        "12.1",
-        "12.2"
-      ]
-    },
-    {
-      "id": 30,
-      "tasks": [
-        "12.3",
-        "12.4"
-      ]
-    },
-    {
-      "id": 31,
-      "tasks": [
-        "13.1"
-      ]
-    },
-    {
-      "id": 32,
-      "tasks": [
-        "13.2",
-        "13.3"
-      ]
-    },
-    {
-      "id": 33,
-      "tasks": [
-        "14.1"
-      ]
-    },
-    {
-      "id": 34,
-      "tasks": [
-        "14.2",
-        "14.3",
-        "14.4"
-      ]
-    },
-    {
-      "id": 35,
-      "tasks": [
-        "15.1"
-      ]
-    },
-    {
-      "id": 36,
-      "tasks": [
-        "15.2",
-        "15.3"
-      ]
-    },
-    {
-      "id": 37,
-      "tasks": [
-        "16.1"
-      ]
-    },
-    {
-      "id": 38,
-      "tasks": [
-        "16.2",
-        "16.3"
-      ]
-    },
-    {
-      "id": 39,
-      "tasks": [
-        "16.4"
-      ]
-    },
-    {
-      "id": 40,
-      "tasks": [
-        "16.5",
-        "16.7"
-      ]
-    },
-    {
-      "id": 41,
-      "tasks": [
-        "16.6",
-        "16.8"
-      ]
-    },
-    {
-      "id": 42,
-      "tasks": [
-        "16.9"
-      ]
-    },
-    {
-      "id": 43,
-      "tasks": [
-        "17.1",
-        "18.1"
-      ]
-    },
-    {
-      "id": 44,
-      "tasks": [
-        "17.2",
-        "17.3",
-        "18.2"
-      ]
-    },
-    {
-      "id": 45,
-      "tasks": [
-        "19.1"
-      ]
-    },
-    {
-      "id": 46,
-      "tasks": [
-        "19.2"
-      ]
-    },
-    {
-      "id": 47,
-      "tasks": [
-        "19.3",
-        "19.4",
-        "19.5"
-      ]
-    },
-    {
-      "id": 48,
-      "tasks": [
-        "19.6",
-        "19.7",
-        "19.8"
-      ]
-    },
-    {
-      "id": 49,
-      "tasks": [
-        "19.9",
-        "19.10"
-      ]
-    },
-    {
-      "id": 50,
-      "tasks": [
-        "19.11",
-        "19.12"
-      ]
-    },
-    {
-      "id": 51,
-      "tasks": [
-        "19.13"
-      ]
-    },
-    {
-      "id": 52,
-      "tasks": [
-        "19.14"
-      ]
-    },
-    {
-      "id": 53,
-      "tasks": [
-        "20.1"
-      ]
-    },
-    {
-      "id": 54,
-      "tasks": [
-        "21.1"
-      ]
-    },
-    {
-      "id": 55,
-      "tasks": [
-        "21.2",
-        "21.3",
-        "21.5"
-      ]
-    },
-    {
-      "id": 56,
-      "tasks": [
-        "21.4",
-        "21.6",
-        "21.7"
-      ]
-    },
-    {
-      "id": 57,
-      "tasks": [
-        "21.8"
-      ]
-    },
-    {
-      "id": 58,
-      "tasks": [
-        "21.9",
-        "21.10",
-        "21.11",
-        "21.12",
-        "21.13"
-      ]
-    },
-    {
-      "id": 59,
-      "tasks": [
-        "21.14"
-      ]
-    },
-    {
-      "id": 60,
-      "tasks": [
-        "22.1"
-      ]
-    },
-    {
-      "id": 61,
-      "tasks": [
-        "22.2",
-        "22.3",
-        "22.5"
-      ]
-    },
-    {
-      "id": 62,
-      "tasks": [
-        "22.4",
-        "22.6",
-        "22.7",
-        "22.8"
-      ]
-    },
-    {
-      "id": 63,
-      "tasks": [
-        "22.9"
-      ]
-    },
-    {
-      "id": 64,
-      "tasks": [
-        "22.10",
-        "22.11"
-      ]
-    },
-    {
-      "id": 65,
-      "tasks": [
-        "23.1",
-        "23.2",
-        "23.3",
-        "23.4",
-        "23.5"
-      ]
-    },
-    {
-      "id": 66,
-      "tasks": [
-        "24.1",
-        "24.2"
-      ]
-    },
-    {
-      "id": 67,
-      "tasks": [
-        "25.1"
-      ]
-    },
-    {
-      "id": 68,
-      "tasks": [
-        "25.2",
-        "26.1"
-      ]
-    },
-    {
-      "id": 69,
-      "tasks": [
-        "27.1"
-      ]
-    }
+    { "id": 0, "tasks": ["1.1"] },
+    { "id": 1, "tasks": ["1.2", "1.3", "1.4"] },
+    { "id": 2, "tasks": ["2.1"] },
+    { "id": 3, "tasks": ["2.2", "2.3"] },
+    { "id": 4, "tasks": ["2.4", "2.5", "2.6", "2.7", "2.8"] },
+    { "id": 5, "tasks": ["2.9"] },
+    { "id": 6, "tasks": ["3.1"] },
+    { "id": 7, "tasks": ["3.2", "3.3"] },
+    { "id": 8, "tasks": ["4.1"] },
+    { "id": 9, "tasks": ["4.2"] },
+    { "id": 10, "tasks": ["5.1"] },
+    { "id": 11, "tasks": ["5.2"] },
+    { "id": 12, "tasks": ["5.3"] },
+    { "id": 13, "tasks": ["5.4", "5.5", "5.6"] },
+    { "id": 14, "tasks": ["5.7"] },
+    { "id": 15, "tasks": ["5.8"] },
+    { "id": 16, "tasks": ["5.9"] },
+    { "id": 17, "tasks": ["5.10"] },
+    { "id": 18, "tasks": ["5.11"] },
+    { "id": 19, "tasks": ["5.12", "5.13"] },
+    { "id": 20, "tasks": ["5.14"] },
+    { "id": 21, "tasks": ["6.1"] },
+    { "id": 22, "tasks": ["7.1"] },
+    { "id": 23, "tasks": ["7.2"] },
+    { "id": 24, "tasks": ["7.3"] },
+    { "id": 25, "tasks": ["7.4"] },
+    { "id": 26, "tasks": ["8.1", "8.2"] },
+    { "id": 27, "tasks": ["8.3"] },
+    { "id": 28, "tasks": ["8.4", "8.5", "8.6", "8.7"] },
+    { "id": 29, "tasks": ["9.1", "10.1"] },
+    { "id": 30, "tasks": ["9.2", "10.2"] },
+    { "id": 31, "tasks": ["10.3", "11.1"] },
+    { "id": 32, "tasks": ["11.2"] },
+    { "id": 33, "tasks": ["11.3"] },
+    { "id": 34, "tasks": ["11.4", "11.5"] },
+    { "id": 35, "tasks": ["11.6"] },
+    { "id": 36, "tasks": ["12.1", "12.2"] },
+    { "id": 37, "tasks": ["12.3", "12.4"] },
+    { "id": 38, "tasks": ["13.1"] },
+    { "id": 39, "tasks": ["13.2", "13.3"] },
+    { "id": 40, "tasks": ["14.1"] },
+    { "id": 41, "tasks": ["14.2", "14.3", "14.4"] },
+    { "id": 42, "tasks": ["15.1"] },
+    { "id": 43, "tasks": ["15.2", "15.3"] },
+    { "id": 44, "tasks": ["16.1"] },
+    { "id": 45, "tasks": ["16.2", "16.3"] },
+    { "id": 46, "tasks": ["16.4"] },
+    { "id": 47, "tasks": ["16.5", "16.7"] },
+    { "id": 48, "tasks": ["16.6", "16.8"] },
+    { "id": 49, "tasks": ["16.9"] },
+    { "id": 50, "tasks": ["17.1", "18.1"] },
+    { "id": 51, "tasks": ["17.2", "17.3", "18.2"] },
+    { "id": 52, "tasks": ["19.1"] },
+    { "id": 53, "tasks": ["19.2"] },
+    { "id": 54, "tasks": ["19.3", "19.4", "19.5"] },
+    { "id": 55, "tasks": ["19.6", "19.7", "19.8"] },
+    { "id": 56, "tasks": ["19.9", "19.10"] },
+    { "id": 57, "tasks": ["19.11", "19.12"] },
+    { "id": 58, "tasks": ["19.13"] },
+    { "id": 59, "tasks": ["19.14"] },
+    { "id": 60, "tasks": ["20.1"] },
+    { "id": 61, "tasks": ["21.1"] },
+    { "id": 62, "tasks": ["21.2", "21.3", "21.5"] },
+    { "id": 63, "tasks": ["21.4", "21.6", "21.7"] },
+    { "id": 64, "tasks": ["21.8"] },
+    { "id": 65, "tasks": ["21.9", "21.10", "21.11", "21.12", "21.13"] },
+    { "id": 66, "tasks": ["21.14"] },
+    { "id": 67, "tasks": ["22.1"] },
+    { "id": 68, "tasks": ["22.2", "22.3", "22.5"] },
+    { "id": 69, "tasks": ["22.4", "22.6", "22.7", "22.8"] },
+    { "id": 70, "tasks": ["22.9"] },
+    { "id": 71, "tasks": ["22.10", "22.11"] },
+    { "id": 72, "tasks": ["23.1", "23.2", "23.3", "23.4", "23.5", "23.6"] },
+    { "id": 73, "tasks": ["24.1", "24.2"] },
+    { "id": 74, "tasks": ["25.1"] },
+    { "id": 75, "tasks": ["25.2", "26.1"] },
+    { "id": 76, "tasks": ["27.1"] }
   ]
 }
 ```

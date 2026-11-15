@@ -405,6 +405,34 @@ Tests (example-based; UI rendering is not a PBT target): in `ResultPlate.test.ts
 Root `package.json` gets `"e2e": "pnpm --filter @bones/expense-auditor test:e2e"`. `test` and `typecheck` stay `pnpm -r ...`; `-r test` runs the App's `test` script and never `test:e2e`.
 
 
+### Part A6: AnswerCard visual fixes (Requirement 21)
+
+Found in the running xray-ui demo; changes only `packages/xray-ui`. They land in task group 5, before the prerequisite checkpoint, so sample (a) looks clean in the first ten seconds.
+
+**DOM** (`AnswerCard.tsx`; existing class names `xr-answer`, `xr-field`, `xr-field-value`, `xr-crack-overlay`, `xr-stamp` stay, so current tests keep working):
+
+```html
+<article class="xr-answer" data-overruled>
+  <svg class="xr-crack-overlay" aria-hidden="true">...</svg>   <!-- first child, z-index 0 -->
+  <div class="xr-answer-body">                                 <!-- position: relative; z-index: 1 -->
+    <header class="xr-answer-head">AI answer</header>
+    <dl class="xr-answer-fields">
+      <div class="xr-field">...</div>                          <!-- solid background, gap between rows -->
+    </dl>
+    <div class="xr-stamp-area">                                <!-- only when overruled; in flow after the rows -->
+      <div class="xr-stamp" role="note">...</div>
+    </div>
+  </div>
+</article>
+```
+
+**CSS.** New token `--xr-bg-row` (opaque, a little lighter than `--xr-bg-panel`; text `--xr-text` on it must reach 4.5:1 and is added to the contrast test pairs). `.xr-crack-overlay { z-index: 0 }`; `.xr-answer-body { position: relative; z-index: 1 }`; `.xr-answer-fields { display: grid; gap: var(--xr-space-1) }`; `.xr-field { background: var(--xr-bg-row); padding: var(--xr-space-1) var(--xr-space-2); border-radius: var(--xr-radius) }`; `.xr-answer { padding: var(--xr-space-3) }` so cracks show only in gaps and margins. `.xr-stamp-area { min-height: 72px; padding: var(--xr-space-3) 0 var(--xr-space-2); display: flex; justify-content: flex-end; overflow: visible }` with the stamp `position: static`, `transform: rotate(-8deg)` and the padding sized for the rotated box (a 12 deg rotation of a 220x44 box grows its height by about 46 px, so the area keeps at least that spare room). `.xr-stamp` is no longer `position: absolute`. The reduced-motion safety rule and `anim-*` classes are unchanged.
+
+**Pure helpers.** `hasFieldLabel(anatomy, path): boolean` in `model/selectors.ts` (own-property check, non-empty string; additive, `fieldViews` is untouched). `summariseValue(value: unknown, formatted: string): string` in `model/format.ts`: arrays or plain objects whose `formatted` contains "{" or "[" give `"<n> item(s)"` (`1 item`, `3 items`) or `"<n> field(s)"`; every other case returns `formatted`. `AnswerCard` computes `fields = fieldViews(...)` (all), `overruled` and the stamp from all of them, and renders rows for `fields.filter(f => showUnlabelled || hasFieldLabel(anatomy, f.path))`, with value text `summariseValue(rawValue, f.value)`.
+
+**Tests.** Component tests for hidden unlabelled rows, `showUnlabelled`, no "{" or "[" and no camelCase label in any row, DOM order (crack layer before the body), stamp inside `.xr-stamp-area` and not inside a `.xr-field`; stylesheet text assertions (`.xr-crack-overlay` z-index lower than `.xr-answer-body`, `.xr-field` background is a `var(--xr-bg-...)` token, `.xr-stamp` is not absolutely positioned); contrast pair. Real-browser layout checks (bounding boxes, computed styles) live in the e2e test (Requirement 19.13, 19.14), because jsdom has no layout. The `overruled-fields` property test stays green because overruled detection reads all fields. The app tooltip rows still use the raw fallback label for unlabelled evidence keys; the app avoids this by labelling every evidence key (Requirement 11.2).
+
+
 ### Part B: App package (Requirement 6)
 
 #### Folder tree
@@ -675,7 +703,7 @@ export function formatValue(path: string, value: unknown): string;
 
 | # | Condition | Output |
 | --- | --- | --- |
-| 1 | `path` is `lineItems` or `alcoholLineItems` and `value` is an array of objects with a safe-integer `amount` | each item as `description $x.xx` (or `$x.xx` without a string `description`), joined by ", "; empty array gives "none" |
+| 1 | `path` is `lineItems` or `alcoholLineItems` and `value` is an array of objects with a safe-integer `amount` | a Value_Summary: `"<n> line item(s) · <sum as dollars>"` ("4 line items · $48.00", "1 line item · $6.50"); an empty array gives "No line items · $0.00"; item descriptions are not included; never raw JSON |
 | 2 | `isCentsPath(path)` and `Number.isSafeInteger(value)` | `formatCents(value)` |
 | 3 | `path` in `receiptDate`, `tripStart`, `tripEnd` and `value` is a real ISO date string | `formatDate(value)` |
 | 4 | `typeof value === "boolean"` | "Yes" or "No" |

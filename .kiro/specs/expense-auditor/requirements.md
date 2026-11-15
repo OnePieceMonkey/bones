@@ -70,6 +70,10 @@ Facts about the current code that the requirements respect:
 - **Overrule_Dialog**: The accessible modal dialog used to create an Override.
 - **Guard_Tests**: The Vitest tests that scan source files and the built `dist` for forbidden imports, keys and names.
 - **E2E_Test**: The single Playwright test file run in chromium against the built App served by `vite preview`.
+- **Labelled_Field**: A proposed field whose path has an own entry in `Anatomy.fieldLabels` with a non-empty string.
+- **Value_Summary**: The short, non-JSON text that the `AnswerCard` shows for an array or object value (for example "1 line item · $48.00"), produced by `formatValue` or, as a fallback, by `summariseValue`.
+- **Crack_Layer**: The decorative SVG crack overlay of the `AnswerCard` (`.xr-crack-overlay`).
+- **Stamp_Area**: The reserved, in-flow region of the `AnswerCard` that holds the "OVERRULED BY RULE" stamp (`.xr-stamp-area`).
 
 ## Requirements
 
@@ -242,12 +246,14 @@ Facts about the current code that the requirements respect:
 2. THE App Anatomy SHALL provide `fieldLabels` in plain English for every Rule_Field, `amountCents` and every computed evidence key (for example "Alcohol total" for `alcoholLineItems[*].amount_sum`).
 3. WHEN `formatValue` receives a path ending in `Cents` with an integer value, THE App SHALL return dollars with the "$" symbol, comma thousands separators and two decimals (4150 returns "$41.50").
 4. WHEN `formatValue` receives a date path (`receiptDate`, `tripStart` or `tripEnd`) with a valid YYYY-MM-DD string, THE App SHALL return the en-US form "Mar 15, 2024", built by manual formatting without `Date` time-zone conversion.
-5. WHEN `formatValue` receives a line item list, THE App SHALL return a compact text such as "Grilled salmon $22.00, Caesar salad $11.00".
+5. WHEN `formatValue` receives a line item list (`lineItems` or `alcoholLineItems`), THE App SHALL return a Value_Summary of the form "<n> line item(s) · <sum of all amounts as dollars>" ("4 line items · $48.00", "1 line item · $6.50", "No line items · $0.00" for an empty list), never raw JSON, and without item descriptions.
 6. WHEN `formatValue` receives a boolean, THE App SHALL return "Yes" or "No".
 7. WHEN `formatValue` receives any other value, THE App SHALL return the Xray_UI default style (`defaultFormat`).
 8. FOR ALL integer cent values from 0 to 10^12, parsing the output of `formatMoney` SHALL return the original cents (round-trip property, at least 100 runs).
 9. FOR ALL valid ISO calendar dates, THE date formatter SHALL return a non-empty string without throwing, and the output SHALL show the same day number as the input.
 10. THE Dr. Bones chat text SHALL come from the Trace and the fixed Xray_UI templates only, and THE App SHALL generate no explanation text by any other route.
+11. THE App SHALL show every money value in dollars with the "$" symbol, through `formatMoney`, `formatValue` and the Money_Filter, and the string "EUR" SHALL appear nowhere in the App `src`, the recorded samples, the App tests (except the guard that checks for it) or the built `dist`.
+12. THE App `fieldLabels` SHALL contain a plain-English label for every proposed field that the `AnswerCard` should show (`merchant`, `receiptDate`, `claimedTotalCents`, `lineItems`), so that no AI card row depends on a raw key.
 
 ### Requirement 12: Start screen and intro sequence
 
@@ -379,6 +385,9 @@ Facts about the current code that the requirements respect:
 10. THE Guard_Tests SHALL assert that no file under the App `src`, `api` and test directories imports from `apps/case-files`.
 11. THE Guard_Tests SHALL assert that, after a build, no file in the App `dist` and no file in the App `src` contains an API key pattern or a provider environment variable name.
 12. THE Guard_Tests SHALL assert that the App `src` imports workspace code only from `@bones/core` and `@bones/xray-ui` and never from `@bones/core/node`.
+13. THE E2E_Test SHALL assert, for the Signature_Sample at the viewport sizes 1280x800 and 390x844, that the bounding box of the stamp "OVERRULED BY RULE" intersects no `.xr-field-value` element of the AI card.
+14. THE E2E_Test SHALL assert in the real browser that the computed `z-index` of the Crack_Layer is lower than the computed `z-index` of the field rows container, that every `.xr-field` row has a computed background colour with alpha 1, and that no AI card row text contains "{" or "[" and no row label matches a camelCase key.
+15. THE Guard_Tests SHALL assert that the string "EUR" does not appear in the App `src`, the recorded samples, the e2e spec and the built `dist`, and that `packages/xray-ui/demo` formats money with "$" (Requirement 21.8).
 
 ### Requirement 20: Deploy and README
 
@@ -394,3 +403,24 @@ Facts about the current code that the requirements respect:
 6. THE App README SHALL contain "Try it" steps: install, `pnpm dev`, load the Signature case and describe what to see (result "$41.50", two fractured bones, cracked card, stamp), run unit tests, run `pnpm e2e` (with the Playwright install command), enable live mode locally, and enable live mode on Vercel.
 7. THE App README SHALL contain security notes: the key lives only in the server environment, the `LIVE_EXTRACTION` kill switch, the request size cap and the per-IP rate limit.
 8. THE App README SHALL explain in plain language why the LLM never decides and where each of the five Bones parts (extraction, rules, trace, override, X-ray) appears in the App.
+
+### Requirement 21: Xray_UI AnswerCard visual fixes
+
+**User Story:** As a viewer of the first ten seconds of the demo, I want the AI answer card to stay readable when it cracks, so that the crack, the stamp and every value are all legible at the same time.
+
+#### Acceptance Criteria
+
+1. THE Xray_UI `AnswerCard` SHALL render the Crack_Layer as the first child of the card and behind the content: the Crack_Layer SHALL have a lower `z-index` than the container of the field rows, and the field rows SHALL not be covered by it.
+2. THE Xray_UI stylesheet SHALL give every `.xr-field` row a solid (opaque) background colour taken from a Design_Tokens variable, SHALL separate the rows by a gap of at least `--xr-space-1`, and SHALL give the card inner padding, so that the cracks are visible only in the gaps and the margins.
+3. THE Xray_UI text and background colour pair of a field row SHALL meet the contrast ratio of at least 4.5:1, and THE contrast test SHALL include that pair.
+4. WHILE Reduced_Motion_Mode is active, THE `AnswerCard` SHALL keep its current behaviour: no Animated_Class, a static Crack_Layer and a static stamp, with the state still shown by text and icon.
+5. WHEN at least one Overruled_Field exists, THE Xray_UI `AnswerCard` SHALL render the stamp inside the Stamp_Area, an in-flow block placed after the field rows (or in the card header corner), and the stamp SHALL NOT be positioned over the field rows.
+6. THE Stamp_Area SHALL reserve enough height and padding for the rotated stamp, so that the stamp never overlaps a `.xr-field-value` element, including at a viewport width of 390 px.
+7. THE Xray_UI `AnswerCard` SHALL render a row only for a Labelled_Field, using `fieldLabels[path]` as the row label, and SHALL hide a field without a label by default.
+8. THE Xray_UI `AnswerCard` SHALL accept an optional prop `showUnlabelled?: boolean` (default false); WHEN it is true, a field without a label SHALL be shown with its path as label (the previous behaviour).
+9. THE Xray_UI SHALL compute the Overruled_Field set, the crack overlay and the stamp from all proposed fields, including hidden ones, so that hiding a row never changes whether the card cracks or the stamp appears.
+10. WHEN the value of a row is an array or a plain object, THE `AnswerCard` SHALL show the output of `formatValue`; IF that output contains "{" or "[", THEN THE `AnswerCard` SHALL show the fixed summary "<n> item(s)" for arrays or "<n> field(s)" for objects (pure function `summariseValue`), so that no row shows raw JSON.
+11. THE Xray_UI unit tests SHALL assert, for a trace that has unlabelled camelCase fields and array fields of objects, that no rendered row text (label and value) contains "{" or "[" and that no row shows a camelCase key.
+12. THE Xray_UI `selectors` function `fieldViews` and its output shape SHALL stay unchanged, and THE existing Xray_UI tests SHALL stay green: a test that needs an unlabelled row SHALL be adapted only by adding a label to its fixture or by passing `showUnlabelled`, and no assertion SHALL be weakened.
+13. THE Xray_UI demo (`packages/xray-ui/demo`) and the Xray_UI README example SHALL format money with the "$" symbol and SHALL not contain the string "EUR".
+14. THE Xray_UI spec documents (`requirements.md` criterion 5.1 and the AnswerCard section of `design.md`) SHALL be updated to describe these changes.
