@@ -1,4 +1,5 @@
 import { parseIsoDate } from "../../shared/iso";
+import type { TripWindow } from "../extraction/samples";
 
 export { parseIsoDate, isRealIsoDate } from "../../shared/iso";
 
@@ -29,7 +30,7 @@ export function formatDate(iso: string): string {
 }
 
 /** "Trip: Mar 10 - Mar 20, 2024"; the year is printed once when both dates share it. */
-export function formatTripWindow(trip: { start: string; end: string }): string {
+export function formatTripWindow(trip: TripWindow): string {
   const a = parseIsoDate(trip.start);
   const b = parseIsoDate(trip.end);
   if (a === null || b === null) {
