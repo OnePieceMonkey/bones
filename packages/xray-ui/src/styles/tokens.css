@@ -2,6 +2,8 @@
 .xr-root {
   --xr-bg-deep: #05090d;        /* lightbox viewing area */
   --xr-bg-panel: #0b1620;       /* chat, answer card, strip background */
+  --xr-bg-row: #132636;         /* answer card rows, opaque */
+  --xr-bg-row-paper: #e6dec6;   /* answer card rows in plain paper mode */
   --xr-bg-plate: #1b2a35;       /* result plate, tooltip, chips */
   --xr-bg-paper: #f1ead8;       /* "ordinary document" mode */
   --xr-bg-metal-light: #c9d1d6; /* title plate */

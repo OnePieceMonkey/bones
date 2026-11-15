@@ -23,6 +23,9 @@ export const TOKEN_PAIRS: { fg: string; bg: string }[] = [
   { fg: "--xr-text-on-plate", bg: "--xr-bg-plate" },
   { fg: "--xr-text-on-red", bg: "--xr-bg-red-fill" },
   { fg: "--xr-text-stamp", bg: "--xr-bg-stamp" },
+  { fg: "--xr-text", bg: "--xr-bg-row" },
+  { fg: "--xr-text-dim", bg: "--xr-bg-row" },
+  { fg: "--xr-text-on-paper", bg: "--xr-bg-row-paper" },
 ];
 
 function hexOf(name: string): string | undefined {
@@ -31,8 +34,8 @@ function hexOf(name: string): string | undefined {
 }
 
 describe("token contrast", () => {
-  it("defines 15 pairs", () => {
-    expect(TOKEN_PAIRS).toHaveLength(15);
+  it("defines 18 pairs", () => {
+    expect(TOKEN_PAIRS).toHaveLength(18);
   });
 
   it("every pair token exists in tokens.css with a hex value", () => {

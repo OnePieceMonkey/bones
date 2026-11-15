@@ -52,14 +52,14 @@ export function AnswerCard({ trace, anatomy, reducedMotion, className, showUnlab
             </div>
           ))}
         </dl>
-        <div className="xr-stamp-area">
-          {anyOverruled && (
+        {anyOverruled && (
+          <div className="xr-stamp-area">
             <div className={cx("xr-stamp", animClass(reduced, "stamp"))} role="note">
               <span className="xr-stamp-title">OVERRULED BY RULE</span>
               <span className="xr-stamp-bones">{overruledLabels.join(", ")}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </article>
   );

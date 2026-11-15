@@ -195,8 +195,15 @@
   overflow: hidden;
 }
 .xr-answer-head { margin-bottom: var(--xr-space-2); font-weight: 700; letter-spacing: 0.08em; }
-.xr-answer-fields { margin: 0; }
-.xr-field { display: flex; gap: var(--xr-space-3); padding: var(--xr-space-1) 0; }
+.xr-answer-body { position: relative; z-index: 1; }
+.xr-answer-fields { margin: 0; display: grid; gap: var(--xr-space-1); }
+.xr-field {
+  display: flex;
+  gap: var(--xr-space-3);
+  padding: var(--xr-space-1) var(--xr-space-2);
+  background: var(--xr-bg-row);
+  border-radius: var(--xr-radius);
+}
 .xr-field dt { min-width: 30%; color: var(--xr-text-dim); }
 .xr-field dd { margin: 0; }
 .xr-conf { margin-left: var(--xr-space-2); font-size: 11px; color: var(--xr-text-muted); }
@@ -209,14 +216,15 @@
   color: var(--xr-text-on-red);
   border-radius: 2px;
 }
-.xr-crack-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.xr-crack-overlay { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
 .xr-crack-overlay path { fill: none; vector-effect: non-scaling-stroke; }
 .xr-crack-line { stroke: var(--xr-red); stroke-width: 2; filter: drop-shadow(0 0 4px var(--xr-red-glow)); }
 .xr-crack-glass { stroke: #ffffff; stroke-width: 1; opacity: 0.6; transform: translate(1px, 1px); }
 .xr-stamp {
-  position: absolute;
-  right: var(--xr-space-3);
-  bottom: var(--xr-space-3);
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: var(--xr-space-2) var(--xr-space-2) 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -224,8 +232,17 @@
   background: var(--xr-bg-stamp);
   color: var(--xr-text-stamp);
   border: 3px double var(--xr-text-stamp);
-  transform: rotate(-12deg);
+  text-align: center;
+  overflow-wrap: anywhere;
+  transform: rotate(-8deg);
   pointer-events: none;
+}
+.xr-stamp-area {
+  min-height: 72px;
+  padding: var(--xr-space-3) 0 var(--xr-space-2);
+  display: flex;
+  justify-content: flex-end;
+  overflow: visible;
 }
 .xr-stamp-title { font-weight: 700; letter-spacing: 0.12em; }
 .xr-stamp-bones { font-size: 11px; }
@@ -539,6 +556,7 @@
   --xr-cyan-glow: transparent;
   --xr-red: var(--xr-bg-red-fill);
   --xr-red-glow: transparent;
+  --xr-bg-row: var(--xr-bg-row-paper);
 }
 .xr--plain .xr-viewport { background: var(--xr-bg-paper); box-shadow: none; }
 .xr--plain .xr-film,
