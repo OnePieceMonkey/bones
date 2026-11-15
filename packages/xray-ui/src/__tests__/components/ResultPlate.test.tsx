@@ -71,3 +71,48 @@ describe("ResultPlate", () => {
     expect(screen.getByRole("status")).toHaveTextContent("500");
   });
 });
+
+describe("ResultPlate effective prop", () => {
+  const results: DecisionResult[] = ["approved", "partially_approved", "rejected"];
+  const combos = results.flatMap((eff) => results.map((tr) => [eff, tr] as const));
+  const info: Record<DecisionResult, [string, string]> = {
+    approved: ["✓", "APPROVED"],
+    partially_approved: ["◐", "PARTIALLY APPROVED"],
+    rejected: ["✕", "REJECTED"],
+  };
+
+  it.each(combos)("effective %s over trace %s shows one rules amount", (eff, tr) => {
+    const trace = { ...signatureTrace(), result: tr, amountCents: 4150 };
+    const anatomy = { ...signatureAnatomy(), formatValue: (_p: string, v: unknown) => `$${String(v)}!` };
+    const { container } = render(
+      <ResultPlate trace={trace} anatomy={anatomy} effective={{ result: eff, reviewerName: "Dana" }} />,
+    );
+    const plate = screen.getByRole("status");
+    expect(plate).toHaveAttribute("data-result", tr);
+    expect(plate).toHaveAttribute("data-effective", eff);
+    expect(container.querySelector(".xr-result-icon")?.textContent).toBe(info[eff][0]);
+    expect(container.querySelector(".xr-result-label")?.textContent).toBe(info[eff][1]);
+    expect(container.querySelector(".xr-result-overruled")?.textContent).toBe("overruled by Dana");
+    expect(container.querySelector(".xr-result-rules")?.textContent).toBe(`Rules decided: ${info[tr][1]}`);
+    expect(container.querySelector(".xr-result-amount-label")?.textContent).toBe("Amount by rules");
+    const amounts = container.querySelectorAll(".xr-result-amount");
+    expect(amounts).toHaveLength(1);
+    expect(amounts[0]?.textContent).toBe("$4150!");
+    expect((plate.textContent ?? "").split("$4150!")).toHaveLength(2);
+    expect((plate.textContent ?? "").match(/\$/g)).toHaveLength(1);
+  });
+
+  it("shows PARTIALLY APPROVED as the rules decision text", () => {
+    const trace = { ...signatureTrace(), result: "partially_approved" as const };
+    render(<ResultPlate trace={trace} anatomy={signatureAnatomy()} effective={{ result: "rejected", reviewerName: "Dana" }} />);
+    expect(screen.getByRole("status")).toHaveTextContent("Rules decided: PARTIALLY APPROVED");
+  });
+
+  it("has no data-effective and no overruled text without effective", () => {
+    const { container } = render(<ResultPlate trace={signatureTrace()} anatomy={signatureAnatomy()} />);
+    expect(screen.getByRole("status")).not.toHaveAttribute("data-effective");
+    expect(container.textContent).not.toContain("overruled by");
+    expect(container.querySelector(".xr-result-rules")).toBeNull();
+    expect(container.querySelector(".xr-result-amount-label")).toBeNull();
+  });
+});
