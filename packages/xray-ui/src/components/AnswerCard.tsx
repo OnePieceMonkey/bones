@@ -32,31 +32,35 @@ export function AnswerCard({ trace, anatomy, reducedMotion, className, showUnlab
       aria-label="AI answer"
       data-overruled={anyOverruled ? "true" : "false"}
     >
-      <header className="xr-answer-head">AI answer</header>
-      <dl className="xr-answer-fields">
-        {visibleFields.map((f) => (
-          <div key={f.path} className="xr-field" data-path={f.path} data-overruled={f.overruled ? "true" : "false"}>
-            <dt>{f.label}</dt>
-            <dd>
-              <span className="xr-field-value">{summariseValue(trace.proposedFields[f.path], f.value)}</span>{" "}
-              <span className="xr-conf">confidence {f.confidenceText}</span>
-              {f.overruled && <span className="xr-badge">⚠ OVERRULED</span>}
-            </dd>
-          </div>
-        ))}
-      </dl>
       {anyOverruled && (
-        <>
-          <svg className="xr-crack-overlay" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
-            <path className="xr-crack-glass" d={crackPath(trace.decisionId, 400, 300)} />
-            <path className="xr-crack-line" d={crackPath(trace.decisionId, 400, 300)} />
-          </svg>
-          <div className={cx("xr-stamp", animClass(reduced, "stamp"))} role="note">
-            <span className="xr-stamp-title">OVERRULED BY RULE</span>
-            <span className="xr-stamp-bones">{overruledLabels.join(", ")}</span>
-          </div>
-        </>
+        <svg className="xr-crack-overlay" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+          <path className="xr-crack-glass" d={crackPath(trace.decisionId, 400, 300)} />
+          <path className="xr-crack-line" d={crackPath(trace.decisionId, 400, 300)} />
+        </svg>
       )}
+      <div className="xr-answer-body">
+        <header className="xr-answer-head">AI answer</header>
+        <dl className="xr-answer-fields">
+          {visibleFields.map((f) => (
+            <div key={f.path} className="xr-field" data-path={f.path} data-overruled={f.overruled ? "true" : "false"}>
+              <dt>{f.label}</dt>
+              <dd>
+                <span className="xr-field-value">{summariseValue(trace.proposedFields[f.path], f.value)}</span>{" "}
+                <span className="xr-conf">confidence {f.confidenceText}</span>
+                {f.overruled && <span className="xr-badge">⚠ OVERRULED</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <div className="xr-stamp-area">
+          {anyOverruled && (
+            <div className={cx("xr-stamp", animClass(reduced, "stamp"))} role="note">
+              <span className="xr-stamp-title">OVERRULED BY RULE</span>
+              <span className="xr-stamp-bones">{overruledLabels.join(", ")}</span>
+            </div>
+          )}
+        </div>
+      </div>
     </article>
   );
 }
