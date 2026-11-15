@@ -32,6 +32,9 @@ export { TRACE_SCHEMA_VERSION, isCoreError } from "./types.js";
 // Condition AST
 export { getPath, evaluateCondition } from "./rules/ast.js";
 
+// Rule schemas
+export { conditionNodeSchema, ruleSchema, ruleSetSchema, parseRule, parseRuleSet } from "./rules/schema.js";
+
 // Extraction
 export type { ExtractionPort, RawInput } from "./extraction/port.js";
 export { guardInput } from "./extraction/port.js";

@@ -80,6 +80,7 @@ export interface RuleSet {
   id: string;      // non-empty, ≤ 128 chars
   version: string; // MAJOR.MINOR.PATCH
   rules: RuleRef[]; // 0–200 entries
+  currencySymbol?: string; // 1 to 4 characters, default "$"
 }
 
 /** Rule catalog — keyed by `${id}@${version}`. */
