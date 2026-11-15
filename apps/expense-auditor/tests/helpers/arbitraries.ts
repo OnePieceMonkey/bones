@@ -99,3 +99,31 @@ export function arbExtraction(trip: ArbTrip): fc.Arbitrary<ArbExtractionResult> 
       })),
   );
 }
+
+// ---- session operations (task 16.6) ----
+
+export interface ArbOverrideForm {
+  reviewerName: string;
+  reason: string;
+  replacementResult: "approved" | "partially_approved" | "rejected";
+}
+
+/** A valid Override form: non-blank reviewer name and reason, reason at most 500 characters. */
+export const arbOverrideForm: fc.Arbitrary<ArbOverrideForm> = fc.record({
+  reviewerName: fc.stringMatching(/^[A-Za-z][A-Za-z ]{0,19}$/),
+  reason: fc.stringMatching(/^[A-Za-z][A-Za-z ,.]{0,79}$/),
+  replacementResult: fc.constantFrom(
+    "approved" as const,
+    "partially_approved" as const,
+    "rejected" as const,
+  ),
+});
+
+export type ArbOp =
+  | { type: "select"; label: "v1" | "v2" | "v3" }
+  | { type: "override"; form: ArbOverrideForm };
+
+export const arbOp: fc.Arbitrary<ArbOp> = fc.oneof(
+  arbLabel.map((label): ArbOp => ({ type: "select", label })),
+  arbOverrideForm.map((form): ArbOp => ({ type: "override", form })),
+);
