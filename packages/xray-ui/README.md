@@ -53,7 +53,7 @@ const anatomy: Anatomy = {
   ],
   fieldLabels: { total: "Total" },
   formatValue: (path, value) =>
-    path === "amountCents" ? `${(Number(value) / 100).toFixed(2)} EUR` : String(value),
+    path === "amountCents" ? `$${(Number(value) / 100).toFixed(2)}` : String(value),
 };
 
 <XrayView

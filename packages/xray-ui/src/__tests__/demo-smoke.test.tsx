@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockInstance } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -83,6 +86,21 @@ describe("demo smoke", () => {
       expect(meal).toHaveTextContent("applied, no change");
       expect(errorSpy).not.toHaveBeenCalled();
     });
+  });
+
+  it("shows dollars and never the old currency word", () => {
+    const { container } = render(<Harness />);
+    const text = container.textContent ?? "";
+    expect(text).toContain("$41.50");
+    expect(text).toContain("1 line item · $6.50");
+    expect(text).toContain("1 line item · $48.00");
+    const forbidden = new RegExp(["E", "UR"].join(""));
+    expect(container.innerHTML).not.toMatch(forbidden);
+    const here = dirname(fileURLToPath(import.meta.url));
+    for (const rel of ["../../demo/anatomy.ts", "../../README.md"]) {
+      expect(readFileSync(resolve(here, rel), "utf8")).not.toMatch(forbidden);
+    }
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it("a knob key press changes the shown rule version from 1.0.0 to 2.0.0", () => {
