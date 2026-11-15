@@ -1,0 +1,31 @@
+{
+  "id": "clean",
+  "title": "Clean meal",
+  "receiptText": "CORNER BISTRO\nMarket Square 4\nDate: 2024-03-12\nTable 3  Server: Ana\n------------------------------\nChicken bowl            18.90\nIced tea                 3.50\nSide salad              10.00\n------------------------------\nTOTAL                   32.40\nThank you",
+  "trip": { "start": "2024-03-10", "end": "2024-03-20" },
+  "extraction": {
+    "proposedFields": {
+      "merchant": "Corner Bistro",
+      "receiptDate": "2024-03-12",
+      "claimedTotalCents": 3240,
+      "lineItems": [
+        { "description": "Chicken bowl", "amount": 1890, "isAlcohol": false },
+        { "description": "Iced tea", "amount": 350, "isAlcohol": false },
+        { "description": "Side salad", "amount": 1000, "isAlcohol": false }
+      ]
+    },
+    "confidence": {
+      "merchant": 0.99,
+      "receiptDate": 0.98,
+      "claimedTotalCents": 0.97,
+      "lineItems": 0.95
+    },
+    "sources": {
+      "merchant": { "kind": "line", "lineIndex": 0 },
+      "receiptDate": { "kind": "line", "lineIndex": 2 },
+      "claimedTotalCents": { "kind": "line", "lineIndex": 9 },
+      "lineItems": { "kind": "line", "lineIndex": 5 }
+    },
+    "rawModelOutput": "{\"merchant\":\"Corner Bistro\",\"receiptDate\":\"2024-03-12\",\"claimedTotalCents\":3240,\"lineItems\":[{\"description\":\"Chicken bowl\",\"amount\":1890,\"isAlcohol\":false},{\"description\":\"Iced tea\",\"amount\":350,\"isAlcohol\":false},{\"description\":\"Side salad\",\"amount\":1000,\"isAlcohol\":false}]}"
+  }
+}

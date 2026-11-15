@@ -1,0 +1,30 @@
+{
+  "id": "outside-window",
+  "title": "Outside the trip window",
+  "receiptText": "AIRPORT CAFE\nTerminal 2\nDate: 2024-03-25\nCounter 4  Server: Kim\n------------------------------\nClub sandwich           14.50\nCoffee                   7.00\n------------------------------\nTOTAL                   21.50\nThank you",
+  "trip": { "start": "2024-03-10", "end": "2024-03-20" },
+  "extraction": {
+    "proposedFields": {
+      "merchant": "Airport Cafe",
+      "receiptDate": "2024-03-25",
+      "claimedTotalCents": 2150,
+      "lineItems": [
+        { "description": "Club sandwich", "amount": 1450, "isAlcohol": false },
+        { "description": "Coffee", "amount": 700, "isAlcohol": false }
+      ]
+    },
+    "confidence": {
+      "merchant": 0.99,
+      "receiptDate": 0.97,
+      "claimedTotalCents": 0.98,
+      "lineItems": 0.96
+    },
+    "sources": {
+      "merchant": { "kind": "line", "lineIndex": 0 },
+      "receiptDate": { "kind": "line", "lineIndex": 2 },
+      "claimedTotalCents": { "kind": "line", "lineIndex": 8 },
+      "lineItems": { "kind": "line", "lineIndex": 5 }
+    },
+    "rawModelOutput": "{\"merchant\":\"Airport Cafe\",\"receiptDate\":\"2024-03-25\",\"claimedTotalCents\":2150,\"lineItems\":[{\"description\":\"Club sandwich\",\"amount\":1450,\"isAlcohol\":false},{\"description\":\"Coffee\",\"amount\":700,\"isAlcohol\":false}]}"
+  }
+}

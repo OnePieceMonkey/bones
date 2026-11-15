@@ -1,0 +1,32 @@
+{
+  "id": "signature",
+  "title": "Signature case",
+  "receiptText": "HARBOR GRILL\nHarbor Street 12\nDate: 2024-03-15\nTable 7  Server: Jo\n------------------------------\nGrilled salmon          22.00\nCaesar salad            11.00\nSparkling water          8.50\nDraft beer               6.50\n------------------------------\nTOTAL                   48.00\nThank you",
+  "trip": { "start": "2024-03-10", "end": "2024-03-20" },
+  "extraction": {
+    "proposedFields": {
+      "merchant": "Harbor Grill",
+      "receiptDate": "2024-03-15",
+      "claimedTotalCents": 48000,
+      "lineItems": [
+        { "description": "Grilled salmon", "amount": 2200, "isAlcohol": false },
+        { "description": "Caesar salad", "amount": 1100, "isAlcohol": false },
+        { "description": "Sparkling water", "amount": 850, "isAlcohol": false },
+        { "description": "Draft beer", "amount": 650, "isAlcohol": true }
+      ]
+    },
+    "confidence": {
+      "merchant": 0.99,
+      "receiptDate": 0.98,
+      "claimedTotalCents": 0.62,
+      "lineItems": 0.93
+    },
+    "sources": {
+      "merchant": { "kind": "line", "lineIndex": 0 },
+      "receiptDate": { "kind": "line", "lineIndex": 2 },
+      "claimedTotalCents": { "kind": "line", "lineIndex": 10 },
+      "lineItems": { "kind": "line", "lineIndex": 5 }
+    },
+    "rawModelOutput": "{\"merchant\":\"Harbor Grill\",\"receiptDate\":\"2024-03-15\",\"claimedTotalCents\":48000,\"lineItems\":[{\"description\":\"Grilled salmon\",\"amount\":2200,\"isAlcohol\":false},{\"description\":\"Caesar salad\",\"amount\":1100,\"isAlcohol\":false},{\"description\":\"Sparkling water\",\"amount\":850,\"isAlcohol\":false},{\"description\":\"Draft beer\",\"amount\":650,\"isAlcohol\":true}]}"
+  }
+}
