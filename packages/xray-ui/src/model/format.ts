@@ -18,6 +18,29 @@ export function defaultFormat(_path: string, value: unknown): string {
   }
 }
 
+/**
+ * Short summary for structured values whose formatted text looks like JSON.
+ * Every other case returns `formatted` unchanged. Total: never throws.
+ */
+export function summariseValue(value: unknown, formatted: string): string {
+  try {
+    if (!formatted.includes("{") && !formatted.includes("[")) return formatted;
+    if (Array.isArray(value)) {
+      const n = value.length;
+      return n === 1 ? "1 item" : `${n} items`;
+    }
+    if (typeof value === "object" && value !== null) {
+      const proto: unknown = Object.getPrototypeOf(value);
+      if (proto !== Object.prototype && proto !== null) return formatted;
+      const n = Object.keys(value).length;
+      return n === 1 ? "1 field" : `${n} fields`;
+    }
+    return formatted;
+  } catch {
+    return formatted;
+  }
+}
+
 /** Wraps the host formatter; falls back to defaultFormat on throw or non-string output. */
 export function safeFormat(anatomy: Anatomy): Formatter {
   return (path, value) => {

@@ -29,6 +29,7 @@ export {
   isAppliedNoChange,
   stateText,
   fieldLabel,
+  hasFieldLabel,
   selectBones,
   evidenceRows,
   relatedFields,
@@ -42,7 +43,7 @@ export { SPLINTER_COUNT, CRACK_SEGMENTS, hashString, nextRandom, splinters, crac
 export { gaugeValue, buildGaugeModel } from "./model/confidence";
 export { SWEEP, needleAngle, knobAngle, stepVersion } from "./model/gauge";
 export { TEMPLATES, MAX_EVIDENCE_LINES, buildChatMessages } from "./model/chat";
-export { defaultFormat, safeFormat, resultLabel } from "./model/format";
+export { defaultFormat, safeFormat, resultLabel, summariseValue } from "./model/format";
 export type { Formatter } from "./model/format";
 export { VIEWBOX, REGION_BOXES, layoutBone, chipFor } from "./model/skeletonLayout";
 export type { RegionBox } from "./model/skeletonLayout";

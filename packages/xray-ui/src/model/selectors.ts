@@ -62,6 +62,17 @@ export function fieldLabel(anatomy: Anatomy, path: string): string {
     : path;
 }
 
+/** True when the anatomy has its own, non-empty label for the path. Total. */
+export function hasFieldLabel(anatomy: Anatomy, path: string): boolean {
+  try {
+    if (!hasOwn(anatomy.fieldLabels, path)) return false;
+    const label: unknown = anatomy.fieldLabels[path];
+    return typeof label === "string" && label.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 function normaliseRegion(region: string): Region {
   return (REGIONS as readonly string[]).includes(region) ? (region as Region) : "spine";
 }
