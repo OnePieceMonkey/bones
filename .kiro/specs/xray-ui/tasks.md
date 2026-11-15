@@ -446,7 +446,7 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - _Requirements: 12.5, 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
     - Commit: `git add packages/xray-ui && git commit -m "docs(xray-ui): add README"`
 
-- [-] 21. Final checkpoint
+- [x] 21. Final checkpoint
   - Run `pnpm test` and `pnpm typecheck` from the repo root; both must pass for all packages
   - Run `git status` and confirm a clean working tree (everything committed, `.kiro/` tracked)
   - Ensure all tests pass, ask the user if questions arise.
