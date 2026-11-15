@@ -136,6 +136,22 @@ describe("expense signature scenario (integration)", () => {
     expect(deductOutcome!.conditionMet).toBe(true);
     expect(deductOutcome!.deductedCents).toBe(650);
 
+    // Rendered messages use the money filter (dollars, not raw cents)
+    expect(byId("meal-limit").renderedMessage).toBe(
+      `Meal limit v${mealVersion[0]}: expenses are capped at $${(mealCap / 100).toFixed(2)}. Claimed total: $480.00.`,
+    );
+    expect(byId("line-item-cap").renderedMessage).toBe(
+      "Receipt total $480.00 does not match line items $48.00. Capped to the line-item sum.",
+    );
+    expect(byId("alcohol-deducting").renderedMessage).toBe(
+      "Alcohol is not reimbursable: $6.50 deducted.",
+    );
+    if (mealVersion === "1.0.0") {
+      expect(byId("meal-limit").renderedMessage).toBe(
+        "Meal limit v1: expenses are capped at $50.00. Claimed total: $480.00.",
+      );
+    }
+
     // Also create a trace to exercise the full pipeline
     const rawBytes = new TextEncoder().encode(scenarioFixture.rawModelOutput);
     const extractionResult = {

@@ -15,5 +15,5 @@
     },
     "scope": "total"
   },
-  "messageTemplate": "Alcohol line items deducted. Claimed: {{claimedTotalCents}}, line items: {{lineItemSumCents}}"
+  "messageTemplate": "Alcohol is not reimbursable: {{alcoholLineCents|money}} deducted."
 }

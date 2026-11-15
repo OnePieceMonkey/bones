@@ -16,5 +16,5 @@
     },
     "scope": "total"
   },
-  "messageTemplate": "Receipt total {{claimedTotalCents}} does not match line items {{lineItemSumCents}}. Capped to line item sum."
+  "messageTemplate": "Receipt total {{claimedTotalCents|money}} does not match line items {{lineItemSumCents|money}}. Capped to the line-item sum."
 }

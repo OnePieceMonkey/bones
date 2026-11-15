@@ -9,5 +9,5 @@
     "right": { "kind": "literal", "value": true }
   },
   "effectConfig": { "cap": 6000, "scope": "total" },
-  "messageTemplate": "Meal expense capped at 6000 cents (v2). Claimed: {{claimedTotalCents}}"
+  "messageTemplate": "Meal limit v2: expenses are capped at $60.00. Claimed total: {{claimedTotalCents|money}}."
 }
