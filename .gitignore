@@ -14,3 +14,6 @@ coverage/
 .DS_Store
 
 # Note: .kiro/ must stay tracked (hackathon rule).
+# Playwright
+test-results/
+playwright-report/
