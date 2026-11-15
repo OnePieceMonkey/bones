@@ -181,6 +181,59 @@ describe("XrayView", () => {
     expect(onOverride).toHaveBeenCalledTimes(1);
   });
 
+  describe("effective prop and title", () => {
+    const effective = { result: "approved" as const, reviewerName: "Dana" };
+    const regions = [".xr-skeleton", ".xr-ecg", "article.xr-answer", "figure.xr-film", '[role="log"]'];
+
+    function snapshot(extra: Partial<XrayViewProps>) {
+      const { container, unmount } = render(<XrayView {...props({ trace: sourcedTrace(), ...extra })} />);
+      const html: Record<string, string | undefined> = {};
+      for (const sel of regions) html[sel] = container.querySelector(sel)?.innerHTML;
+      const result = {
+        fractured: container.querySelectorAll('button.xr-bone-btn[data-state="fractured"]').length,
+        ecg: container.querySelector(".xr-ecg .xr-visually-hidden")?.textContent,
+        overruled: container.querySelector("article.xr-answer")?.getAttribute("data-overruled"),
+        html,
+        plate: container.querySelector(".xr-result")?.textContent ?? "",
+        outside: (() => {
+          const clone = container.cloneNode(true) as HTMLElement;
+          clone.querySelector(".xr-result")?.remove();
+          return clone.innerHTML;
+        })(),
+      };
+      unmount();
+      return result;
+    }
+
+    it("leaves fractured count, ECG summary, overruled flag and all other regions identical", () => {
+      const without = snapshot({});
+      const withEff = snapshot({ effective });
+      expect(without.fractured).toBe(2);
+      expect(withEff.fractured).toBe(without.fractured);
+      expect(without.ecg).toBeTruthy();
+      expect(withEff.ecg).toBe(without.ecg);
+      expect(withEff.overruled).toBe(without.overruled);
+      for (const sel of regions) {
+        expect(without.html[sel], sel).toBeTruthy();
+        expect(withEff.html[sel], sel).toBe(without.html[sel]);
+      }
+      expect(withEff.outside).toBe(without.outside);
+      expect(withEff.plate).not.toBe(without.plate);
+    });
+
+    it("shows 'overruled by Dana' on the plate only with effective", () => {
+      const without = snapshot({});
+      const withEff = snapshot({ effective });
+      expect(withEff.plate).toContain("overruled by Dana");
+      expect(without.plate).not.toContain("overruled by");
+    });
+
+    it("renders the title prop in h2.xr-title-plate", () => {
+      const { container } = render(<XrayView {...props({ title: "Receipt 42" })} />);
+      expect(container.querySelector("h2.xr-title-plate")?.textContent).toBe("Receipt 42");
+    });
+  });
+
   it("fires onMessagesComplete once with reducedMotion", () => {
     const onMessagesComplete = vi.fn();
     render(<XrayView {...props({ onMessagesComplete })} />);
