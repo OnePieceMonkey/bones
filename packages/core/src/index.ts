@@ -36,7 +36,6 @@ export { getPath, evaluateCondition } from "./rules/ast.js";
 export type { ExtractionPort, RawInput } from "./extraction/port.js";
 export { guardInput } from "./extraction/port.js";
 export { LiveAdapter } from "./extraction/live.js";
-export { RecordedAdapter } from "./extraction/recorded.js";
 
 // Core pipeline
 export { validate } from "./validation.js";

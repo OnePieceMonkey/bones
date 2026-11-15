@@ -80,7 +80,7 @@ The kernel exposes eight public entry points, each a standalone function or clas
 |-----------|------|-----------|
 | `ExtractionPort` | `extraction/port.ts` | Interface: `extract(input) → Promise<ExtractionResult \| CoreError>` |
 | `LiveAdapter` | `extraction/live.ts` | Stub: always returns `CoreError("live_adapter_not_implemented")` |
-| `RecordedAdapter` | `extraction/recorded.ts` | Reads JSON fixture file, returns stored `ExtractionResult` |
+| `RecordedAdapter` | `extraction/recorded.ts` | Reads JSON fixture file, returns stored `ExtractionResult`. Node-only: exported from `@bones/core/node` (`src/node.ts`), never from the main barrel |
 | `validate` | `validation.ts` | `(proposedFields, schema) → ValidatedFields \| CoreError` |
 | `evaluate` | `rules/evaluate.ts` | `(fields, ruleSet, catalog, amountScopes) → Decision \| CoreError` |
 | `evaluateCondition` | `rules/ast.ts` | `(node, fields) → { result, evidence } \| CoreError` |
@@ -797,7 +797,8 @@ export { TRACE_SCHEMA_VERSION } from "./trace.js";
 // Extraction
 export type { ExtractionPort } from "./extraction/port.js";
 export { LiveAdapter } from "./extraction/live.js";
-export { RecordedAdapter } from "./extraction/recorded.js";
+// RecordedAdapter is NOT exported here: it imports node:fs/promises and would break
+// browser bundles. It is exported from src/node.ts as `@bones/core/node`.
 
 // Core pipeline
 export { validate } from "./validation.js";

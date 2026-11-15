@@ -12,6 +12,11 @@ pnpm add @bones/core
 
 `@bones/core` exports TypeScript source directly (the `exports` field points at `./src/index.ts`). Consumers build it through `tsx`, Vite, or any bundler that handles `.ts` imports — no separate compilation step is needed.
 
+## Entry points
+
+- `@bones/core` is browser-safe: no file reachable from it imports a Node built-in (a test guards this).
+- `@bones/core/node` holds Node-only adapters. `RecordedAdapter` (reads JSON fixtures with `node:fs/promises`) lives here: `import { RecordedAdapter } from "@bones/core/node"`.
+
 ## Concepts
 
 **Port injection** — `createTrace`, `replay`, and `override` receive a `KernelPorts` object (`{ clock, id, hasher }`). This keeps `evaluate()` a pure function — no I/O, no randomness, no `Date.now()`. Tests inject deterministic stubs so every trace is reproducible.

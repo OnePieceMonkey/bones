@@ -209,7 +209,7 @@ Build `@bones/core` — the pure TypeScript decision kernel of the Bones platfor
     - `extract`: call `guardInput`; if guard returns CoreError, return it
     - Read file via `fs.readFile(fixturePath, "utf-8")`; catch `ENOENT` → `CoreError("fixture_not_found")`; catch other errors → `CoreError("fixture_invalid", …, parseError: String(e))`
     - Parse JSON; return parsed object cast to `ExtractionResult` (no re-serialization or transformation)
-    - Export `LiveAdapter`, `RecordedAdapter`, and `ExtractionPort` type from `src/index.ts`
+    - Export `LiveAdapter` and the `ExtractionPort` type from `src/index.ts`; export `RecordedAdapter` only from `src/node.ts` (`@bones/core/node`), because it imports `node:fs/promises` and must stay out of the browser barrel
     - _Requirements: 1.2, 1.7, 1.8_
   - [ ]* 10.4 Write unit tests for extraction in `src/__tests__/extraction.test.ts`
     - Test `guardInput`: empty string → `"input_empty"`, empty `Uint8Array` → `"input_empty"`, 10 MB + 1 byte → `"input_too_large"`, valid input → `null`

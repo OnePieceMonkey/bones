@@ -2,12 +2,15 @@
   "name": "@bones/xray-ui",
   "version": "0.1.0",
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "test": "vitest --run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "dev": "vite --config demo/vite.config.ts"
+    "dev": "vite --config demo/vite.config.ts",
+    "build:demo": "vite build --config demo/vite.config.ts"
   },
   "peerDependencies": {
     "react": "^18.3.1",
