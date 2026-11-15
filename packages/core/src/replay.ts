@@ -52,6 +52,13 @@ export function replay(
     };
   }
 
+  if (!trace.inputHash) {
+    return {
+      kind: "invalid_replay_arguments",
+      message: "trace.inputHash must be a non-empty string",
+      missingField: "inputHash",
+    };
+  }
   // Guard: schema version must match
   if (trace.traceSchemaVersion !== TRACE_SCHEMA_VERSION) {
     return {
@@ -74,12 +81,11 @@ export function replay(
     sources: trace.sources,
   };
 
-  // Use the rawModelOutput bytes as the input bytes for hashing (same as createTrace does)
-  const rawInputBytes = new TextEncoder().encode(trace.rawModelOutput);
-
   // Override the ruleSet's version with the supplied ruleSetVersion so the new
   // Trace records the version that was actually used for this replay.
   const replayRuleSet: RuleSet = { ...ruleSet, version: ruleSetVersion };
 
-  return createTrace(decision, extractionResult, replayRuleSet, trace.validatedFields, rawInputBytes, ports);
+  return createTrace(decision, extractionResult, replayRuleSet, trace.validatedFields, new Uint8Array(0), ports, {
+    inputHash: trace.inputHash,
+  });
 }

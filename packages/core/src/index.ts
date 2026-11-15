@@ -45,5 +45,6 @@ export { validate } from "./validation.js";
 export { evaluate } from "./rules/evaluate.js";
 export { formatMoney, renderTemplate, DEFAULT_CURRENCY_SYMBOL } from "./rules/template.js";
 export { createTrace, deepFreeze } from "./trace.js";
+export type { CreateTraceOptions } from "./trace.js";
 export { replay } from "./replay.js";
 export { override, effectiveResult } from "./override.js";

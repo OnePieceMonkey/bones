@@ -21,6 +21,11 @@ export function deepFreeze<T>(obj: T): Readonly<T> {
   return Object.freeze(obj);
 }
 
+export interface CreateTraceOptions {
+  /** When set, the hasher port is not called and rawInputBytes is not read. Used by replay. */
+  inputHash?: string;
+}
+
 /**
  * Creates an immutable, self-describing Trace from a Decision and its inputs.
  * Clock, id, and hasher are injected — never called inside evaluate().
@@ -31,7 +36,8 @@ export function createTrace(
   ruleSet: RuleSet,
   validatedFields: ValidatedFields,
   rawInputBytes: Uint8Array,
-  ports: KernelPorts
+  ports: KernelPorts,
+  options: CreateTraceOptions = {}
 ): Trace | CoreError {
   let createdAt: string;
   let decisionId: string;
@@ -59,7 +65,7 @@ export function createTrace(
   }
 
   try {
-    inputHash = ports.hasher(rawInputBytes);
+    inputHash = options.inputHash ?? ports.hasher(rawInputBytes);
     if (!inputHash) throw new Error("hasher port returned an empty string");
   } catch (e) {
     return {
