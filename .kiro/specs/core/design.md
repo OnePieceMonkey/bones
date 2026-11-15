@@ -184,7 +184,7 @@ interface Rule {
   effect: RuleEffect;
   condition: ConditionNode;
   effectConfig: BlockingConfig | CappingConfig | DeductingConfig;
-  messageTemplate: string;   // ≤ 1024 chars, may contain {{fieldPath}} slots
+  messageTemplate: string;   // ≤ 1024 chars, may contain {{path}} and {{path|money}} slots
 }
 
 interface RuleRef {
@@ -196,6 +196,7 @@ interface RuleSet {
   id: string;
   version: string;           // MAJOR.MINOR.PATCH
   rules: RuleRef[];          // 0–200 entries
+  currencySymbol?: string;   // 1 to 4 characters (UTF-16 code units), default "$"
 }
 
 type RuleCatalog = Map<string, Rule>; // key: `${id}@${version}`
@@ -475,18 +476,46 @@ Return:
 
 ### messageTemplate rendering
 
-Before attaching `renderedMessage` to each `RuleOutcome`, run:
+`renderTemplate` and `formatMoney` live in `src/rules/template.ts` and are exported from `index.ts` together with `DEFAULT_CURRENCY_SYMBOL` (`"$"`). `evaluate` calls `renderTemplate(template, fields, ruleSet.currencySymbol ?? DEFAULT_CURRENCY_SYMBOL)` before attaching `renderedMessage` to each `RuleOutcome`:
 
 ```typescript
-function renderTemplate(template: string, fields: ValidatedFields): string {
-  return template.replace(/\{\{([^}]+)\}\}/g, (_, path) => {
+const SLOT = /\{\{([^}]+)\}\}/g;
+
+// Precondition: Number.isSafeInteger(cents). Integer arithmetic only.
+function formatMoney(cents: number, symbol: string): string {
+  const negative = cents < 0;
+  const abs = Math.abs(cents);
+  const frac = abs % 100;
+  const whole = (abs - frac) / 100;
+  const grouped = String(whole).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `${negative ? "-" : ""}${symbol}${grouped}.${frac < 10 ? "0" : ""}${frac}`;
+}
+
+function renderTemplate(
+  template: string,
+  fields: ValidatedFields,
+  currencySymbol: string = DEFAULT_CURRENCY_SYMBOL,
+): string {
+  return template.replace(SLOT, (_m, inner: string) => {
+    const bar = inner.indexOf("|");
+    const path = (bar < 0 ? inner : inner.slice(0, bar)).trim();
+    const filter = bar < 0 ? undefined : inner.slice(bar + 1).trim();
     const val = getPath(fields, path);
-    return val === undefined ? "" : String(val);
+    if (val === undefined) return "";
+    if (filter === "money" && typeof val === "number" && Number.isSafeInteger(val)) {
+      return formatMoney(val, currencySymbol);
+    }
+    return String(val);
   });
 }
 ```
 
-Missing paths render as `""` (empty string). No errors are raised for missing paths.
+Slot syntax is `{{path}}` or `{{path|money}}`; whitespace around the path and the filter name is ignored. Rules:
+
+- A missing path renders as `""`. No error is raised.
+- `money` applies only to safe integers and formats cents as `<symbol><grouped whole>.<two digits>`, with a leading `-` for negative values (`48000` gives `$480.00`, `4150` gives `$41.50`, `-5` gives `-$0.05`).
+- An unknown filter, or `money` on a value that is not a safe integer, renders the plain `String(value)`.
+- The symbol comes from `RuleSet.currencySymbol` (default `"$"`). `ruleSetSchema` requires 1 to 4 characters, counted as UTF-16 code units (`z.string().min(1).max(4)`).
 
 ### Purity guarantee
 
@@ -877,7 +906,7 @@ These tests use **fast-check** (version pinned in `package.json`). Each test run
 
 ### Property 12: messageTemplate rendering substitutes all present field paths
 
-*For any* `messageTemplate` string containing one or more `{{fieldPath}}` slots and any `ValidatedFields`, the rendered message contains the string representation of every present field value in place of its slot, and every absent field path is replaced with an empty string.
+*For any* `messageTemplate` string containing one or more `{{fieldPath}}` and `{{fieldPath|money}}` slots and any `ValidatedFields`, the rendered message contains the string representation of every present field value in place of its plain slot, the formatted amount in place of every `|money` slot whose value is a safe integer, and an empty string in place of every absent field path.
 
 **Validates: Requirements 4.8, 4.9**
 
