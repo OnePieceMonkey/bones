@@ -28,6 +28,7 @@ export function XrayView({
   onReplay,
   onOverride,
   onMessagesComplete,
+  effective,
   reducedMotion,
   className,
 }: XrayViewProps) {
@@ -83,7 +84,13 @@ export function XrayView({
             onXrayChange={handleXrayChange}
             {...motion}
           />
-          <ResultPlate className="xr-view-result" trace={trace} anatomy={anatomy} {...motion} />
+          <ResultPlate
+            className="xr-view-result"
+            trace={trace}
+            anatomy={anatomy}
+            {...(effective === undefined ? {} : { effective })}
+            {...motion}
+          />
         </div>
       </Lightbox>
     </HoveredRuleProvider>
