@@ -22,3 +22,51 @@ export function readRuleDir(dir: "rules" | "rule-sets"): Record<string, unknown>
 export function loadTestBundle(): RuleBundle | CoreError {
   return buildBundle(readRuleDir("rules"), readRuleDir("rule-sets"));
 }
+
+// ---- pipeline fixtures (task 14.2) ----
+import { isCoreError } from "@bones/core";
+import type { Anatomy } from "@bones/xray-ui";
+import type { Trace } from "@bones/core";
+import { RecordedSampleAdapter } from "../../src/extraction/RecordedSampleAdapter";
+import { SAMPLES, sampleSchema } from "../../src/extraction/samples";
+import type { Sample, SampleId } from "../../src/extraction/samples";
+import { runPipeline } from "../../src/pipeline/runPipeline";
+import type { VersionLabel } from "../../src/pipeline/runPipeline";
+import { makePortFactory } from "../../src/pipeline/ports";
+import { counterPorts } from "./fakes";
+
+/** Parses a bundled Sample. Throws when the id is unknown (test setup error). */
+export function loadSample(id: SampleId): Sample {
+  const entry = SAMPLES.find((s) => (s as { id?: unknown }).id === id);
+  return sampleSchema.parse(entry);
+}
+
+/** Runs the real pipeline for a Sample with fixed ports and the real SHA-256 over the receipt text bytes. */
+export async function sampleTrace(id: SampleId, label: VersionLabel): Promise<Trace> {
+  const sample = loadSample(id);
+  const bundle = loadTestBundle();
+  if (isCoreError(bundle)) throw new Error(JSON.stringify(bundle));
+  const bytes = new TextEncoder().encode(sample.receiptText);
+  const result = await runPipeline({
+    input: { raw: sample.receiptText, bytes },
+    adapter: new RecordedSampleAdapter(id),
+    trip: sample.trip,
+    ruleSetLabel: label,
+    bundle,
+    portFactory: makePortFactory(counterPorts()),
+  });
+  if (isCoreError(result)) throw new Error(JSON.stringify(result));
+  return result;
+}
+
+/** Anatomy for the five expense rules, as in the design (labels and regions only). */
+export const testAnatomy: Anatomy = {
+  bones: [
+    { ruleId: "date-blocking-before", label: "Date before trip", region: "spine" },
+    { ruleId: "date-blocking-after", label: "Date after trip", region: "spine" },
+    { ruleId: "alcohol-deducting", label: "Alcohol", region: "pelvis" },
+    { ruleId: "meal-limit", label: "Meal limit", region: "ribs" },
+    { ruleId: "line-item-cap", label: "Line-item match", region: "arm-right" },
+  ],
+  fieldLabels: {},
+};
