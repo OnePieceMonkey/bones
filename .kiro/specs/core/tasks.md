@@ -227,7 +227,7 @@ Build `@bones/core` — the pure TypeScript decision kernel of the Bones platfor
   - Ask the user if any questions arise before continuing.
 
 - [x] 12. Expense test fixtures and integration test
-  - [x] 12.1 Create rule JSON files under `test-fixtures/expense/rules/`
+  - [x] 12.1 Create rule JSON files under `rules/expense-auditor/rules/` (moved from `test-fixtures/expense/rules/`)
     - `meal-limit-v1.json`: `effect: "capping"`, `cap: 5000`, condition always-true or a suitable trivially-passing comparison
     - `meal-limit-v2.json`: same structure, `cap: 6000`
     - `meal-limit-v3.json`: same structure, `cap: 7500`
@@ -235,7 +235,7 @@ Build `@bones/core` — the pure TypeScript decision kernel of the Bones platfor
     - `alcohol-deducting.json`: `effect: "deducting"`, `condition` always-true (or check field presence), `effectConfig: { deductionAmount: <from field>, scope: "total" }` — since deduction is dynamic, use a `sum` or `comparison` condition that fires when `alcoholLineCents > 0`; `deductionAmount` reads from the field path via the AST
     - `line-item-cap.json`: `effect: "capping"`, `condition: { kind: "comparison", left: {kind:"path", segments:["claimedTotalCents"]}, op: "!=", right: {kind:"path", segments:["lineItemSumCents"]} }`, `cap: { kind: "path", ... }` pointing to `lineItemSumCents`
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
-  - [x] 12.2 Create rule-set JSON files under `test-fixtures/expense/rule-sets/`
+  - [x] 12.2 Create rule-set JSON files under `rules/expense-auditor/rule-sets/` (moved from `test-fixtures/expense/rule-sets/`)
     - `expense-v1.json`: includes `date-blocking`, `alcohol-deducting`, `meal-limit-v1`, `line-item-cap`
     - `expense-v2.json`: same but with `meal-limit-v2`
     - `expense-v3.json`: same but with `meal-limit-v3`

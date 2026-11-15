@@ -127,17 +127,6 @@ packages/core/
 │   └── index.ts              ← public barrel export
 ├── test-fixtures/
 │   └── expense/
-│       ├── rules/
-│       │   ├── meal-limit-v1.json
-│       │   ├── meal-limit-v2.json
-│       │   ├── meal-limit-v3.json
-│       │   ├── date-blocking.json
-│       │   ├── alcohol-deducting.json
-│       │   └── line-item-cap.json
-│       ├── rule-sets/
-│       │   ├── expense-v1.json
-│       │   ├── expense-v2.json
-│       │   └── expense-v3.json
 │       └── recorded/
 │           └── signature-scenario.json
 ├── package.json
@@ -654,9 +643,9 @@ Returns data **exactly as stored** — no transformation, no re-serialization.
 
 ## Test Fixture Layout
 
-All fixtures live under `packages/core/test-fixtures/expense/`. No `src/` file imports from this path.
+The expense rules and rule sets live in the versioned rules folder at the repo root (`rules/expense-auditor/rules/` and `rules/expense-auditor/rule-sets/`). The recorded scenario stays in `packages/core/test-fixtures/expense/recorded/`. No `src/` file imports from any of these paths.
 
-### `test-fixtures/expense/rules/`
+### `rules/expense-auditor/rules/`
 
 | File | Effect | Key config |
 |------|--------|-----------|
@@ -667,7 +656,7 @@ All fixtures live under `packages/core/test-fixtures/expense/`. No `src/` file i
 | `alcohol-deducting.json` | `deducting` | `deductionAmount` = field `alcoholLineCents`; `scope: "total"` |
 | `line-item-cap.json` | `capping` | `cap`: AST sum expression over line items |
 
-### `test-fixtures/expense/rule-sets/`
+### `rules/expense-auditor/rule-sets/`
 
 | File | Included rules |
 |------|---------------|

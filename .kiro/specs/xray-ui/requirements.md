@@ -301,7 +301,7 @@ interface Anatomy {
 #### Acceptance Criteria
 
 1. THE Demo_App SHALL live in `packages/xray-ui/demo` as a Vite app without Storybook.
-2. THE Demo_App SHALL evaluate the Signature_Fixture through `@bones/core` `evaluate` and `createTrace`, using the rule sets expense-v1, expense-v2 and expense-v3 and the rules in `packages/core/test-fixtures/expense/rules`.
+2. THE Demo_App SHALL evaluate the Signature_Fixture through `@bones/core` `evaluate` and `createTrace`, using the rule sets expense-v1, expense-v2 and expense-v3 and the rules in `rules/expense-auditor/rules`.
 3. THE Demo_App SHALL define its own Anatomy with expense wording.
 4. THE Demo_App SHALL render an XrayView for the resulting Trace.
 5. WHEN the Version_Knob reports a new version, THE Demo_App SHALL call `evaluate` and `createTrace` for that rule set version and pass the new Trace to the XrayView.

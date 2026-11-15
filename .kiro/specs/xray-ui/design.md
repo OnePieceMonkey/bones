@@ -821,11 +821,11 @@ As a belt-and-braces measure `xray.css` also contains `@media (prefers-reduced-m
 import { evaluate, createTrace, validate, isCoreError } from "@bones/core";
 import type { Rule, RuleSet, RuleCatalog, AmountScope, Trace } from "@bones/core";
 import { z } from "zod";
-import expenseV1 from "../../core/test-fixtures/expense/rule-sets/expense-v1.json";
-import expenseV2 from "../../core/test-fixtures/expense/rule-sets/expense-v2.json";
-import expenseV3 from "../../core/test-fixtures/expense/rule-sets/expense-v3.json";
+import expenseV1 from "../../../rules/expense-auditor/rule-sets/expense-v1.json";
+import expenseV2 from "../../../rules/expense-auditor/rule-sets/expense-v2.json";
+import expenseV3 from "../../../rules/expense-auditor/rule-sets/expense-v3.json";
 import scenario from "../../core/test-fixtures/expense/recorded/signature-scenario.json";
-import alcohol from "../../core/test-fixtures/expense/rules/alcohol-deducting.json";
+import alcohol from "../../../rules/expense-auditor/rules/alcohol-deducting.json";
 // ... date-blocking-before, date-blocking-after, line-item-cap, meal-limit-v1, meal-limit-v2, meal-limit-v3
 
 export const VERSIONS = ["v1", "v2", "v3"] as const;

@@ -417,7 +417,7 @@ Build the small `@bones/core` change first (capping before deducting, amounts be
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo anatomy"`
   - [x] 18.2 Create `demo/demoTrace.ts`
     - Export `VERSIONS`, `DemoVersion`, `buildCatalog()` (seven rule files, keys `id@version`) and `buildTrace(version)`: validate the signature scenario fields with zod, pick the rule set JSON, use `amountScopes = [{ name: "total", claimedCents: claimedTotalCents }]` (48000), call `evaluate` and `createTrace` from `@bones/core` with deterministic stub ports; throw on a `CoreError`
-    - Import the JSON files from `../../core/test-fixtures/expense/...`; confirm the needed functions are exported from `packages/core/src/index.ts`
+    - Import the JSON files from `../../../rules/expense-auditor/...` (the recorded scenario from `../../core/test-fixtures/expense/recorded/`); confirm the needed functions are exported from `packages/core/src/index.ts`
     - _Requirements: 16.2, 16.5, 16.6, 16.9_
     - Commit: `git add packages/xray-ui && git commit -m "feat(xray-ui): add demo trace builder"`
   - [x] 18.3 Create the demo page and `dev` script
