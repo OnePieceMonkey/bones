@@ -1,10 +1,13 @@
 import { useSyncExternalStore } from "react";
-import { isCoreError } from "@bones/core";
+import { isCoreError, override as coreOverride, replay as coreReplay } from "@bones/core";
 import type { CoreError, DecisionResult, override, replay } from "@bones/core";
 import { RecordedSampleAdapter } from "../extraction/RecordedSampleAdapter";
-import { sampleSchema } from "../extraction/samples";
+import { SAMPLES, sampleSchema } from "../extraction/samples";
 import type { SampleId } from "../extraction/samples";
+import { sha256Hex } from "../pipeline/hash";
+import { makePortFactory } from "../pipeline/ports";
 import type { PortFactory } from "../pipeline/ports";
+import { loadBundle } from "../rules/catalog";
 import { replayTrace, runPipeline } from "../pipeline/runPipeline";
 import type { RuleBundle, VersionLabel } from "../pipeline/runPipeline";
 import type { IntroEvent } from "./intro";
@@ -173,6 +176,26 @@ export function createSessionStore(deps: SessionDeps): SessionStore {
     clearNotice: () => dispatch({ type: "notice_cleared" }),
     reset: () => dispatch({ type: "reset" }),
   };
+}
+
+/** Recorded-mode session with the real ports, the bundled rules and the bundled samples. */
+export function createProductionSession(
+  loader: () => RuleBundle | CoreError = loadBundle,
+): SessionStore | CoreError {
+  const bundle = loader();
+  if (isCoreError(bundle)) return bundle;
+  return createSessionStore({
+    bundle,
+    samples: SAMPLES,
+    portFactory: makePortFactory(),
+    sha256: sha256Hex,
+    replayFn: coreReplay,
+    overrideFn: coreOverride,
+    prefersReducedMotion: () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  });
 }
 
 export function useSession(store: SessionStore): AppState {
