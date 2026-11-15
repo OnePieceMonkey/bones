@@ -68,6 +68,37 @@ const anatomy: Anatomy = {
 
 A bone is fractured only when its rule matched and changed the decision: a blocking effect, or a capping or deducting effect whose `amountAfterCents` is lower than `amountBeforeCents`. A matched capping or deducting rule that changed nothing is shown as passed with the text "applied, no change".
 
+## Showing a human override: the `effective` prop
+
+`XrayView` and `ResultPlate` accept an optional `effective` prop:
+
+```ts
+effective?: { result: DecisionResult; reviewerName: string };
+```
+
+`DecisionResult` comes from `@bones/core`. Without `effective`, the plate shows the rule result as before. With it, `ResultPlate`:
+
+- shows the label and icon of `effective.result` instead of the rule result,
+- adds the line "overruled by <reviewerName>",
+- adds the line "Rules decided: <label>", with the label of `trace.result`,
+- labels the amount "Amount by rules".
+
+Amount rule: an override carries a result, never an amount. The only amount on the plate is the rule amount, `trace.amountCents`, formatted with `formatValue`. The plate does not recompute or replace it.
+
+`trace` stays unchanged and keeps describing the rule decision. In `XrayView`, only `ResultPlate` receives `effective`. `Skeleton`, `EcgLine`, `AnswerCard`, `DrBonesChat` and `FilmClip` all get the same `trace`, so fractures, the heartbeat line and the "OVERRULED BY RULE" stamp look the same with or without an override. The `title` prop still feeds the title plate.
+
+```tsx
+<XrayView
+  trace={trace}
+  anatomy={anatomy}
+  source={source}
+  versions={versions}
+  version={version}
+  onVersionChange={setVersion}
+  effective={{ result: "approved", reviewerName: "A. Meyer" }}
+/>
+```
+
 ## Exported components
 
 - `XrayView`: composition of all parts in the reference layout.
@@ -83,7 +114,7 @@ A bone is fractured only when its rule matched and changed the decision: a block
 - `KnobControl`: RULE VERSION rotary knob.
 - `GaugeControl`: AI READ CONFIDENCE needle gauge.
 - `ToggleSwitch`: X-RAY switch with lamp.
-- `ResultPlate`: result label, icon and amount.
+- `ResultPlate`: result label, icon and amount. Takes an optional `effective` prop (see above).
 
 Hooks: `useReducedMotion`, `useTypewriter`, `HoveredRuleProvider`, `useHoveredRule`.
 
