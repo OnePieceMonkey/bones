@@ -26,6 +26,12 @@ export const arbTrip: fc.Arbitrary<ArbTrip> = fc
   .tuple(arbIsoDate, fc.integer({ min: 0, max: 30 }))
   .map(([start, days]) => ({ start, end: addDays(start, days) }));
 
+export const arbLabel: fc.Arbitrary<"v1" | "v2" | "v3"> = fc.constantFrom(
+  "v1" as const,
+  "v2" as const,
+  "v3" as const,
+);
+
 export type ArbLineItem = {
   description: string;
   amount: number;
