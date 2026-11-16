@@ -67,3 +67,19 @@ describe("ResultFooter", () => {
     expect(status).toHaveTextContent("Rules decided: PARTIALLY APPROVED");
   });
 });
+
+describe("ResultFooter progress track", () => {
+  it("styles a visible track and a scaleX fill", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { resolve } = await import("node:path");
+    const css = readFileSync(resolve(__dirname, "../../styles/panels.css"), "utf8");
+    const track = /\.xr-progress\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    const fill = /\.xr-progress-fill\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(track).toMatch(/background:/);
+    expect(track).toMatch(/border:/);
+    expect(track).toMatch(/height:/);
+    expect(fill).toMatch(/background:/);
+    expect(fill).toMatch(/width:\s*100%/);
+    expect(fill).toMatch(/transform-origin:\s*left/);
+  });
+});
