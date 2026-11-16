@@ -9,6 +9,7 @@ export default defineConfig({
     environmentMatchGlobs: [["tests/**/*.node.test.ts", "node"]],
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.{ts,tsx}"],
+    exclude: ["e2e/**", "node_modules/**", "dist/**"],
     css: false,
   },
 });
