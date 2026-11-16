@@ -85,7 +85,7 @@ describe("DecisionView (signature case)", () => {
 
   it("an override shows the reviewer and the rules result; fractured bones stay at 2", async () => {
     const store = await setup();
-    await userEvent.click(screen.getByRole("button", { name: "Overrule" }));
+    await userEvent.click(screen.getByRole("button", { name: "Human override" }));
     await userEvent.type(screen.getByLabelText("Reviewer name"), "Ada");
     await userEvent.type(screen.getByLabelText("Reason"), "Manager approved the beer");
     await userEvent.click(screen.getByRole("button", { name: "Save override" }));
@@ -94,7 +94,7 @@ describe("DecisionView (signature case)", () => {
     expect(plate).toHaveTextContent("Rules decided: PARTIALLY APPROVED");
     expect(fractured()).toHaveLength(2);
     expect((store.getState() as DecisionState).overrides).toHaveLength(1);
-    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Overrule" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Human override" }));
   });
 
   it("a failing replay shows the error panel and keeps v1", async () => {

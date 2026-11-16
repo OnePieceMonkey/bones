@@ -51,7 +51,9 @@ export function ShellFrame({
       data-intro={reduced ? "done" : introPhase}
       data-xray={xray ? "true" : "false"}
     >
-      <h1 className="xr-visually-hidden">{heading}</h1>
+      <h1 className="xr-visually-hidden" tabIndex={-1}>
+        {heading}
+      </h1>
       <HeaderBar xray={xray} {...(headerActions !== undefined ? { headerActions } : {})} />
       <SteelFrame className="xr-shell-frame">
         <Lightbox

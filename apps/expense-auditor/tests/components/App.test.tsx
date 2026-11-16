@@ -98,7 +98,7 @@ describe("App", () => {
     await userEvent.click(screen.getByRole("button", { name: "Download trace" }));
     expect(downloads).toBe(1);
 
-    await userEvent.click(screen.getByRole("button", { name: "Overrule" }));
+    await userEvent.click(screen.getByRole("button", { name: "Human override" }));
     await userEvent.type(screen.getByLabelText("Reviewer name"), "Ada");
     await userEvent.type(screen.getByLabelText("Reason"), "Manager approved");
     await userEvent.click(screen.getByRole("button", { name: "Save override" }));

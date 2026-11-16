@@ -27,36 +27,7 @@ main {
   padding: var(--xr-space-4);
 }
 
-/* Brushed-metal plate around the whole screen */
-.app-plate {
-  display: inline-block;
-  margin: 0 0 var(--xr-space-3);
-  padding: var(--xr-space-2) var(--xr-space-3);
-  background: var(--xr-bg-metal-light);
-  color: var(--xr-text-on-metal);
-  border: 2px solid var(--xr-bg-metal-dark);
-  border-radius: var(--xr-radius);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 /* Start screen */
-.app-start {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: var(--xr-space-4);
-  background: var(--xr-bg-panel);
-  color: var(--xr-text);
-  border: 4px solid var(--xr-bg-metal-dark);
-  border-radius: var(--xr-radius);
-}
-
-.app-start h1 {
-  margin: 0 0 var(--xr-space-2);
-  color: var(--xr-cyan);
-}
-
 .app-lead {
   margin: 0 0 var(--xr-space-3);
   color: var(--xr-text-dim);
@@ -93,17 +64,6 @@ main {
 }
 
 /* Decision view */
-.app-decision {
-  display: flex;
-  flex-direction: column;
-  gap: var(--xr-space-3);
-}
-
-.app-decision h1 {
-  margin: 0;
-  color: var(--xr-cyan);
-}
-
 .app-note {
   display: inline-block;
   margin: 0;
@@ -120,16 +80,6 @@ main {
 }
 
 /* Toolbar */
-.app-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--xr-space-2);
-  padding: var(--xr-space-2);
-  background: var(--xr-bg-panel);
-  border: 1px solid var(--xr-bg-metal-dark);
-  border-radius: var(--xr-radius);
-}
-
 /* Buttons */
 .app-button {
   min-height: 2.75rem;

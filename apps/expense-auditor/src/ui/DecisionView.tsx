@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { isCoreError } from "@bones/core";
-import { XrayView } from "@bones/xray-ui";
+import { Shell } from "@bones/xray-ui";
 import { anatomy } from "../anatomy";
 import { formatTripWindow } from "../format/dates";
 import { INTRO_DELAY_MS } from "../state/intro";
 import type { DecisionState } from "../state/reducer";
-import { displayedTrace, effectiveView, replayNote, titlePlate } from "../state/selectors";
+import { claimedCentsOf, displayedTrace, effectiveView, replayNote, titlePlate } from "../state/selectors";
 import type { SessionStore } from "../state/sessionStore";
 import { VERSION_LABELS, isVersionLabel } from "../rules/catalog";
 import { ErrorPanel } from "./ErrorPanel";
@@ -40,13 +40,15 @@ export function DecisionView({ state, store, reducedMotion }: DecisionViewProps)
   const motion = reducedMotion === undefined ? {} : { reducedMotion };
 
   return (
-    <div className="app-decision">
-      <h1 tabIndex={-1}>Expense Auditor</h1>
-      <XrayView
+    <>
+      <Shell
+        heading="Expense Auditor"
+        lightboxLabel={titlePlate(state.origin)}
+        introKey={state.sessionId}
         trace={trace}
         anatomy={anatomy}
         source={state.source}
-        title={titlePlate(state.origin)}
+        claimedCents={claimedCentsOf(trace)}
         versions={VERSIONS}
         version={state.selected}
         onVersionChange={(v) => {
@@ -54,16 +56,18 @@ export function DecisionView({ state, store, reducedMotion }: DecisionViewProps)
         }}
         xray={state.intro.xray}
         onXrayChange={(next) => store.dispatchIntro({ type: "user", xray: next })}
+        onOverride={() => setDialogOpen(true)}
+        overrideRef={overruleRef}
+        headerActions={<Toolbar state={state} store={store} />}
+        statusNote={
+          <>
+            <VersionNote note={replayNote(state)} />
+            <span className="app-trip-text">{formatTripWindow(state.trip)}</span>
+          </>
+        }
         {...(effective === null ? {} : { effective })}
         {...motion}
       />
-      <VersionNote note={replayNote(state)} />
-      <p className="app-trip-text">{formatTripWindow(state.trip)}</p>
-      {/* Temporary until task 8.3 moves Overrule into the Shell's "Human override" button. */}
-      <button type="button" className="app-button" ref={overruleRef} onClick={() => setDialogOpen(true)}>
-        Overrule
-      </button>
-      <Toolbar state={state} store={store} />
       <OverrideDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
@@ -72,6 +76,6 @@ export function DecisionView({ state, store, reducedMotion }: DecisionViewProps)
       />
       <ErrorPanel error={state.notice === null ? null : state.notice.error} title="Replay failed" />
       <ErrorPanel error={effectiveError} title="Override could not be applied" />
-    </div>
+    </>
   );
 }
