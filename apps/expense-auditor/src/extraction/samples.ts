@@ -64,4 +64,11 @@ export const SAMPLE_BLURBS: Record<SampleId, string> = {
   "outside-window": "A receipt dated after the trip ended. The date rule rejects it.",
 };
 
+/** One neutral line per sample, written from visible facts only. No result is named. */
+export const SAMPLE_FILM_LINES: Record<SampleId, string> = {
+  signature: "Harbor Grill, 2024-03-15. Four items, printed total 48.00.",
+  clean: "Corner Bistro, 2024-03-12. Three items, printed total 32.40.",
+  "outside-window": "Airport Cafe, 2024-03-25. Two items, printed total 21.50.",
+};
+
 export const DEFAULT_TRIP: TripWindow = { start: "2024-03-10", end: "2024-03-20" };

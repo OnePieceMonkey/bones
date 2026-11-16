@@ -7,6 +7,7 @@ import "./styles/header.css";
 import "./styles/stage.css";
 import "./styles/panels.css";
 import "./styles/controls.css";
+import "./styles/sheet.css";
 import "./styles/intro.css";
 import "./styles/motion.css";
 
@@ -47,6 +48,8 @@ export { Toggle } from "./components/panel/Toggle";
 export type { ToggleProps } from "./components/panel/Toggle";
 export { Lamp } from "./components/panel/Lamp";
 export type { LampProps } from "./components/panel/Lamp";
+export { FilmSheet } from "./components/FilmSheet";
+export type { FilmSheetProps } from "./components/FilmSheet";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";

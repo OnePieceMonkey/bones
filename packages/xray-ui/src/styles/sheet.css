@@ -1,0 +1,57 @@
+/* Film sheet: a clipped film card for the start screen. */
+.xr-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--xr-u, 1px));
+  box-sizing: border-box;
+  min-width: 0;
+  padding: calc(30 * var(--xr-u, 1px)) calc(16 * var(--xr-u, 1px)) calc(16 * var(--xr-u, 1px));
+  text-align: left;
+  font: inherit;
+  color: var(--xr-text-on-sheet);
+  background: var(--xr-bg-sheet) url("../assets/film.webp") center / cover no-repeat;
+  border: 1px solid rgba(61, 232, 255, 0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 500ms ease;
+}
+.xr-sheet-clip {
+  position: absolute;
+  top: calc(-8 * var(--xr-u, 1px));
+  left: 50%;
+  width: calc(56 * var(--xr-u, 1px));
+  height: calc(40 * var(--xr-u, 1px));
+  transform: translateX(-50%);
+  background: url("../assets/clip.webp") center / contain no-repeat;
+  pointer-events: none;
+}
+.xr-sheet-title {
+  font-size: max(13px, calc(18 * var(--xr-u, 1px)));
+  font-weight: 700;
+}
+.xr-sheet-desc {
+  display: block;
+  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xr-sheet[data-selected="true"] {
+  transform: translateY(calc(-12 * var(--xr-u, 1px))) scale(1.04);
+}
+.xr-sheet:focus-visible {
+  outline: 3px solid var(--xr-focus, #3de8ff);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast, #05090d);
+}
+.xr-sheet:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Reduced-motion override for this file (the motion guard checks each file). */
+.xr-sheet[data-reduced="true"] { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .xr-sheet { transition: none; }
+}
