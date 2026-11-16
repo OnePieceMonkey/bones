@@ -23,6 +23,29 @@
   background: none;
 }
 
+/*
+ * In the shell the light cone is a real element: .xr-cone carries the blend
+ * and the intro fade, its child .xr-cone-flicker carries the idle flicker.
+ */
+.xr-shell .xr-viewport::before {
+  content: none;
+}
+.xr-cone {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.xr-cone-flicker {
+  position: absolute;
+  inset: 0;
+  background: url("../assets/light-cone.webp") top center / contain no-repeat;
+}
+.xr-lightbox[data-xray="false"] .xr-cone {
+  display: none;
+}
+
 /* Stage cell and cropped photo box (crop 3 % to 65 % of 1208 x 1800 = 1208 x 1116). */
 .xr-stage {
   container-type: size;
@@ -214,11 +237,4 @@
   transform: translateX(-10%);
 }
 .xr-ecg-head--still { opacity: 0; }
-@keyframes xr-ecg-head {
-  from { transform: translateX(-10%); }
-  to { transform: translateX(100%); }
-}
-.anim-ecg-head { animation: xr-ecg-head 3.2s linear infinite; }
-@media (prefers-reduced-motion: reduce) {
-  .anim-ecg-head { animation: none; }
-}
+/* The sweep of .xr-ecg-head is an idle animation; it lives in motion.css. */

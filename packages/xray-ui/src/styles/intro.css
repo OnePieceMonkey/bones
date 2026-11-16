@@ -54,7 +54,7 @@
 .xr-shell.xr-live[data-intro="running"] .xr-viewport {
   animation: xr-intro-flicker var(--xr-t-flicker) linear 0s both;
 }
-.xr-shell.xr-live[data-intro="running"] .xr-viewport::before {
+.xr-shell.xr-live[data-intro="running"] .xr-cone {
   animation: xr-intro-cone calc(var(--xr-t-cone-to) - var(--xr-t-cone-from)) ease-out var(--xr-t-cone-from) both;
 }
 .xr-shell.xr-live[data-intro="running"] .xr-photo::after {

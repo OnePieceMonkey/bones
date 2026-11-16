@@ -98,6 +98,37 @@
   animation: xr-fx-shake-b 300ms ease-in-out 1;
 }
 
+/*
+ * Idle motion. Runs only while the toggle is on and motion is allowed: every
+ * selector sits under .xr-shell.xr-live[data-xray="true"]. Intro animations
+ * use other elements (.xr-cone, .xr-viewport), so nothing fights over a property.
+ */
+@keyframes xr-idle-brightness {
+  from { filter: brightness(0.95); }
+  to { filter: brightness(1.05); }
+}
+@keyframes xr-idle-flicker {
+  0%, 100% { opacity: 1; }
+  20% { opacity: 0.93; }
+  40% { opacity: 0.98; }
+  60% { opacity: 0.91; }
+  80% { opacity: 0.97; }
+}
+@keyframes xr-idle-ecg-head {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(100%); }
+}
+/* 2 s per direction, alternate: one full brightness cycle takes 4 s. */
+.xr-shell.xr-live[data-xray="true"] .xr-photo-img {
+  animation: xr-idle-brightness 2s ease-in-out infinite alternate;
+}
+.xr-shell.xr-live[data-xray="true"] .xr-cone-flicker {
+  animation: xr-idle-flicker 5s linear infinite;
+}
+.xr-shell.xr-live[data-xray="true"] .xr-ecg-head.anim-ecg-head {
+  animation: xr-idle-ecg-head 3.2s linear infinite;
+}
+
 /* Reduced-motion override for this file (the motion guard checks each file). Same pair as shell.css. */
 .xr-shell[data-motion="reduce"],
 .xr-shell[data-motion="reduce"] * {

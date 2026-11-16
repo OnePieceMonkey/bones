@@ -71,6 +71,9 @@ export function ShellFrame({
           {...(lightboxLabel !== undefined ? { title: lightboxLabel } : {})}
           {...(reducedMotion !== undefined ? { reducedMotion } : {})}
         >
+          <span className="xr-cone" aria-hidden="true">
+            <span className="xr-cone-flicker" />
+          </span>
           {children}
           {controls}
         </Lightbox>
