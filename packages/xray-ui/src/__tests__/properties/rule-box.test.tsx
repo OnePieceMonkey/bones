@@ -1,4 +1,7 @@
 // Feature: visual-polish, Property 9: Rule box content is complete
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import fc from "fast-check";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
@@ -87,7 +90,7 @@ describe("Rule box", () => {
     expect(document.querySelector(".xr-rb-line")).toBeNull();
   });
 
-  it("draws a decorative line of width 1.5 inside the lightbox when rects are measured", () => {
+  it("draws a decorative cyan line of width 2 with an end dot inside the lightbox when rects are measured", () => {
     vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
       const make = (left: number, top: number, width: number, height: number) =>
         ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top, toJSON() {} }) as DOMRect;
@@ -110,11 +113,25 @@ describe("Rule box", () => {
     const svg = viewport.querySelector(".xr-rb-line")!;
     expect(svg.getAttribute("aria-hidden")).toBe("true");
     const line = svg.querySelector("line")!;
-    expect(line.getAttribute("stroke-width")).toBe("1.5");
+    const width = Number(line.getAttribute("stroke-width"));
+    expect(width).toBeGreaterThanOrEqual(2);
+    expect(width).toBeLessThanOrEqual(3);
+    const dot = svg.querySelector("circle")!;
+    expect(dot.getAttribute("cx")).toBe(line.getAttribute("x2"));
+    expect(dot.getAttribute("cy")).toBe(line.getAttribute("y2"));
+    expect(Number(dot.getAttribute("r"))).toBeGreaterThan(0);
     expect(Number(line.getAttribute("x2"))).toBe(222);
     expect(Number(line.getAttribute("y2"))).toBe(322);
     // Hotspot centre is left of the middle, so the box sits on the right with a 24 px gap.
     expect(tip.style.left).toBe("246px");
+  });
+
+  it("styles the line with the cyan token, at least 2 px, and a cyan end dot", () => {
+    const css = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../styles/stage.css"), "utf8");
+    const lineRule = /\.xr-rb-line line\s*{([^}]*)}/.exec(css)![1]!;
+    expect(lineRule).toMatch(/stroke:\s*var\(--xr-cyan\)/);
+    expect(Number(/stroke-width:\s*([\d.]+)/.exec(lineRule)![1])).toBeGreaterThanOrEqual(2);
+    expect(/\.xr-rb-line circle\s*{([^}]*)}/.exec(css)![1]).toMatch(/fill:\s*var\(--xr-cyan\)/);
   });
 
   it("shows the empty-evidence text for a rule without evidence rows", () => {

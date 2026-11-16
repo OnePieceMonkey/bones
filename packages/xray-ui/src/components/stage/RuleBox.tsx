@@ -46,11 +46,12 @@ export function RuleBox({ id, bone, anatomy, rect, boxRef }: RuleBoxProps) {
   );
 }
 
-/** Thin line from the rule box to the hotspot centre; covers the lightbox. */
+/** Line from the rule box to the hotspot centre, ending in a dot on the bone; covers the lightbox. */
 export function RuleBoxLine({ line }: { line: { x1: number; y1: number; x2: number; y2: number } }) {
   return (
     <svg className="xr-rb-line" aria-hidden="true" focusable="false">
-      <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} strokeWidth={1.5} />
+      <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} strokeWidth={2} />
+      <circle cx={line.x2} cy={line.y2} r={3.5} />
     </svg>
   );
 }

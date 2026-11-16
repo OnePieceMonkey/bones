@@ -203,7 +203,11 @@
 }
 .xr-rb-line line {
   stroke: var(--xr-cyan);
-  stroke-width: 1.5;
+  stroke-width: 2;
+}
+.xr-rb-line circle {
+  fill: var(--xr-cyan);
+  stroke: none;
 }
 .xr-rulebox {
   position: absolute;
