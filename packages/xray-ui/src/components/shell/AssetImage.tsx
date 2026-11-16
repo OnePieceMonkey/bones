@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CSSProperties } from "react";
 
 export interface AssetImageProps {
   src: string;
@@ -7,6 +8,8 @@ export interface AssetImageProps {
   className?: string;
   /** Default "" (decorative); the image is then hidden from assistive tech. */
   alt?: string;
+  /** Inline custom properties for per-instance values (for example fly-out offsets). */
+  style?: CSSProperties;
 }
 
 /**
@@ -15,7 +18,7 @@ export interface AssetImageProps {
  * appears and nothing shifts. Never sets `loading`, so first-paint images are
  * not deferred.
  */
-export function AssetImage({ src, width, height, className, alt = "" }: AssetImageProps) {
+export function AssetImage({ src, width, height, className, alt = "", style }: AssetImageProps) {
   const [failed, setFailed] = useState(false);
   const decorative = alt === "";
   return (
@@ -25,6 +28,7 @@ export function AssetImage({ src, width, height, className, alt = "" }: AssetIma
       height={height}
       alt={alt}
       {...(className !== undefined ? { className } : {})}
+      {...(style !== undefined ? { style } : {})}
       {...(decorative ? { "aria-hidden": true as const } : {})}
       {...(failed ? { "data-failed": "true" } : {})}
       onError={() => setFailed(true)}

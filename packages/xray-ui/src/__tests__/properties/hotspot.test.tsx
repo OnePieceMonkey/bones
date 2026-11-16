@@ -29,8 +29,13 @@ describe("Property 3: Hotspot visual state follows the bone state", () => {
           expect(el.getAttribute("data-state")).toBe(state);
           expect(el.querySelector(`.xr-hs-ring--${state}`)).not.toBeNull();
           expect(el.querySelectorAll(".xr-hs-check")).toHaveLength(state === "applied-no-change" ? 1 : 0);
-          if (state === "passed" || state === "not-applicable") {
-            expect(el.querySelector(".xr-burst, .xr-splinter")).toBeNull();
+          if (state === "fractured") {
+            expect(el.querySelectorAll(".xr-burst")).toHaveLength(1);
+            const n = el.querySelectorAll(".xr-splinter").length;
+            expect(n).toBeGreaterThanOrEqual(6);
+            expect(n).toBeLessThanOrEqual(8);
+          } else {
+            expect(el.querySelector(".xr-burst, .xr-splinter, .xr-fx")).toBeNull();
           }
         });
         unmount();
@@ -61,6 +66,37 @@ describe("Property 5: Every hotspot has a complete accessible name", () => {
       }),
       { numRuns: 100 },
     );
+  });
+});
+
+describe("Fracture visuals", () => {
+  it("keeps the ring and the accessible name when the burst image fails", () => {
+    const { container } = render(<Stage trace={signatureTrace()} anatomy={signatureAnatomy()} />);
+    const fractured = container.querySelector<HTMLElement>('.xr-hotspot[data-state="fractured"]')!;
+    const name = fractured.querySelector("button.xr-bone-btn")!.getAttribute("aria-label");
+    fireEvent.error(fractured.querySelector(".xr-burst")!);
+    expect(fractured.querySelector(".xr-burst")!.getAttribute("data-failed")).toBe("true");
+    expect(fractured.querySelector(".xr-hs-ring--fractured")).not.toBeNull();
+    expect(fractured.querySelector("button.xr-bone-btn")!.getAttribute("aria-label")).toBe(name);
+  });
+
+  it("renders the same trace twice with identical DOM and six distinct splinter files", () => {
+    const a = render(<Stage trace={signatureTrace()} anatomy={signatureAnatomy()} />);
+    const htmlA = a.container.innerHTML;
+    a.unmount();
+    const b = render(<Stage trace={signatureTrace()} anatomy={signatureAnatomy()} />);
+    expect(b.container.innerHTML).toBe(htmlA);
+    for (const spot of b.container.querySelectorAll('.xr-hotspot[data-state="fractured"]')) {
+      const srcs = [...spot.querySelectorAll(".xr-splinter")].map((e) => e.getAttribute("src"));
+      expect(srcs).toHaveLength(6);
+      expect(new Set(srcs).size).toBe(6);
+    }
+  });
+
+  it("styles splinters with opacity 0.7 and the burst with screen blend in CSS", () => {
+    const css = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../styles/stage.css"), "utf8");
+    expect(css).toMatch(/\.xr-splinter\s*{[^}]*opacity:\s*0\.7/);
+    expect(css).toMatch(/\.xr-burst\s*{[^}]*mix-blend-mode:\s*screen/);
   });
 });
 

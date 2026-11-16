@@ -1,8 +1,12 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cx } from "../../cx";
+import { fractureBurstUrl, SPLINTER_URLS } from "../../assets";
+import { splinters } from "../../model/hash";
+import { splinterAssets } from "../../model/splinterAssets";
 import type { HotspotState } from "../../model/hotspotState";
 import type { BoneView, CommonProps } from "../../types";
 import { BoneButton } from "../Bone";
+import { AssetImage } from "../shell/AssetImage";
 
 export interface HotspotProps extends CommonProps {
   bone: BoneView;
@@ -15,6 +19,44 @@ export interface HotspotProps extends CommonProps {
 }
 
 const r2 = (v: number): number => Math.round(v * 100) / 100;
+
+/** Extra fly-out distance beyond the splinter length, in --xr-u units. */
+const FLY_EXTRA = 20;
+
+/**
+ * Fracture effects group: flash, burst image and six splinters. All values are
+ * deterministic per rule id. The red ring is drawn by CSS, so the glow stays
+ * when an image fails to load.
+ */
+function FractureFx({ ruleId }: { ruleId: string }) {
+  const files = splinterAssets(ruleId);
+  const shards = splinters(ruleId);
+  return (
+    <span className="xr-fx" aria-hidden="true">
+      <span className="xr-hs-flash" />
+      <AssetImage className="xr-burst" src={fractureBurstUrl} width={768} height={768} />
+      {shards.map((sh, i) => {
+        const rad = (sh.angleDeg * Math.PI) / 180;
+        const dist = sh.length + FLY_EXTRA;
+        const style = {
+          "--dx": r2(Math.cos(rad) * dist),
+          "--dy": r2(Math.sin(rad) * dist),
+          "--rot": `${sh.angleDeg - 90}deg`,
+        } as CSSProperties;
+        return (
+          <AssetImage
+            key={i}
+            className="xr-splinter"
+            src={SPLINTER_URLS[files[i] ?? 0] as string}
+            width={60}
+            height={160}
+            style={style}
+          />
+        );
+      })}
+    </span>
+  );
+}
 
 /**
  * One anchored hotspot: a ring by state, an optional check, and the focusable
@@ -35,6 +77,7 @@ export function Hotspot({ bone, place, hotspotState, describedBy, className, red
           {"\u2713"}
         </span>
       )}
+      {hotspotState === "fractured" && <FractureFx ruleId={bone.ruleId} />}
       <BoneButton
         bone={bone}
         {...(describedBy !== undefined ? { describedBy } : {})}
