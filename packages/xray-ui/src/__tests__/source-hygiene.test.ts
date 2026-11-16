@@ -12,7 +12,9 @@ function listFiles(dir: string): string[] {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name)
     if (statSync(full).isDirectory()) {
-      if (name === '__tests__') continue
+      // src/assets/ holds binary images (webp). They must not be read as UTF-8 text.
+      // Every text file elsewhere under src/ is still scanned with all patterns.
+      if (name === '__tests__' || (name === 'assets' && dir === srcDir)) continue
       out.push(...listFiles(full))
     } else {
       out.push(full)
