@@ -37,8 +37,22 @@ describe("FilmSheet", () => {
   it("removes the transition in Reduced_Motion", () => {
     render(<FilmSheet id="s1" title="T" description="D" reducedMotion onSelect={() => {}} />);
     expect(screen.getByRole("button")).toHaveAttribute("data-reduced", "true");
-    expect(css).toMatch(/\.xr-sheet\[data-reduced="true"\] \{ transition: none; \}/);
-    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{\s*\.xr-sheet \{ transition: none; \}/);
+    expect(css).toMatch(/\.xr-sheet\[data-reduced="true"\], \.xr-sheet\[data-reduced="true"\]::after \{ transition: none; \}/);
+    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{\s*\.xr-sheet, \.xr-sheet::after \{ transition: none; \}/);
+  });
+  it("shows a decorative paper thumbnail that does not change the name or description", () => {
+    const { container } = render(<FilmSheet id="s1" title="T" description="D" onSelect={() => {}} />);
+    const img = container.querySelector("img.xr-sheet-thumb");
+    expect(img).toHaveAttribute("alt", "");
+    expect(img).toHaveAttribute("aria-hidden", "true");
+    expect(img).toHaveAttribute("width");
+    expect(img).toHaveAttribute("height");
+    const b = screen.getByRole("button", { name: "T" });
+    expect(b).toHaveAccessibleDescription("D");
+  });
+  it("lifts 4 px on hover with a pseudo-element glow that fades in", () => {
+    expect(css).toMatch(/\.xr-sheet:hover:not\(:disabled\)[^{]*\{[^}]*translateY\(calc\(-4 \*/);
+    expect(css).toMatch(/\.xr-sheet::after \{[^}]*opacity: 0;[^}]*transition: opacity/);
   });
   it("keeps the clip decorative", () => {
     const { container } = render(<FilmSheet id="s1" title="T" description="D" onSelect={() => {}} />);

@@ -1,5 +1,7 @@
 import type { CommonProps } from "../types";
 import { cx } from "../cx";
+import { paperUrl } from "../assets";
+import { AssetImage } from "./shell/AssetImage";
 
 export interface FilmSheetProps extends CommonProps {
   /** Used for the description id. */
@@ -43,6 +45,7 @@ export function FilmSheet({
       onClick={onSelect}
     >
       <span className="xr-sheet-clip" aria-hidden="true" />
+      <AssetImage src={paperUrl} width={62} height={110} className="xr-sheet-thumb" />
       <span id={`${id}-title`} className="xr-sheet-title">{title}</span>
       <span id={descId} className="xr-sheet-desc">
         {description}

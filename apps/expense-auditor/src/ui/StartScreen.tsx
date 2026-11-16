@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FilmSheet, ShellFrame } from "@bones/xray-ui";
+import { FilmSheet, ShellFrame, StartHeadline } from "@bones/xray-ui";
 import { SAMPLE_FILM_LINES, SAMPLE_IDS } from "../extraction/samples";
 import type { SampleId } from "../extraction/samples";
 import type { StartError } from "../state/reducer";
@@ -25,6 +25,10 @@ export function StartScreen({ busy, error, onLoadSample, reducedMotion }: StartS
   return (
     <>
       <ShellFrame heading="Expense Auditor" xray lightboxLabel="Load sample receipt" {...motion}>
+        <StartHeadline
+          title="Pick a receipt to X-ray."
+          subtitle="The AI reads the receipt. The rules decide."
+        />
         <div role="group" aria-label="Load sample receipt" className="app-sheets">
           {SAMPLE_IDS.map((id) => (
             <FilmSheet

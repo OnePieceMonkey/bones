@@ -113,7 +113,7 @@ const FOCUS_PAIRS: { name: string; fg: string; bg: string }[] = [
   })),
 ];
 
-// Count of text pairs: 18 original + 9 token pairs above + 2 glass + 1 paper image = 30.
+// Count of text pairs: 18 original + 9 token pairs above + 2 glass + 1 paper image + 2 start subline = 32.
 describe("new surface contrast", () => {
   // The old exact count of 18 became "at least 29" because 11 new surfaces were added.
   it("has at least 29 text pairs", async () => {
@@ -148,6 +148,13 @@ describe("new surface contrast", () => {
     expect(ratio, failMessage("paper document", ratio, 4.5)).toBeGreaterThanOrEqual(4.5);
   });
 
+  it("start subline meets 4.5 on the darkest and lightest film pixel", async () => {
+    const { light, dark } = await extremePixels(join(assets, "film.webp"));
+    for (const [label, px] of [["darkest", dark], ["lightest", light]] as const) {
+      const ratio = contrastRatio(need("--xr-text-start-sub"), rgbToHex(px));
+      expect(ratio, failMessage(`start subline on ${label} film pixel`, ratio, 4.5)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
   it.each(FOCUS_PAIRS.map((p) => [p.name, p] as const))("%s >= 3", (_n, p) => {
     const ratio = contrastRatio(need(p.fg), need(p.bg));
     expect(ratio, failMessage(p.name, ratio, 3)).toBeGreaterThanOrEqual(3);

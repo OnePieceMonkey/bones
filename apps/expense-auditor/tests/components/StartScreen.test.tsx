@@ -12,7 +12,8 @@ describe("StartScreen", () => {
     expect(container.querySelectorAll("h1")).toHaveLength(1);
     expect(container.querySelectorAll(".xr-sheet")).toHaveLength(3);
     for (const name of NAMES) expect(screen.getByRole("button", { name })).toBeInTheDocument();
-    expect(screen.queryByText("The AI reads the receipt. The rules decide.")).toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Pick a receipt to X-ray." })).toBeInTheDocument();
+    expect(screen.getByText("The AI reads the receipt. The rules decide.")).toBeInTheDocument();
   });
 
   it("has the three sample buttons with blurbs and calls onLoadSample with the id", async () => {

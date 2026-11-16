@@ -37,6 +37,7 @@
   --xr-text-header: #e8f4f8;
   --xr-bg-header: #0b1620;
   --xr-text-on-sheet: #e8f4f8;
+  --xr-text-start-sub: #b8d6e2;  /* subline on the lightest film pixel, read by the contrast test */
   --xr-bg-sheet: #10222e;
   --xr-text-bubble: #e8f4f8;
   --xr-bg-bubble: #132636;
