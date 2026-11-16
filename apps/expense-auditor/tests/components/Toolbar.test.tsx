@@ -1,4 +1,3 @@
-import { createRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -34,33 +33,19 @@ afterEach(() => {
 });
 
 describe("Toolbar", () => {
-  it("has three typed buttons in a labelled toolbar", async () => {
+  it("has two typed buttons in a labelled toolbar", async () => {
     const store = await loadedStore();
     render(
       <Toolbar
         state={store.getState() as DecisionState}
         store={store}
-        onOverrule={() => {}}
-        overruleRef={createRef<HTMLButtonElement>()}
       />,
     );
     const bar = screen.getByRole("toolbar", { name: "Decision actions" });
     const buttons = screen.getAllByRole("button");
-    expect(buttons.map((b) => b.textContent)).toEqual(["Overrule", "Download trace", "Load another receipt"]);
+    expect(buttons.map((b) => b.textContent)).toEqual(["Download trace", "Load another receipt"]);
     for (const b of buttons) expect(b).toHaveAttribute("type", "button");
     expect(bar).toContainElement(buttons[0] as HTMLElement);
-  });
-
-  it("Overrule calls onOverrule and the ref points at the button", async () => {
-    const store = await loadedStore();
-    const onOverrule = vi.fn();
-    const ref = createRef<HTMLButtonElement>();
-    render(
-      <Toolbar state={store.getState() as DecisionState} store={store} onOverrule={onOverrule} overruleRef={ref} />,
-    );
-    await userEvent.setup().click(screen.getByRole("button", { name: "Overrule" }));
-    expect(onOverrule).toHaveBeenCalledTimes(1);
-    expect(ref.current).toBe(screen.getByRole("button", { name: "Overrule" }));
   });
 
   it("Download trace uses the injected download and makes no network request", async () => {
@@ -73,8 +58,6 @@ describe("Toolbar", () => {
       <Toolbar
         state={state}
         store={store}
-        onOverrule={() => {}}
-        overruleRef={createRef<HTMLButtonElement>()}
         download={download}
       />,
     );
@@ -93,8 +76,6 @@ describe("Toolbar", () => {
       <Toolbar
         state={store.getState() as DecisionState}
         store={store}
-        onOverrule={() => {}}
-        overruleRef={createRef<HTMLButtonElement>()}
       />,
     );
     await userEvent.setup().click(screen.getByRole("button", { name: "Load another receipt" }));

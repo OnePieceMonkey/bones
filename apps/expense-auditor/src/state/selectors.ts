@@ -1,5 +1,6 @@
 import { effectiveResult, isCoreError } from "@bones/core";
 import type { CoreError, DecisionResult, Override, Trace } from "@bones/core";
+import { isRuleFields } from "../pipeline/toRuleFields";
 import type { DecisionState, Origin } from "./reducer";
 
 export type EffectiveView = { result: DecisionResult; reviewerName: string };
@@ -30,6 +31,12 @@ export function effectiveView(s: DecisionState): EffectiveView | CoreError | nul
     if (Date.parse(o.createdAt) > Date.parse(latest.createdAt)) latest = o;
   }
   return { result, reviewerName: latest.reviewerName };
+}
+
+/** Claimed total in cents of the trace's validated fields; 0 when the shape is invalid. */
+export function claimedCentsOf(trace: Trace): number {
+  const fields: unknown = trace.validatedFields;
+  return isRuleFields(fields) ? fields.claimedTotalCents : 0;
 }
 
 export function titlePlate(origin: Origin | null, mode?: "recorded" | "live"): string {

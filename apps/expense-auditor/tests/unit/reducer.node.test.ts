@@ -3,7 +3,7 @@ import { isCoreError } from "@bones/core";
 import type { CoreError, Override } from "@bones/core";
 import { initialState, reducer } from "../../src/state/reducer";
 import type { Action, AppState, DecisionState } from "../../src/state/reducer";
-import { displayedTrace, effectiveView, linkedOverrides, replayNote, titlePlate } from "../../src/state/selectors";
+import { claimedCentsOf, displayedTrace, effectiveView, linkedOverrides, replayNote, titlePlate } from "../../src/state/selectors";
 import { sampleTrace, signatureDecisionState } from "../helpers/fixtures";
 
 const err: CoreError = { kind: "invalid_replay_arguments", message: "boom", missingField: "x" };
@@ -134,6 +134,13 @@ describe("selectors", () => {
     expect(replayNote(state)).toBeNull();
     expect(replayNote({ ...state, selected: "v2" })).toBe("Replayed with v2");
     expect(displayedTrace({ ...state, selected: "v3" })).toBe(state.replays.v3);
+  });
+
+  it("claimedCentsOf reads claimedTotalCents and gives 0 for an invalid shape", async () => {
+    const state = await signatureDecisionState();
+    const fields = state.original.validatedFields as { claimedTotalCents: number };
+    expect(claimedCentsOf(state.original)).toBe(fields.claimedTotalCents);
+    expect(claimedCentsOf({ ...state.original, validatedFields: { nope: 1 } })).toBe(0);
   });
 
   it("titlePlate shows the mode", async () => {

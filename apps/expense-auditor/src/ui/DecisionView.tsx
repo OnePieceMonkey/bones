@@ -59,7 +59,11 @@ export function DecisionView({ state, store, reducedMotion }: DecisionViewProps)
       />
       <VersionNote note={replayNote(state)} />
       <p className="app-trip-text">{formatTripWindow(state.trip)}</p>
-      <Toolbar state={state} store={store} onOverrule={() => setDialogOpen(true)} overruleRef={overruleRef} />
+      {/* Temporary until task 8.3 moves Overrule into the Shell's "Human override" button. */}
+      <button type="button" className="app-button" ref={overruleRef} onClick={() => setDialogOpen(true)}>
+        Overrule
+      </button>
+      <Toolbar state={state} store={store} />
       <OverrideDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
