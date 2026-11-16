@@ -198,3 +198,60 @@
   outline: calc(3 * var(--xr-u, 1px)) solid var(--xr-focus);
   box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast);
 }
+
+/* Doctor panel: phone-shaped chat with notch, header, scrolling log and footer. */
+.xr-doctor {
+  grid-area: doctor;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border-radius: calc(28 * var(--xr-u, 1px));
+  border: 2px solid var(--xr-cyan-glow);
+  background: var(--xr-bg-panel);
+  color: var(--xr-text-bubble);
+  overflow: hidden;
+  box-shadow: 0 0 calc(18 * var(--xr-u, 1px)) var(--xr-cyan-glow);
+}
+.xr-doctor-notch {
+  align-self: center;
+  flex: none;
+  width: 28%;
+  height: calc(14 * var(--xr-u, 1px));
+  border-radius: 0 0 calc(10 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px));
+  background: #000;
+}
+.xr-doctor-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--xr-u, 1px));
+  padding: calc(8 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  background: var(--xr-bg-phone-head);
+  color: var(--xr-text-phone-head);
+}
+.xr-doctor-avatar {
+  width: calc(40 * var(--xr-u, 1px));
+  height: calc(40 * var(--xr-u, 1px));
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--xr-cyan);
+}
+.xr-doctor-title {
+  margin: 0;
+  font-size: max(11px, calc(16 * var(--xr-u, 1px)));
+  letter-spacing: 0.04em;
+}
+.xr-doctor-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+.xr-doctor .xr-bubble {
+  background: var(--xr-bg-bubble);
+  color: var(--xr-text-bubble);
+  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+}
+.xr-doctor .xr-result-footer { flex: none; }
