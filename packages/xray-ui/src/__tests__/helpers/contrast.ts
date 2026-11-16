@@ -17,3 +17,19 @@ export function contrastRatio(a: string, b: string): number {
   const l2 = Math.min(la, lb);
   return (l1 + 0.05) / (l2 + 0.05);
 }
+
+export type Rgb = readonly [number, number, number];
+
+export function hexToRgb(hex: string): Rgb {
+  const h = hex.startsWith("#") ? hex.slice(1) : hex;
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+
+export function rgbToHex(rgb: Rgb): string {
+  return "#" + rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("");
+}
+
+/** Per channel: tint * alpha + backdrop * (1 - alpha). */
+export function blend(tint: Rgb, alpha: number, backdrop: Rgb): [number, number, number] {
+  return [0, 1, 2].map((i) => tint[i]! * alpha + backdrop[i]! * (1 - alpha)) as [number, number, number];
+}

@@ -27,6 +27,29 @@
   --xr-red: #ff7a7a;
   --xr-red-glow: rgba(255, 90, 90, 0.65);
   --xr-focus: #ffffff;
+  --xr-focus-contrast: #05090d;
+  --xr-amber-glow: rgba(255, 176, 32, 0.8);
+  --xr-glass-tint: #0b1620;     /* hex, read by the contrast test */
+  --xr-glass-alpha: 0.55;       /* plain number, read by the contrast test */
+  --xr-glass-tint-rgba: rgba(11, 22, 32, 0.55);
+  --xr-text-on-glass: #e8f4f8;
+  --xr-text-on-steel: #14202a;  /* on --xr-bg-metal-light plaques */
+  --xr-text-header: #e8f4f8;
+  --xr-bg-header: #0b1620;
+  --xr-text-on-sheet: #e8f4f8;
+  --xr-bg-sheet: #10222e;
+  --xr-text-bubble: #e8f4f8;
+  --xr-bg-bubble: #132636;
+  --xr-text-phone-head: #e8f4f8;
+  --xr-bg-phone-head: #1b2a35;
+  --xr-text-footer: #e8f4f8;
+  --xr-bg-footer: #0b1620;
+  --xr-text-rulebox: #e8f4f8;
+  --xr-bg-rulebox: #0b1620;
+  --xr-text-paper-doc: #1a1a1a;
+  --xr-bg-paper-doc: #efe6cc;   /* underlay behind document text */
+  --xr-text-stamp-live: #ffd0d0;
+  --xr-bg-stamp-live: #3a0f14;
 
   --xr-space-1: 4px; --xr-space-2: 8px; --xr-space-3: 16px; --xr-space-4: 24px;
   --xr-radius: 6px;
