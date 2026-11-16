@@ -76,3 +76,57 @@
   stroke: var(--xr-text-dim);
   stroke-width: 2;
 }
+/* Control panel parts: X-ray toggle and amber lamp. */
+.xr-ptoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--xr-u, 1px));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.xr-ptoggle:focus-visible {
+  outline: calc(3 * var(--xr-u, 1px)) solid var(--xr-focus);
+  outline-offset: calc(2 * var(--xr-u, 1px));
+  box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast);
+}
+.xr-ptoggle-lever {
+  display: block;
+  width: calc(64 * var(--xr-u, 1px));
+  aspect-ratio: 1 / 1;
+}
+.xr-ptoggle-img,
+.xr-plamp-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.xr-ptoggle-img {
+  transform: scaleY(1);
+  transition: transform 120ms ease-out;
+}
+.xr-ptoggle-lever[data-on="true"] .xr-ptoggle-img {
+  transform: scaleY(-1);
+}
+.xr-ptoggle-img[data-failed="true"],
+.xr-plamp-img[data-failed="true"] {
+  visibility: hidden;
+}
+.xr-plamp {
+  display: block;
+  width: calc(40 * var(--xr-u, 1px));
+  aspect-ratio: 1 / 1;
+  filter: brightness(0.8);
+  transition: filter 300ms ease;
+}
+.xr-plamp[data-lit="true"] {
+  filter: brightness(1.6) drop-shadow(0 0 calc(10 * var(--xr-u, 1px)) var(--xr-amber-glow));
+}
+@media (prefers-reduced-motion: reduce) {
+  .xr-ptoggle-img,
+  .xr-plamp {
+    transition: none;
+  }
+}

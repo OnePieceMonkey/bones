@@ -1,0 +1,47 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { Toggle } from "../../components/panel/Toggle";
+afterEach(cleanup);
+const css = readFileSync(resolve(__dirname, "../../styles/controls.css"), "utf8");
+function rule(selector: string): string {
+  const i = css.indexOf(`${selector} {`);
+  expect(i).toBeGreaterThanOrEqual(0);
+  return css.slice(i, css.indexOf("}", i));
+}
+describe("Toggle and Lamp", () => {
+  it("exposes aria-checked true and false with a non-empty name", () => {
+    const { rerender } = render(<Toggle xray={true} onXrayChange={() => {}} />);
+    const sw = screen.getByRole("switch");
+    expect(sw).toHaveAttribute("aria-checked", "true");
+    expect(sw.getAttribute("aria-label")).toBeTruthy();
+    rerender(<Toggle xray={false} onXrayChange={() => {}} />);
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-checked", "false");
+  });
+  it("calls onXrayChange with the opposite value", () => {
+    const fn = vi.fn();
+    render(<Toggle xray={false} onXrayChange={fn} />);
+    fireEvent.click(screen.getByRole("switch"));
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(true);
+  });
+  it("marks the lever and lamp state and keeps the lamp decorative", () => {
+    const { container, rerender } = render(<Toggle xray={true} onXrayChange={() => {}} />);
+    expect(container.querySelector(".xr-ptoggle-lever")).toHaveAttribute("data-on", "true");
+    expect(container.querySelector(".xr-plamp")).toHaveAttribute("data-lit", "true");
+    expect(container.querySelector(".xr-plamp")).toHaveAttribute("aria-hidden", "true");
+    rerender(<Toggle xray={false} onXrayChange={() => {}} />);
+    expect(container.querySelector(".xr-ptoggle-lever")).toHaveAttribute("data-on", "false");
+    expect(container.querySelector(".xr-plamp")).toHaveAttribute("data-lit", "false");
+  });
+  it("styles the lever flip and lamp filters in CSS", () => {
+    expect(rule('.xr-ptoggle-lever[data-on="true"] .xr-ptoggle-img')).toContain("scaleY(-1)");
+    const on = rule('.xr-plamp[data-lit="true"]');
+    expect(on).toContain("brightness(1.6)");
+    expect(on).toMatch(/drop-shadow\(0 0 calc\(10 \* var\(--xr-u, 1px\)\) var\(--xr-amber-glow\)\)/);
+    const off = rule(".xr-plamp");
+    expect(off).toContain("brightness(0.8)");
+    expect(off).not.toContain("drop-shadow");
+  });
+});
