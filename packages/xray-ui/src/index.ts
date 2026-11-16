@@ -14,6 +14,8 @@ export { HeaderAction } from "./components/shell/HeaderAction";
 export { ShellFrame } from "./components/shell/ShellFrame";
 export type { ShellFrameProps, IntroPhase } from "./components/shell/ShellFrame";
 export { DocumentPanel } from "./components/panels/DocumentPanel";
+export { GlassCard } from "./components/panels/GlassCard";
+export type { GlassCardProps } from "./components/panels/GlassCard";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";

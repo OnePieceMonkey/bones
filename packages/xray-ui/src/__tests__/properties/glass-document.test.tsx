@@ -1,8 +1,14 @@
 // Feature: visual-polish, Property 18: Document marks follow the hovered rule
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { useEffect } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import fc from "fast-check";
 import { cleanup, render } from "@testing-library/react";
 import type { Trace } from "@bones/core";
+import { GlassCard } from "../../components/panels/GlassCard";
+import { HoveredRuleProvider, useHoveredRule } from "../../hooks/useHoveredRule";
 import { DocumentPanel } from "../../components/panels/DocumentPanel";
 import { FilmClip } from "../../components/FilmClip";
 import { fieldViews, relatedFields, selectBones } from "../../model/selectors";
@@ -129,3 +135,85 @@ describe("DocumentPanel", () => {
     expect(container.querySelectorAll(".xr-scan")).toHaveLength(0);
   });
 });
+
+// Feature: visual-polish, Property 17: Glass card shows cracks and exactly one stamp when something is overruled
+describe("Property 17: glass card cracks and stamp", () => {
+  it("shows cracks and exactly one stamp iff a field is overruled", () => {
+    fc.assert(
+      fc.property(arbTraceAndAnatomy, ({ trace, anatomy }) => {
+        // Validates: Requirements 7.3, 7.4, 7.5, 7.6, 7.9
+        const bones = selectBones(trace, anatomy);
+        const views = fieldViews(trace, anatomy, bones);
+        const overruled = views.filter((f) => f.overruled);
+        const { container } = render(<GlassCard trace={trace} anatomy={anatomy} showUnlabelled />);
+        const stamps = container.querySelectorAll(".xr-stamp");
+        const cracks = container.querySelectorAll(".xr-cracks");
+        if (overruled.length === 0) {
+          expect(stamps).toHaveLength(0);
+          expect(cracks).toHaveLength(0);
+        } else {
+          expect(cracks).toHaveLength(1);
+          expect(stamps).toHaveLength(1);
+          const first = bones.find(
+            (b) => b.state === "fractured" && overruled.some((f) => f.overruledBy.includes(b.label)),
+          );
+          const text = stamps[0]?.textContent ?? "";
+          expect(text).toContain("OVERRULED BY RULE");
+          if (first) expect(text).toContain(`${first.label}${first.version !== null ? ` ${first.version}` : ""}`);
+        }
+        const rows = [...container.querySelectorAll('.xr-field[data-overruled="true"]')];
+        expect(rows).toHaveLength(overruled.length);
+        for (const r of rows) expect(r.textContent).toContain("OVERRULED");
+        cleanup();
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+describe("GlassCard", () => {
+  it("has no cracks and no stamp when nothing is overruled", () => {
+    const trace = signatureTrace();
+    const { container } = render(<GlassCard trace={{ ...trace, ruleOutcomes: [] }} anatomy={signatureAnatomy()} />);
+    expect(container.querySelector(".xr-cracks")).toBeNull();
+    expect(container.querySelector(".xr-stamp")).toBeNull();
+  });
+
+  it("keeps the article and note roles and links rows to the hovered rule", () => {
+    const trace = textTrace();
+    const anatomy = signatureAnatomy();
+    const bone = selectBones(trace, anatomy).find((b) => relatedFields(b).includes("receipt.alcoholCents"));
+    expect(bone).toBeDefined();
+    const { getByRole } = render(
+      <HoveredRuleProvider>
+        <Hover id={bone!.ruleId} />
+        <GlassCard trace={trace} anatomy={anatomy} showUnlabelled />
+      </HoveredRuleProvider>,
+    );
+    expect(getByRole("article", { name: "AI answer" })).toBeInTheDocument();
+    expect(getByRole("note")).toHaveTextContent("OVERRULED BY RULE");
+    const linked = relatedFields(bone!);
+    const rows = document.querySelectorAll('.xr-field[data-linked="true"]');
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) expect(linked).toContain(r.getAttribute("data-path"));
+  });
+
+  it("styles: stamp rotation 5..12 degrees and blur 4..16 px", () => {
+    const css = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../styles/panels.css"), "utf8");
+    const rot = /\.xr-glass-stamp\s*\{[^}]*rotate\((-?\d+(?:\.\d+)?)deg\)/.exec(css);
+    expect(rot).not.toBeNull();
+    expect(Math.abs(Number(rot![1]))).toBeGreaterThanOrEqual(5);
+    expect(Math.abs(Number(rot![1]))).toBeLessThanOrEqual(12);
+    const blur = /\.xr-glass\s*\{[^}]*?[^-]backdrop-filter:\s*blur\((\d+)px\)/.exec(css);
+    expect(blur).not.toBeNull();
+    expect(Number(blur![1])).toBeGreaterThanOrEqual(4);
+    expect(Number(blur![1])).toBeLessThanOrEqual(16);
+    expect(css).toMatch(/@supports not/);
+  });
+});
+
+function Hover({ id }: { id: string }) {
+  const { setHoveredRuleId } = useHoveredRule();
+  useEffect(() => setHoveredRuleId(id), [id, setHoveredRuleId]);
+  return null;
+}

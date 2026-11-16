@@ -95,3 +95,61 @@
 @media (prefers-reduced-motion: reduce) {
   .xr-doc .xr-mark--line::before { transition: none; }
 }
+
+/* Glass card: frosted AI answer, cracks and stamp when a field is overruled. */
+.xr-glass {
+  grid-area: glass;
+  position: relative;
+  box-sizing: border-box;
+  padding: calc(14 * var(--xr-u, 1px));
+  background: var(--xr-glass-tint-rgba);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--xr-cyan-glow);
+  border-radius: var(--xr-radius);
+  color: var(--xr-text-on-glass);
+  overflow: hidden;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .xr-glass { background: var(--xr-bg-panel); }
+}
+.xr-glass-body { position: relative; z-index: 2; }
+.xr-glass .xr-cracks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.xr-glass .xr-field[data-linked="true"] {
+  outline: 2px solid var(--xr-cyan);
+  outline-offset: -2px;
+}
+.xr-glass-stamp {
+  position: absolute;
+  z-index: 3;
+  right: calc(14 * var(--xr-u, 1px));
+  bottom: calc(10 * var(--xr-u, 1px));
+  margin: 0;
+  padding: calc(8 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px));
+  border: 2px dashed var(--xr-text-stamp-live);
+  background: var(--xr-bg-stamp-live);
+  color: var(--xr-text-stamp-live);
+  transform: rotate(-8deg);
+  overflow: hidden;
+}
+.xr-glass-stamp .xr-stamp-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.xr-glass-stamp .xr-stamp-title,
+.xr-glass-stamp .xr-stamp-bones { position: relative; z-index: 1; }
