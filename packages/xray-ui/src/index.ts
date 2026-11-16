@@ -19,6 +19,8 @@ export { GlassCard } from "./components/panels/GlassCard";
 export type { GlassCardProps } from "./components/panels/GlassCard";
 export { ResultFooter } from "./components/panels/ResultFooter";
 export type { ResultFooterProps } from "./components/panels/ResultFooter";
+export { SkeletonPhoto } from "./components/stage/SkeletonPhoto";
+export type { SkeletonPhotoProps } from "./components/stage/SkeletonPhoto";
 export { ControlPanel } from "./components/panel/ControlPanel";
 export type { ControlPanelProps } from "./components/panel/ControlPanel";
 export { Knob } from "./components/panel/Knob";
