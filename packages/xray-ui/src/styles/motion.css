@@ -129,6 +129,23 @@
   animation: xr-idle-ecg-head 3.2s linear infinite;
 }
 
+/*
+ * Meter needle swing. The needle element is keyed on the confidence value, so a
+ * new value remounts it and restarts the animation. --from, --over and --to
+ * come from needleSwing(prev, next); the SVG transform attribute holds the same
+ * end angle as the static fallback.
+ */
+@keyframes xr-needle-swing {
+  from { transform: rotate(var(--from, 0deg)); }
+  60% { transform: rotate(var(--over, 0deg)); }
+  to { transform: rotate(var(--to, 0deg)); }
+}
+.xr-shell.xr-live .xr-pmeter-needle {
+  transform-box: view-box;
+  transform-origin: 320px 270px;
+  animation: xr-needle-swing 700ms ease-out both;
+}
+
 /* Reduced-motion override for this file (the motion guard checks each file). Same pair as shell.css. */
 .xr-shell[data-motion="reduce"],
 .xr-shell[data-motion="reduce"] * {

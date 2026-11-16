@@ -11,7 +11,7 @@
   border-radius: 50%;
   box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast);
 }
-.xr-pknob-dial {
+.xr-shell .xr-pknob-dial {
   position: absolute;
   inset: 17%;
   transform-origin: 50% 50%;
@@ -41,11 +41,6 @@
   outline: 1px solid var(--xr-text-on-metal);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .xr-pknob-dial {
-    transition: none;
-  }
-}
 /* Control panel parts: AI read confidence meter. */
 .xr-pmeter {
   position: relative;
@@ -103,7 +98,7 @@
   width: 100%;
   height: 100%;
 }
-.xr-ptoggle-img {
+.xr-shell .xr-ptoggle-img {
   transform: scaleY(1);
   transition: transform 120ms ease-out;
 }
@@ -114,7 +109,7 @@
 .xr-plamp-img[data-failed="true"] {
   visibility: hidden;
 }
-.xr-plamp {
+.xr-shell .xr-plamp {
   display: block;
   width: calc(40 * var(--xr-u, 1px));
   aspect-ratio: 1 / 1;
@@ -124,10 +119,21 @@
 .xr-plamp[data-lit="true"] {
   filter: brightness(1.6) drop-shadow(0 0 calc(10 * var(--xr-u, 1px)) var(--xr-amber-glow));
 }
+/*
+ * Reduced-motion override for this file (the motion guard checks each file).
+ * The base selectors carry the transitions; the data-motion pair switches them
+ * off, so the prop and the media query resolve in one place.
+ */
+.xr-shell[data-motion="reduce"],
+.xr-shell[data-motion="reduce"] * {
+  animation: none !important;
+  transition: none !important;
+}
 @media (prefers-reduced-motion: reduce) {
-  .xr-ptoggle-img,
-  .xr-plamp {
-    transition: none;
+  .xr-shell[data-motion="auto"],
+  .xr-shell[data-motion="auto"] * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

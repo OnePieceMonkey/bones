@@ -153,3 +153,31 @@ describe("motion.css idle motion", () => {
     expect(read("stage.css")).not.toMatch(/@keyframes xr-ecg-head/);
   });
 });
+
+describe("control motion", () => {
+  const controls = read("controls.css");
+  const motion = read("motion.css");
+  const duration = (css: string, re: RegExp): number => {
+    const m = re.exec(css);
+    if (!m) throw new Error(`missing ${re}`);
+    return Number(m[1]);
+  };
+
+  it("turns the knob in 200 to 600 ms", () => {
+    const d = duration(controls, /\.xr-pknob-dial\s*{[^}]*transition:\s*transform\s+(\d+)ms/);
+    expect(d).toBeGreaterThanOrEqual(200);
+    expect(d).toBeLessThanOrEqual(600);
+  });
+  it("swings the needle in at most 800 ms", () => {
+    expect(duration(motion, /animation:\s*xr-needle-swing\s+(\d+)ms/)).toBeLessThanOrEqual(800);
+    expect(motion).toMatch(/@keyframes xr-needle-swing[\s\S]*?var\(--from[\s\S]*?var\(--over[\s\S]*?var\(--to/);
+  });
+  it("moves the lever in at most 150 ms", () => {
+    expect(duration(controls, /\.xr-ptoggle-img\s*{[^}]*transition:\s*transform\s+(\d+)ms/)).toBeLessThanOrEqual(150);
+  });
+  it("fades the lamp in 150 to 500 ms", () => {
+    const d = duration(controls, /\.xr-plamp\s*{[^}]*transition:\s*filter\s+(\d+)ms/);
+    expect(d).toBeGreaterThanOrEqual(150);
+    expect(d).toBeLessThanOrEqual(500);
+  });
+});

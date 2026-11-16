@@ -1,6 +1,9 @@
+import { useEffect, useRef, type CSSProperties } from "react";
 import { meterUrl } from "../../assets";
 import { cx } from "../../cx";
 import { buildGaugeModel } from "../../model/confidence";
+import { needleAngle } from "../../model/gauge";
+import { needleSwing } from "../../model/needleSwing";
 import { selectBones } from "../../model/selectors";
 import type { Anatomy, CommonProps, Trace } from "../../types";
 import { AssetImage } from "../shell/AssetImage";
@@ -23,6 +26,17 @@ const EMPTY_ANATOMY: Anatomy = { bones: [], fieldLabels: {} };
 export function Meter({ trace, anatomy, className }: MeterProps) {
   const bones = selectBones(trace, anatomy ?? EMPTY_ANATOMY);
   const model = buildGaugeModel(trace, bones);
+  // The previous angle starts at the resting position; it updates after commit.
+  const prevAngle = useRef(needleAngle(null));
+  const swing = needleSwing(prevAngle.current, model.angle);
+  useEffect(() => {
+    prevAngle.current = model.angle;
+  }, [model.angle]);
+  const swingStyle = {
+    "--from": `${swing.from}deg`,
+    "--over": `${swing.over}deg`,
+    "--to": `${swing.to}deg`,
+  } as CSSProperties;
   const valueProps: { "aria-valuenow"?: number } =
     model.value === null ? {} : { "aria-valuenow": Math.round(100 * model.value) };
   return (
@@ -43,7 +57,9 @@ export function Meter({ trace, anatomy, className }: MeterProps) {
         focusable="false"
       >
         <g
+          key={String(model.value)}
           className="xr-pmeter-needle"
+          style={swingStyle}
           data-angle={model.angle}
           transform={`rotate(${model.angle} ${PIVOT_X} ${PIVOT_Y})`}
         >
