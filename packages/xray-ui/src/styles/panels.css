@@ -270,7 +270,17 @@
   min-height: 0;
   overflow-y: auto;
 }
+.xr-doctor .xr-chat-log { min-width: 0; }
+/* Bubbles size to their text: no fixed height, no clipping, normal wrapping. */
 .xr-doctor .xr-bubble {
+  flex: none;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 92%;
+  height: auto;
+  overflow: visible;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
   background: var(--xr-bg-bubble);
   color: var(--xr-text-bubble);
   font-size: max(11px, calc(13 * var(--xr-u, 1px)));
