@@ -48,3 +48,68 @@
   pointer-events: none;
   user-select: none;
 }
+
+/* Hotspots, positioned in percent of the crop box. */
+.xr-hotspots { position: absolute; inset: 0; }
+.xr-hotspot-wrap { display: contents; }
+.xr-hotspot {
+  --xr-hs-size: calc(44 * var(--xr-u, 1px));
+  position: absolute;
+  width: var(--xr-hs-size);
+  height: var(--xr-hs-size);
+  transform: translate(-50%, -50%);
+}
+.xr-hotspot .xr-bone-btn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  border-radius: 50%;
+  z-index: 1;
+}
+.xr-hotspot .xr-bone-btn:focus-visible {
+  outline: calc(3 * var(--xr-u, 1px)) solid var(--xr-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast);
+}
+/* Icon and state text stay available to assistive tech but not on the film. */
+.xr-hotspot .xr-bone-cue { display: none; }
+.xr-hotspot .xr-bone-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.xr-hs-ring {
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  border: calc(2 * var(--xr-u, 1px)) solid var(--xr-cyan);
+  box-shadow: 0 0 calc(10 * var(--xr-u, 1px)) var(--xr-cyan-glow), inset 0 0 calc(6 * var(--xr-u, 1px)) var(--xr-cyan-glow);
+  pointer-events: none;
+}
+.xr-hs-ring--applied-no-change { border-color: var(--xr-cyan); }
+.xr-hs-ring--fractured {
+  border-color: var(--xr-red);
+  box-shadow: 0 0 calc(14 * var(--xr-u, 1px)) var(--xr-red-glow), inset 0 0 calc(8 * var(--xr-u, 1px)) var(--xr-red-glow);
+}
+.xr-hs-ring--not-applicable {
+  border-color: var(--xr-text-muted);
+  box-shadow: none;
+  opacity: 0.5;
+}
+.xr-hs-check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  line-height: 1;
+  color: var(--xr-cyan);
+  pointer-events: none;
+}
+.xr-hotspot .xr-tooltip { z-index: 10; }
