@@ -96,3 +96,6 @@ html:has(.xr-shell) body {
   width: 80%;
   max-height: 80%;
 }
+
+/* Rule box show and hide: opacity only, under 100 ms. Switched off by the data-motion rules above. */
+.xr-shell .xr-rulebox { transition: opacity 80ms linear; }

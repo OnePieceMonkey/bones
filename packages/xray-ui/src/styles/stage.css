@@ -152,3 +152,45 @@
 .xr-hs-ring--fractured {
   background: radial-gradient(circle, rgba(255, 90, 90, 0.35) 0%, rgba(255, 90, 90, 0) 70%);
 }
+
+/* Rule box and its line. The layer covers the lightbox and never takes pointer events. */
+.xr-rb-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.xr-rb-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.xr-rb-line line {
+  stroke: var(--xr-cyan);
+  stroke-width: 1.5;
+}
+.xr-rulebox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  max-width: calc(260 * var(--xr-u, 1px));
+  min-width: calc(160 * var(--xr-u, 1px));
+  padding: calc(8 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px));
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  color: var(--xr-text-rulebox);
+  background: var(--xr-bg-rulebox);
+  border: 1px solid var(--xr-cyan);
+  border-radius: calc(6 * var(--xr-u, 1px));
+  box-shadow: 0 0 calc(10 * var(--xr-u, 1px)) var(--xr-cyan-glow);
+  opacity: 1;
+}
+.xr-rulebox p { margin: 0 0 4px; }
+.xr-rb-head { font-weight: 700; }
+.xr-rb-state { color: var(--xr-text-rulebox); }
+.xr-rb-evidence { margin: 0; }
+.xr-rb-row { display: flex; gap: calc(8 * var(--xr-u, 1px)); }
+.xr-rb-row dt { opacity: 0.85; }
+.xr-rb-row dd { margin: 0; }
