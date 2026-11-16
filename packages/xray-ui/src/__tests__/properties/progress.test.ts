@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
 import fc from "fast-check";
+import { createElement } from "react";
+import { render, screen } from "@testing-library/react";
+import { ResultFooter } from "../../components/panels/ResultFooter";
+import { signatureAnatomy, signatureTrace } from "../helpers/fixtures";
 import { progressShare, resultLine } from "../../model/progress";
 import { resultLabel } from "../../model/format";
 import type { DecisionResult } from "../../types";
@@ -26,6 +30,25 @@ describe("progressShare", () => {
         if (claimed > 0 && hi <= claimed) expect(sHi).toBe(hi / claimed);
       }),
       { numRuns: 200 },
+    );
+  });
+
+  it("Property 6 (rendered): ResultFooter aria-valuenow is round(100 * share)", () => {
+    // Feature: visual-polish, Property 6: Progress share is bounded and monotonic
+    // Validates: Requirements 8.6, 8.7
+    fc.assert(
+      fc.property(cents, cents, (approved, claimed) => {
+        const trace = { ...signatureTrace(), amountCents: approved };
+        const { unmount } = render(
+          createElement(ResultFooter, { trace, anatomy: signatureAnatomy(), claimedCents: claimed }),
+        );
+        const now = Number(screen.getByRole("progressbar").getAttribute("aria-valuenow"));
+        unmount();
+        expect(now).toBe(Math.round(100 * progressShare(approved, claimed)));
+        expect(now).toBeGreaterThanOrEqual(0);
+        expect(now).toBeLessThanOrEqual(100);
+      }),
+      { numRuns: 100 },
     );
   });
 
