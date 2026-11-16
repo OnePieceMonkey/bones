@@ -176,6 +176,14 @@ export interface FilmClipProps extends CommonProps {
   source: FilmSource;
   /** Overrides the context value when provided. */
   activeRuleId?: string | null;
+  /** Draw a red scan line across each overruled field with a known source location. Default false. */
+  scanOverruled?: boolean;
+}
+
+export interface DocumentPanelProps extends CommonProps {
+  trace: Trace;
+  anatomy: Anatomy;
+  source: FilmSource;
 }
 
 export interface AnswerCardProps extends CommonProps {

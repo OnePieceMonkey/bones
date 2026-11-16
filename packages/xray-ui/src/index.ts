@@ -5,6 +5,7 @@ import "./styles/frame.css";
 import "./styles/fonts.css";
 import "./styles/header.css";
 import "./styles/stage.css";
+import "./styles/panels.css";
 
 export * from "./types";
 
@@ -12,6 +13,7 @@ export { HeaderBar } from "./components/shell/HeaderBar";
 export { HeaderAction } from "./components/shell/HeaderAction";
 export { ShellFrame } from "./components/shell/ShellFrame";
 export type { ShellFrameProps, IntroPhase } from "./components/shell/ShellFrame";
+export { DocumentPanel } from "./components/panels/DocumentPanel";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";

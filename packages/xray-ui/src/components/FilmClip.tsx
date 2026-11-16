@@ -1,7 +1,7 @@
 import { cx } from "../cx";
 import { useHoveredRule } from "../hooks/useHoveredRule";
 import { animClass, useReducedMotion } from "../hooks/useReducedMotion";
-import { selectBones, sourceMarks } from "../model/selectors";
+import { fieldViews, selectBones, sourceMarks } from "../model/selectors";
 import type { FilmClipProps, SourceMark } from "../types";
 
 function pct(v: number): string {
@@ -12,7 +12,7 @@ function markText(mark: SourceMark): string {
   return `${mark.tag}: ${mark.label}`;
 }
 
-export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, className }: FilmClipProps) {
+export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, className, scanOverruled = false }: FilmClipProps) {
   const reduced = useReducedMotion(reducedMotion);
   const { hoveredRuleId } = useHoveredRule();
 
@@ -20,6 +20,13 @@ export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, 
   const bones = selectBones(trace, anatomy);
   const activeBone = activeId == null ? undefined : bones.find((b) => b.ruleId === activeId);
   const marks = sourceMarks(trace, anatomy, activeBone);
+
+  // Paths of overruled fields; only computed when scan lines are requested.
+  const overruledPaths = new Set<string>(
+    scanOverruled ? fieldViews(trace, anatomy, bones).filter((f) => f.overruled).map((f) => f.path) : [],
+  );
+  const scan = (path: string) =>
+    overruledPaths.has(path) ? <span key={`scan-${path}`} className="xr-scan" data-path={path} aria-hidden="true" /> : null;
 
   let body: JSX.Element;
 
@@ -58,6 +65,7 @@ export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, 
                   {markText(m)}
                 </span>
               ))}
+              {here?.map((m) => scan(m.path))}
             </span>
           );
         })}
@@ -79,6 +87,7 @@ export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, 
               style={{ left: pct(loc.x), top: pct(loc.y), width: pct(loc.width), height: pct(loc.height) }}
             >
               <span className="xr-mark-tag">{markText(m)}</span>
+              {scan(m.path)}
             </span>
           );
         })}

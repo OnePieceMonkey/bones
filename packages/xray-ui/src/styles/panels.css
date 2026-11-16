@@ -1,0 +1,97 @@
+/* Document panel: paper strip on the film, two clips, scrolling text, scan lines. */
+.xr-doc {
+  grid-area: doc;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  padding: calc(22 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  box-sizing: border-box;
+}
+.xr-doc-paper {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  padding: calc(26 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  box-sizing: border-box;
+  background: url("../assets/paper.webp") center / 100% 100% no-repeat, var(--xr-bg-paper-doc);
+  color: var(--xr-text-paper-doc);
+  box-shadow: 0 calc(6 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.6);
+}
+.xr-doc-scroll {
+  min-height: 0;
+  overflow: auto;
+  /* Paper-tone underlay keeps the text at 4.5:1 or better on any part of the paper image. */
+  background: var(--xr-bg-paper-doc);
+  color: var(--xr-text-paper-doc);
+}
+.xr-doc-scroll:focus-visible {
+  outline: calc(3 * var(--xr-u, 1px)) solid var(--xr-focus);
+  box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast);
+}
+/* The film wrapper is static so the clips stay at the paper corners while the text scrolls. */
+.xr-doc .xr-film {
+  position: static;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+.xr-doc .xr-clip {
+  top: calc(-6 * var(--xr-u, 1px));
+  width: calc(44 * var(--xr-u, 1px));
+  height: calc(44 * var(--xr-u, 1px));
+  border: 0;
+  border-radius: 0;
+  background: url("../assets/clip.webp") center / contain no-repeat;
+}
+.xr-doc .xr-clip--left { left: calc(8 * var(--xr-u, 1px)); right: auto; }
+.xr-doc .xr-clip--right { right: calc(8 * var(--xr-u, 1px)); left: auto; }
+.xr-doc .xr-film-text {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  line-height: calc(18 * var(--xr-u, 1px));
+  white-space: pre;
+  color: var(--xr-text-paper-doc);
+}
+.xr-doc .xr-film-line {
+  position: relative;
+  min-height: calc(18 * var(--xr-u, 1px));
+}
+.xr-doc .xr-film-image-wrap { position: relative; }
+
+/* Marks on paper: dark cyan edge, highlight fades in by opacity of a pseudo-element. */
+.xr-doc .xr-mark--line,
+.xr-doc .xr-mark--line[data-highlighted="true"] {
+  position: relative;
+  background: none;
+  border-left: 3px solid #0a6a78;
+}
+.xr-doc .xr-mark--line::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(61, 232, 255, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+.xr-doc .xr-mark--line[data-highlighted="true"]::before { opacity: 1; }
+.xr-doc .xr-mark-tag { color: var(--xr-text-on-plate); }
+
+/* Scan line: red line across the full width of an overruled field. */
+.xr-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--xr-red);
+  box-shadow: 0 0 calc(6 * var(--xr-u, 1px)) var(--xr-red-glow);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xr-doc .xr-mark--line::before { transition: none; }
+}
