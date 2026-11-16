@@ -10,6 +10,8 @@ export * from "./types";
 
 export { HeaderBar } from "./components/shell/HeaderBar";
 export { HeaderAction } from "./components/shell/HeaderAction";
+export { ShellFrame } from "./components/shell/ShellFrame";
+export type { ShellFrameProps, IntroPhase } from "./components/shell/ShellFrame";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";

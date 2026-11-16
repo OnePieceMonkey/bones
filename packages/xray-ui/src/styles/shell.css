@@ -2,3 +2,67 @@
 [data-failed="true"] {
   visibility: hidden;
 }
+
+/* Shell: one-screen layout. --xr-u is 1px at 1280x720 and follows the smaller viewport axis. */
+html:has(.xr-shell),
+html:has(.xr-shell) body {
+  margin: 0;
+  background: var(--xr-bg-deep, #05090d);
+}
+.xr-shell {
+  --xr-u: max(1px, min(100vw / 1280, 100vh / 720));
+  position: absolute;
+  inset: 0;
+  min-width: 1280px;
+  min-height: 720px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: calc(52 * var(--xr-u)) minmax(0, 1fr);
+  box-sizing: border-box;
+  background: var(--xr-bg-deep, #05090d);
+  color: var(--xr-text, #e8f4f8);
+}
+.xr-shell-frame {
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+}
+.xr-shell .xr-lightbox {
+  display: grid;
+  min-height: 0;
+  min-width: 0;
+}
+.xr-shell .xr-frame {
+  display: grid;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.xr-shell .xr-viewport {
+  display: grid;
+  grid-template-columns: 28fr 46fr 26fr;
+  grid-template-rows: 62fr 38fr;
+  grid-template-areas:
+    "doc stage doctor"
+    "ctrl stage doctor";
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Reduced motion, prop true: no animation or transition inside the shell. */
+.xr-shell[data-motion="reduce"],
+.xr-shell[data-motion="reduce"] * {
+  animation: none !important;
+  transition: none !important;
+}
+/* Reduced motion, no prop: follow the media query. data-motion="full" stays animated. */
+@media (prefers-reduced-motion: reduce) {
+  .xr-shell[data-motion="auto"],
+  .xr-shell[data-motion="auto"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
