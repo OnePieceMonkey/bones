@@ -101,14 +101,14 @@
 }
 
 @keyframes xr-ecg-scroll {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -24; }
+  from { transform: translateX(0); }
+  to { transform: translateX(-2px); }
 }
 @keyframes xr-ecg-flash {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
 }
-.anim-ecg-scroll { stroke-dasharray: 560; animation: xr-ecg-scroll 3s linear infinite; }
+.anim-ecg-scroll { stroke-dasharray: 560; animation: xr-ecg-scroll 3s linear infinite alternate; }
 .anim-ecg-flash { animation: xr-ecg-flash 1.2s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .anim-ecg-scroll, .anim-ecg-flash { animation: none; }
@@ -153,7 +153,7 @@
 }
 .xr-mark--bbox > .xr-mark-tag { position: absolute; left: 0; bottom: 100%; margin-left: 0; white-space: nowrap; }
 .xr-mark-tag[data-highlighted="true"] { font-weight: 700; border-width: 2px; }
-.anim-mark { transition: background 0.2s ease; }
+.anim-mark { transition: opacity 0.2s ease; }
 @media (prefers-reduced-motion: reduce) {
   .anim-mark { transition: none; }
 }
