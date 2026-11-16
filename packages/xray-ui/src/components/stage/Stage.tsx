@@ -10,6 +10,7 @@ import { selectBones } from "../../model/selectors";
 import type { Anatomy, BoneView, CommonProps } from "../../types";
 import type { Trace } from "@bones/core";
 import { tooltipId } from "../Tooltip";
+import { EcgBand } from "./EcgBand";
 import { Hotspot } from "./Hotspot";
 import { RuleBox, RuleBoxLine } from "./RuleBox";
 import { SkeletonPhoto } from "./SkeletonPhoto";
@@ -88,6 +89,7 @@ export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) 
     }
   };
 
+  const cropPoints = placed.map(toCropPercent);
   const openBone = bones.find((b) => b.ruleId === activeRuleId && dismissedRuleId !== b.ruleId);
 
   return (
@@ -125,6 +127,12 @@ export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) 
           />
         )}
       </div>
+      <EcgBand
+        trace={trace}
+        anatomy={anatomy}
+        anchors={cropPoints}
+        {...(reducedMotion !== undefined ? { reducedMotion } : {})}
+      />
     </SkeletonPhoto>
   );
 }

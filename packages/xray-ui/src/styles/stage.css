@@ -194,3 +194,31 @@
 .xr-rb-row { display: flex; gap: calc(8 * var(--xr-u, 1px)); }
 .xr-rb-row dt { opacity: 0.85; }
 .xr-rb-row dd { margin: 0; }
+
+/* ECG band: 50 % of the full image = (50 - 3) / 62 of the crop box. */
+.xr-ecg-band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: calc((50 - 3) / 62 * 100%);
+  aspect-ratio: 560 / 60;
+  transform: translateY(-50%);
+  overflow: hidden;
+  pointer-events: none;
+}
+.xr-ecg-band-svg { display: block; width: 100%; height: 100%; }
+.xr-ecg-head {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 90%, var(--xr-cyan-glow) 100%);
+  transform: translateX(-10%);
+}
+.xr-ecg-head--still { opacity: 0; }
+@keyframes xr-ecg-head {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(100%); }
+}
+.anim-ecg-head { animation: xr-ecg-head 3.2s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-ecg-head { animation: none; }
+}
