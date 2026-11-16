@@ -1,0 +1,113 @@
+/*
+ * Fracture moment and lightbox shake. Animated properties: transform,
+ * opacity, filter only. Everything ends by 900 ms (splinters: 100 ms start
+ * plus 800 ms); the limit is 1200 ms.
+ *
+ * Two triggers share the same keyframes:
+ *  - the intro: .xr-fx gets the per-bone light-up delay (--xr-t-light);
+ *  - a version change: the fracture group remounts with data-fresh="true"
+ *    and starts at once.
+ * Without either trigger (toggle back on after the intro) the group shows its
+ * end state: burst visible, splinters at the fly-out point with opacity 0.
+ */
+.xr-shell.xr-live[data-intro="running"] .xr-fx {
+  --xr-fx-delay: var(--xr-t-light, 1500ms);
+}
+.xr-shell.xr-live .xr-fx[data-fresh="true"] {
+  --xr-fx-delay: 0ms;
+}
+
+/* End state in full motion: splinters have faded out. */
+.xr-shell.xr-live .xr-splinter {
+  opacity: 0;
+}
+
+@keyframes xr-fx-flash {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes xr-fx-burst {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes xr-fx-fly {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) rotate(var(--rot, 0deg));
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(calc(var(--dx, 0) * var(--xr-u, 1px)), calc(var(--dy, 0) * var(--xr-u, 1px))) rotate(var(--rot, 0deg));
+  }
+}
+@keyframes xr-fx-pulse {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0.55; transform: scale(1.12); }
+}
+@keyframes xr-fx-spike-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.xr-shell.xr-live[data-intro="running"] .xr-fx .xr-hs-flash,
+.xr-shell.xr-live .xr-fx[data-fresh="true"] .xr-hs-flash {
+  animation: xr-fx-flash 200ms ease-out var(--xr-fx-delay, 0ms) both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-fx .xr-burst,
+.xr-shell.xr-live .xr-fx[data-fresh="true"] .xr-burst {
+  animation: xr-fx-burst 400ms ease-out var(--xr-fx-delay, 0ms) both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-fx .xr-splinter,
+.xr-shell.xr-live .xr-fx[data-fresh="true"] .xr-splinter {
+  animation: xr-fx-fly 800ms ease-out calc(var(--xr-fx-delay, 0ms) + 100ms) both;
+}
+
+/* Red pulse: keeps running while the bone stays fractured. */
+.xr-shell.xr-live .xr-hs-ring--fractured {
+  animation: xr-fx-pulse 1400ms ease-in-out infinite alternate;
+}
+
+/* ECG spike fades in within 100 ms. */
+.xr-shell.xr-live .xr-ecg-spike-in {
+  animation: xr-fx-spike-in 100ms ease-out both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-ecg-spike-in {
+  animation-delay: var(--xr-t-light-from);
+}
+
+/* Lightbox shake: two class names with the same keyframes, so a new batch restarts it. */
+@keyframes xr-fx-shake-a {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-4px, 1px, 0); }
+  40% { transform: translate3d(3px, -2px, 0); }
+  60% { transform: translate3d(-2px, 2px, 0); }
+  80% { transform: translate3d(1px, -1px, 0); }
+}
+@keyframes xr-fx-shake-b {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-4px, 1px, 0); }
+  40% { transform: translate3d(3px, -2px, 0); }
+  60% { transform: translate3d(-2px, 2px, 0); }
+  80% { transform: translate3d(1px, -1px, 0); }
+}
+.xr-shell.xr-live .xr-lightbox.xr-shake-a {
+  animation: xr-fx-shake-a 300ms ease-in-out 1;
+}
+.xr-shell.xr-live .xr-lightbox.xr-shake-b {
+  animation: xr-fx-shake-b 300ms ease-in-out 1;
+}
+
+/* Reduced-motion override for this file (the motion guard checks each file). Same pair as shell.css. */
+.xr-shell[data-motion="reduce"],
+.xr-shell[data-motion="reduce"] * {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xr-shell[data-motion="auto"],
+  .xr-shell[data-motion="auto"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

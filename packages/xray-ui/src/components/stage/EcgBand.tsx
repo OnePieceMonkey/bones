@@ -33,11 +33,13 @@ export function EcgBand({ trace, anatomy, anchors, reducedMotion, className }: E
       >
         <path className={cx("xr-ecg-line", model.flatline && "xr-ecg-line--flat")} d={model.linePath} fill="none" />
         {model.spikePath !== "" && (
-          <path
-            className={cx("xr-ecg-spike", !reduced && animClass(reduced, "ecg-flash"))}
-            d={model.spikePath}
-            fill="none"
-          />
+          <g key={model.spikePath} className="xr-ecg-spike-in">
+            <path
+              className={cx("xr-ecg-spike", !reduced && animClass(reduced, "ecg-flash"))}
+              d={model.spikePath}
+              fill="none"
+            />
+          </g>
         )}
       </svg>
       <span

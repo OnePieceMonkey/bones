@@ -8,6 +8,7 @@ import "./styles/stage.css";
 import "./styles/panels.css";
 import "./styles/controls.css";
 import "./styles/intro.css";
+import "./styles/motion.css";
 
 export * from "./types";
 

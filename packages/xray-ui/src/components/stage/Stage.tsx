@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useElementRect } from "../../hooks/useElementRect";
 import { useHoveredRule } from "../../hooks/useHoveredRule";
 import { placeBones, toCropPercent } from "../../model/anchors";
+import { boneKey } from "../../model/fractureDiff";
 import { hotspotState } from "../../model/hotspotState";
 import { introPlan } from "../../model/introOrder";
 import { placeRuleBox } from "../../model/ruleBoxPlacement";
@@ -19,6 +20,8 @@ import { SkeletonPhoto } from "./SkeletonPhoto";
 export interface StageProps extends CommonProps {
   trace: Trace;
   anatomy: Anatomy;
+  /** Fracture group remount keys per bone key (`ruleId:index`), from `useFractureBatches`. */
+  fxKeys?: ReadonlyMap<string, number>;
 }
 
 interface LayerProps {
@@ -66,7 +69,7 @@ function RuleBoxLayer({ bone, anatomy, root, lightbox }: LayerProps) {
 }
 
 /** Cropped skeleton photo with one anchored hotspot per bone. */
-export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) {
+export function Stage({ trace, anatomy, fxKeys, reducedMotion, className }: StageProps) {
   const bones = selectBones(trace, anatomy);
   const placed = placeBones(bones);
   const { startOf } = introPlan(bones, trace);
@@ -115,6 +118,7 @@ export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) 
                 place={{ xPct: point.x, yPct: point.y }}
                 hotspotState={hotspotState(bone)}
                 lightDelayMs={startOf.get(bone) ?? 0}
+                fxKey={fxKeys?.get(boneKey(bone.ruleId, bone.index)) ?? 0}
                 {...(open ? { describedBy: tooltipId(bone.ruleId) } : {})}
                 {...(reducedMotion !== undefined ? { reducedMotion } : {})}
               />

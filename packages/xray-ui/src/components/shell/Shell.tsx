@@ -1,5 +1,6 @@
 import type { ReactNode, Ref } from "react";
 import { HoveredRuleProvider } from "../../hooks/useHoveredRule";
+import { useFractureBatches } from "../../hooks/useFractureBatches";
 import { useIntro } from "../../hooks/useIntro";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { introPlan } from "../../model/introOrder";
@@ -71,7 +72,9 @@ export function Shell({
   className,
 }: ShellProps) {
   const reduced = useReducedMotion(reducedMotion);
-  const { schedule } = introPlan(selectBones(trace, anatomy), trace);
+  const bones = selectBones(trace, anatomy);
+  const { schedule } = introPlan(bones, trace);
+  const { fxKeys, shakeClass } = useFractureBatches(bones);
   const phase = useIntro({ introKey, xray, reduced, schedule });
   // exactOptionalPropertyTypes: only pass optional props that are defined.
   const motion = reducedMotion === undefined ? {} : { reducedMotion };
@@ -84,6 +87,7 @@ export function Shell({
         {...(lightboxLabel !== undefined ? { lightboxLabel } : {})}
         {...(statusNote !== undefined ? { statusNote } : {})}
         introPhase={introPhase ?? phase}
+        {...(shakeClass !== "" && !reduced ? { lightboxClassName: shakeClass } : {})}
         {...(className !== undefined ? { className } : {})}
         {...motion}
         controls={
@@ -102,7 +106,7 @@ export function Shell({
         <DocumentPanel trace={trace} anatomy={anatomy} source={source} {...motion} />
         <div className="xr-shell-stagecell">
           {lightboxLabel !== undefined && <span className="xr-visually-hidden">{lightboxLabel}</span>}
-          {xray && <Stage trace={trace} anatomy={anatomy} {...motion} />}
+          {xray && <Stage trace={trace} anatomy={anatomy} fxKeys={fxKeys} {...motion} />}
           <GlassCard trace={trace} anatomy={anatomy} {...motion} />
         </div>
         <DoctorPanel

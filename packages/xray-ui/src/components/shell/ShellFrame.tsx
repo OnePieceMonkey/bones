@@ -24,6 +24,8 @@ export interface ShellFrameProps extends CommonProps {
   /** Status text shown in the header, right of the tagline (aria-live polite). */
   statusNote?: ReactNode;
   introPhase?: IntroPhase;
+  /** Extra class on the lightbox (the fracture shake). */
+  lightboxClassName?: string;
 }
 
 /**
@@ -39,6 +41,7 @@ export function ShellFrame({
   children,
   statusNote,
   introPhase = "idle",
+  lightboxClassName,
   reducedMotion,
   className,
 }: ShellFrameProps) {
@@ -64,6 +67,7 @@ export function ShellFrame({
           xray={xray}
           pill={false}
           plate={false}
+          {...(lightboxClassName !== undefined ? { className: lightboxClassName } : {})}
           {...(lightboxLabel !== undefined ? { title: lightboxLabel } : {})}
           {...(reducedMotion !== undefined ? { reducedMotion } : {})}
         >

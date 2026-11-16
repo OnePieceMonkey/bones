@@ -16,6 +16,8 @@ export interface HotspotProps extends CommonProps {
   describedBy?: string;
   /** Intro light-up start in ms, exposed as `--xr-t-light`. */
   lightDelayMs?: number;
+  /** Remount key of the fracture group; it changes only when the bone becomes fractured. */
+  fxKey?: number;
   /** Extra content anchored to the hotspot (the tooltip, until the rule box replaces it). */
   children?: ReactNode;
 }
@@ -30,11 +32,11 @@ const FLY_EXTRA = 20;
  * deterministic per rule id. The red ring is drawn by CSS, so the glow stays
  * when an image fails to load.
  */
-function FractureFx({ ruleId }: { ruleId: string }) {
+function FractureFx({ ruleId, fresh }: { ruleId: string; fresh: boolean }) {
   const files = splinterAssets(ruleId);
   const shards = splinters(ruleId);
   return (
-    <span className="xr-fx" aria-hidden="true">
+    <span className="xr-fx" data-fresh={fresh ? "true" : "false"} aria-hidden="true">
       <span className="xr-hs-flash" />
       <AssetImage className="xr-burst" src={fractureBurstUrl} width={768} height={768} />
       {shards.map((sh, i) => {
@@ -71,6 +73,7 @@ export function Hotspot({
   hotspotState,
   describedBy,
   lightDelayMs,
+  fxKey = 0,
   className,
   reducedMotion,
   children,
@@ -90,7 +93,7 @@ export function Hotspot({
           {"\u2713"}
         </span>
       )}
-      {hotspotState === "fractured" && <FractureFx ruleId={bone.ruleId} />}
+      {hotspotState === "fractured" && <FractureFx key={fxKey} ruleId={bone.ruleId} fresh={fxKey > 0} />}
       <BoneButton
         bone={bone}
         {...(describedBy !== undefined ? { describedBy } : {})}
