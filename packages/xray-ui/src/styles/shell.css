@@ -90,9 +90,8 @@ html:has(.xr-shell) body {
   position: absolute;
   left: 2%;
   bottom: 3%;
-  width: 36%;
-  max-height: 40%;
-  overflow: auto;
+  width: 44%;
+  max-height: 62%;
   z-index: 3;
 }
 /* Flat view: the stage is not mounted; the answer card is shown in place. */

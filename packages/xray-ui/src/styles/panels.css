@@ -109,11 +109,31 @@
   border-radius: var(--xr-radius);
   color: var(--xr-text-on-glass);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+/* Room for the stamp in the bottom-right corner, so it never covers a field value. */
+.xr-glass[data-overruled="true"] {
+  padding-bottom: calc(78 * var(--xr-u, 1px));
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .xr-glass { background: var(--xr-bg-panel); }
 }
-.xr-glass-body { position: relative; z-index: 2; }
+.xr-glass-body {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.xr-glass .xr-field {
+  gap: calc(12 * var(--xr-u, 1px));
+  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+}
+.xr-glass .xr-field dt { flex: 0 0 32%; min-width: 0; }
+.xr-glass .xr-field dd { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; }
+.xr-glass .xr-conf { display: block; margin-left: 0; }
 .xr-glass .xr-cracks {
   position: absolute;
   inset: 0;
@@ -132,10 +152,11 @@
 .xr-glass-stamp {
   position: absolute;
   z-index: 3;
-  right: calc(14 * var(--xr-u, 1px));
+  right: calc(10 * var(--xr-u, 1px));
   bottom: calc(10 * var(--xr-u, 1px));
   margin: 0;
-  padding: calc(8 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px));
+  padding: calc(6 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px));
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
   border: 2px dashed var(--xr-text-stamp-live);
   background: var(--xr-bg-stamp-live);
   color: var(--xr-text-stamp-live);
