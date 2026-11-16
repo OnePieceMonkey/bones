@@ -149,7 +149,7 @@
   justify-content: space-around;
   gap: calc(8 * var(--xr-u, 1px));
   min-width: 0;
-  margin: 0 0 calc(-18 * var(--xr-u, 1px)) calc(-18 * var(--xr-u, 1px));
+  margin: 0 0 calc(-14 * var(--xr-u, 1px)) calc(-14 * var(--xr-u, 1px));
   padding: calc(22 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px));
   background: url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat, #3a444b;
   box-shadow:
