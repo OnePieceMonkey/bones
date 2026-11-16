@@ -6,6 +6,7 @@ import "./styles/fonts.css";
 import "./styles/header.css";
 import "./styles/stage.css";
 import "./styles/panels.css";
+import "./styles/controls.css";
 
 export * from "./types";
 
@@ -18,6 +19,8 @@ export { GlassCard } from "./components/panels/GlassCard";
 export type { GlassCardProps } from "./components/panels/GlassCard";
 export { ResultFooter } from "./components/panels/ResultFooter";
 export type { ResultFooterProps } from "./components/panels/ResultFooter";
+export { Knob } from "./components/panel/Knob";
+export type { KnobProps } from "./components/panel/Knob";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";
