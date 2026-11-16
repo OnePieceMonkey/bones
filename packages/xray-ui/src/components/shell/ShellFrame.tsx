@@ -21,7 +21,7 @@ export interface ShellFrameProps extends CommonProps {
   controls?: ReactNode;
   /** Lightbox content. */
   children?: ReactNode;
-  /** One-line status strip under the lightbox (aria-live polite). */
+  /** Status text shown in the header, right of the tagline (aria-live polite). */
   statusNote?: ReactNode;
   introPhase?: IntroPhase;
 }
@@ -54,7 +54,11 @@ export function ShellFrame({
       <h1 className="xr-visually-hidden" tabIndex={-1}>
         {heading}
       </h1>
-      <HeaderBar xray={xray} {...(headerActions !== undefined ? { headerActions } : {})} />
+      <HeaderBar
+        xray={xray}
+        {...(headerActions !== undefined ? { headerActions } : {})}
+        {...(statusNote !== undefined ? { statusNote } : {})}
+      />
       <SteelFrame className="xr-shell-frame">
         <Lightbox
           xray={xray}
@@ -67,11 +71,6 @@ export function ShellFrame({
           {controls}
         </Lightbox>
       </SteelFrame>
-      {statusNote !== undefined && (
-        <div className="xr-shell-status" aria-live="polite">
-          {statusNote}
-        </div>
-      )}
     </div>
   );
 }

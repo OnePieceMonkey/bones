@@ -45,6 +45,14 @@ describe("Shell", () => {
     expect(screen.getByText("status line").closest("[aria-live]")?.getAttribute("aria-live")).toBe("polite");
   });
 
+  it("renders the status note in the header and nothing after the steel frame", () => {
+    const { container } = render(ui());
+    const note = screen.getByText("status line");
+    expect(container.querySelector("header.xr-header")?.contains(note)).toBe(true);
+    const shell = container.querySelector(".xr-shell");
+    expect(shell?.lastElementChild?.classList.contains("xr-shell-frame")).toBe(true);
+  });
+
   it("does not mount the stage in the flat view but keeps the content", () => {
     const { container } = render(ui(false));
     expect(container.querySelector(".xr-hotspots")).toBeNull();

@@ -34,3 +34,13 @@ describe("HeaderBar", () => {
     expect(onA).toHaveBeenCalledTimes(3);
   });
 });
+
+describe("HeaderBar status note", () => {
+  it("renders the status note inside the header, in a polite live region", () => {
+    const { container } = render(<HeaderBar xray statusNote={<span>Trip: Mar 10 - Mar 20, 2024</span>} />);
+    const header = container.querySelector("header.xr-header");
+    const note = screen.getByText("Trip: Mar 10 - Mar 20, 2024");
+    expect(header?.contains(note)).toBe(true);
+    expect(note.closest("[aria-live]")?.getAttribute("aria-live")).toBe("polite");
+  });
+});

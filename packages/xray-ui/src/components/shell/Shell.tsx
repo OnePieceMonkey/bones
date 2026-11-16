@@ -33,7 +33,7 @@ export interface ShellProps extends CommonProps {
   onMessagesComplete?: () => void;
   effective?: EffectiveResult;
   headerActions?: ReactNode;
-  /** One-line strip under the lightbox. */
+  /** Status text shown in the header, right of the tagline. */
   statusNote?: ReactNode;
   introPhase?: IntroPhase;
 }

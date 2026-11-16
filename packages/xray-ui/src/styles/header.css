@@ -1,7 +1,7 @@
 /* Header bar: wordmark and tagline, centred X-ray pill, right-aligned actions. */
 .xr-header {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   box-sizing: border-box;
   height: calc(52 * var(--xr-u, 1px));
@@ -15,7 +15,19 @@
   gap: calc(16 * var(--xr-u, 1px));
   justify-self: start;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
+.xr-header-status {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--xr-u, 1px));
+  min-width: 0;
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  color: var(--xr-text-header);
+  white-space: nowrap;
+}
+.xr-header-status > * { margin: 0; min-width: 0; }
 .xr-wordmark {
   font-family: "Cormorant SC", Georgia, "Times New Roman", serif;
   font-weight: 700;
