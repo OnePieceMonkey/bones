@@ -74,7 +74,15 @@ export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, 
   } else {
     body = (
       <div className="xr-film-image-wrap" style={{ position: "relative" }}>
-        <img className="xr-film-image" src={source.src} alt={source.alt} />
+        <img
+          className="xr-film-image"
+          src={source.src}
+          alt={source.alt}
+          // Intrinsic size is unknown; CSS sets width 100% and height auto, so these only reserve a ratio.
+          width={1000}
+          height={1000}
+          {...(source.alt === "" ? { "aria-hidden": true } : {})}
+        />
         {marks.map((m) => {
           const loc = m.location;
           if (loc.kind !== "bbox") return null;

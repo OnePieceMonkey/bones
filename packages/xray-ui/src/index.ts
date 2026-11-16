@@ -10,8 +10,16 @@ import "./styles/controls.css";
 
 export * from "./types";
 
+export { AssetImage } from "./components/shell/AssetImage";
+export type { AssetImageProps } from "./components/shell/AssetImage";
+export { SteelFrame } from "./components/shell/SteelFrame";
+export { ChatLog } from "./components/chat/ChatLog";
+export { DoctorPanel } from "./components/panels/DoctorPanel";
+export type { DoctorPanelProps } from "./components/panels/DoctorPanel";
 export { HeaderBar } from "./components/shell/HeaderBar";
 export { HeaderAction } from "./components/shell/HeaderAction";
+export { Shell } from "./components/shell/Shell";
+export type { ShellProps } from "./components/shell/Shell";
 export { ShellFrame } from "./components/shell/ShellFrame";
 export type { ShellFrameProps, IntroPhase } from "./components/shell/ShellFrame";
 export { DocumentPanel } from "./components/panels/DocumentPanel";

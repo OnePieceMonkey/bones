@@ -21,6 +21,8 @@ export interface ShellFrameProps extends CommonProps {
   controls?: ReactNode;
   /** Lightbox content. */
   children?: ReactNode;
+  /** One-line status strip under the lightbox (aria-live polite). */
+  statusNote?: ReactNode;
   introPhase?: IntroPhase;
 }
 
@@ -35,6 +37,7 @@ export function ShellFrame({
   lightboxLabel,
   controls,
   children,
+  statusNote,
   introPhase = "idle",
   reducedMotion,
   className,
@@ -62,6 +65,11 @@ export function ShellFrame({
           {controls}
         </Lightbox>
       </SteelFrame>
+      {statusNote !== undefined && (
+        <div className="xr-shell-status" aria-live="polite">
+          {statusNote}
+        </div>
+      )}
     </div>
   );
 }
