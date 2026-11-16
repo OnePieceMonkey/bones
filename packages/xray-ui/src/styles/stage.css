@@ -138,9 +138,20 @@
 .xr-hotspot .xr-tooltip { z-index: 10; }
 
 /* Fracture visuals. Static end state; motion (keyframes) is added separately. */
+/*
+ * .xr-fx is a sibling of .xr-hotspot, placed with the same left/top but centred
+ * by negative margins, never by transform. No ancestor of .xr-burst or
+ * .xr-splinter up to .xr-photo may form a stacking context (transform, filter,
+ * opacity < 1, will-change, isolation, z-index), or the screen blend would mix
+ * with a transparent group and black would stay black.
+ */
 .xr-fx {
+  --xr-hs-size: calc(44 * var(--xr-u, 1px));
   position: absolute;
-  inset: 0;
+  width: var(--xr-hs-size);
+  height: var(--xr-hs-size);
+  margin-left: calc(var(--xr-hs-size) / -2);
+  margin-top: calc(var(--xr-hs-size) / -2);
   pointer-events: none;
 }
 .xr-hs-flash {

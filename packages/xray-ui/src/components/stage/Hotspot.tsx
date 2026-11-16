@@ -32,11 +32,17 @@ const FLY_EXTRA = 20;
  * deterministic per rule id. The red ring is drawn by CSS, so the glow stays
  * when an image fails to load.
  */
-function FractureFx({ ruleId, fresh }: { ruleId: string; fresh: boolean }) {
+function FractureFx({ ruleId, fresh, style }: { ruleId: string; fresh: boolean; style: CSSProperties }) {
   const files = splinterAssets(ruleId);
   const shards = splinters(ruleId);
   return (
-    <span className="xr-fx" data-fresh={fresh ? "true" : "false"} aria-hidden="true">
+    <span
+      className="xr-fx"
+      data-fresh={fresh ? "true" : "false"}
+      data-rule-id={ruleId}
+      style={style}
+      aria-hidden="true"
+    >
       <span className="xr-hs-flash" />
       <AssetImage className="xr-burst" src={fractureBurstUrl} width={768} height={768} />
       {shards.map((sh, i) => {
@@ -81,6 +87,7 @@ export function Hotspot({
   const style = { left: `${r2(place.xPct)}%`, top: `${r2(place.yPct)}%` } as CSSProperties;
   if (lightDelayMs !== undefined) (style as Record<string, string>)["--xr-t-light"] = `${lightDelayMs}ms`;
   return (
+    <>
     <div
       className={cx("xr-hotspot", className)}
       data-state={hotspotState}
@@ -93,7 +100,6 @@ export function Hotspot({
           {"\u2713"}
         </span>
       )}
-      {hotspotState === "fractured" && <FractureFx key={fxKey} ruleId={bone.ruleId} fresh={fxKey > 0} />}
       <BoneButton
         bone={bone}
         {...(describedBy !== undefined ? { describedBy } : {})}
@@ -101,5 +107,11 @@ export function Hotspot({
       />
       {children}
     </div>
+    {/* Sibling of the transformed hotspot: the screen blend of burst and splinters must
+        reach the skeleton photo, so no ancestor may form a stacking context. */}
+    {hotspotState === "fractured" && (
+      <FractureFx key={fxKey} ruleId={bone.ruleId} fresh={fxKey > 0} style={style} />
+    )}
+    </>
   );
 }

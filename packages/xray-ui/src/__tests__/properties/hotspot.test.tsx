@@ -24,11 +24,15 @@ describe("Property 3: Hotspot visual state follows the bone state", () => {
         const { container, unmount } = render(<Stage trace={trace} anatomy={anatomy} />);
         const spots = [...container.querySelectorAll<HTMLElement>(".xr-hotspot")];
         expect(spots).toHaveLength(bones.length);
-        spots.forEach((el, i) => {
+        spots.forEach((hs, i) => {
           const state = hotspotState(bones[i]!);
-          expect(el.getAttribute("data-state")).toBe(state);
-          expect(el.querySelector(`.xr-hs-ring--${state}`)).not.toBeNull();
-          expect(el.querySelectorAll(".xr-hs-check")).toHaveLength(state === "applied-no-change" ? 1 : 0);
+          // The fracture group is a sibling of the hotspot inside the wrap.
+          const wrap = hs.parentElement!;
+          const el = wrap;
+          expect(hs.querySelector(".xr-burst, .xr-splinter, .xr-fx")).toBeNull();
+          expect(hs.getAttribute("data-state")).toBe(state);
+          expect(hs.querySelector(`.xr-hs-ring--${state}`)).not.toBeNull();
+          expect(hs.querySelectorAll(".xr-hs-check")).toHaveLength(state === "applied-no-change" ? 1 : 0);
           if (state === "fractured") {
             expect(el.querySelectorAll(".xr-burst")).toHaveLength(1);
             const n = el.querySelectorAll(".xr-splinter").length;
@@ -73,9 +77,10 @@ describe("Fracture visuals", () => {
   it("keeps the ring and the accessible name when the burst image fails", () => {
     const { container } = render(<Stage trace={signatureTrace()} anatomy={signatureAnatomy()} />);
     const fractured = container.querySelector<HTMLElement>('.xr-hotspot[data-state="fractured"]')!;
+    const wrap = fractured.parentElement!;
     const name = fractured.querySelector("button.xr-bone-btn")!.getAttribute("aria-label");
-    fireEvent.error(fractured.querySelector(".xr-burst")!);
-    expect(fractured.querySelector(".xr-burst")!.getAttribute("data-failed")).toBe("true");
+    fireEvent.error(wrap.querySelector(".xr-burst")!);
+    expect(wrap.querySelector(".xr-burst")!.getAttribute("data-failed")).toBe("true");
     expect(fractured.querySelector(".xr-hs-ring--fractured")).not.toBeNull();
     expect(fractured.querySelector("button.xr-bone-btn")!.getAttribute("aria-label")).toBe(name);
   });
@@ -87,7 +92,7 @@ describe("Fracture visuals", () => {
     const b = render(<Stage trace={signatureTrace()} anatomy={signatureAnatomy()} />);
     expect(b.container.innerHTML).toBe(htmlA);
     for (const spot of b.container.querySelectorAll('.xr-hotspot[data-state="fractured"]')) {
-      const srcs = [...spot.querySelectorAll(".xr-splinter")].map((e) => e.getAttribute("src"));
+      const srcs = [...spot.parentElement!.querySelectorAll(".xr-splinter")].map((e) => e.getAttribute("src"));
       expect(srcs).toHaveLength(6);
       expect(new Set(srcs).size).toBe(6);
     }

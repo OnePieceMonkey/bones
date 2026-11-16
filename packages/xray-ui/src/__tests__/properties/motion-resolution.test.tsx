@@ -122,9 +122,11 @@ describe("Property 12: reduced motion across the full Shell", () => {
             const hs = hotspots.find((h) => h.dataset["ruleId"] === bone.ruleId) as HTMLElement;
             const state = hotspotState(bone);
             expect(hs.dataset["state"]).toBe(state);
-            expect(hs.querySelectorAll(".xr-fx")).toHaveLength(state === "fractured" ? 1 : 0);
+            const wrap = hs.parentElement as HTMLElement;
+            expect(hs.querySelector(".xr-fx")).toBeNull();
+            expect(wrap.querySelectorAll(".xr-fx")).toHaveLength(state === "fractured" ? 1 : 0);
             if (state === "fractured") {
-              expect(hs.querySelector(".xr-fx")?.getAttribute("data-fresh")).toBe("false");
+              expect(wrap.querySelector(".xr-fx")?.getAttribute("data-fresh")).toBe("false");
             }
           }
           unmount();
@@ -144,7 +146,7 @@ describe("Property 12: reduced motion across the full Shell", () => {
     expect(container.querySelector(".xr-lightbox")).not.toBeNull();
     expect(container.querySelector(".xr-shake-a, .xr-shake-b")).toBeNull();
     // data-fresh only flags a remount; without .xr-live no animation CSS matches it.
-    expect(container.querySelector(".xr-hotspot[data-state='fractured'] .xr-fx")).not.toBeNull();
+    expect(container.querySelector(".xr-hotspot-wrap > .xr-fx")).not.toBeNull();
     expect(container.querySelector(".xr-live")).toBeNull();
   });
 

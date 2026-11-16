@@ -63,7 +63,7 @@ describe("Stage fracture group remount", () => {
     const fx = [...container.querySelectorAll(".xr-fx")];
     expect(fx.length).toBeGreaterThan(1);
     expect(fx.every((el) => el.getAttribute("data-fresh") === "false")).toBe(true);
-    const ruleId = fx[0]!.closest(".xr-hotspot")!.getAttribute("data-rule-id")!;
+    const ruleId = fx[0]!.getAttribute("data-rule-id")!;
     const bones = [...container.querySelectorAll(".xr-hotspot")];
     const idx = bones.findIndex((el) => el.getAttribute("data-rule-id") === ruleId);
     rerender(renderStage(new Map([[`${ruleId}:${idx}`, 1]])));
