@@ -361,13 +361,13 @@ Decisions recorded here:
     - Commit message: `test(xray-ui): cover reduced motion across the whole Shell`
     - _Requirements: 8.3, 10.12, 12.6, 13.7, 14.7, 15.1, 15.2, 15.4, 15.5, 15.6, 15.7, 17.8_
 
-- [-] 11. Checkpoint - bones and motion
+- [x] 11. Checkpoint - bones and motion
   - Ensure all tests pass, ask the user if questions arise.
   - Run `pnpm -r typecheck` and `pnpm -r test`. Confirm the app builds.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 11 done". Do not start any further task until the user says "weiter". The user reviews the app in the browser.
 
-- [ ] 12. Start screen
-  - [~] 12.1 FilmSheet and neutral descriptions
+- [x] 12. Start screen
+  - [x] 12.1 FilmSheet and neutral descriptions
     - Add `components/FilmSheet.tsx` and CSS: a `<button type="button" aria-describedby={`${id}-desc`}>` named by its title, one-line description span, `clip.webp` clip, film background, `data-selected` slide (`transform` transition 500 ms), disabled state. It knows no result and no domain words.
     - Add `SAMPLE_FILM_LINES` to `apps/expense-auditor/src/extraction/samples.ts` (neutral descriptions from visible facts, at most 120 characters, no line break). Keep `SAMPLE_BLURBS`.
     - Add `components/FilmSheet.test.tsx` (name, description, disabled blocks `onSelect`, Reduced_Motion has no transition) and an app test `tests/components/FilmSheet.lines.test.ts`.
@@ -376,24 +376,24 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add FilmSheet and neutral sample descriptions`
     - _Requirements: 16.3, 16.4, 16.5, 16.9_
 
-  - [~] 12.2 StartScreen on ShellFrame
+  - [x] 12.2 StartScreen on ShellFrame
     - Render `ShellFrame` with three `FilmSheet`s (one per sample), the status text "Reading receipt" while busy, all sheets disabled while busy, and `ErrorPanel`. Remove the visible plate, lead text and trip line. The hidden `h1` comes from `ShellFrame heading`. Failed load: error panel, status removed, sheets enabled, no intro. A second activation while loading is ignored.
     - In the same commit update `tests/components/StartScreen.test.tsx`: the heading test checks the hidden `h1` by role and name, and the plate and explanation assertions are replaced by "three film sheets, each a button named by its title". Keep the `App.test.tsx` start-screen lookups (`group` named "Load sample receipt", buttons by title) working: keep that `role="group"` and label on the sheet container.
     - Commit message: `feat(expense-auditor): show start screen as three film sheets on the shell`
     - _Requirements: 4.7, 4.8, 16.1, 16.2, 16.6, 16.7, 16.8, 16.10_
 
-- [ ] 13. Playwright and reference screenshots
-  - [~] 13.1 Playwright setup and network spec
+- [x] 13. Playwright and reference screenshots
+  - [x] 13.1 Playwright setup and network spec
     - Add `@playwright/test` to the app devDependencies with an exact pinned version. Add `playwright.config.ts` as in the design (`testDir: "e2e"`, `updateSnapshots: "none"`, `maxDiffPixelRatio: 0.001`, `threshold: 0.2`, `reducedMotion: "reduce"`, 1440x900, `webServer` with `vite preview --host 127.0.0.1 --port 4173 --strictPort`, 60 s timeout). Add scripts `"test:e2e": "vite build && playwright test"`. Exclude `e2e/` from the Vitest include pattern. Add `e2e/network.spec.ts`: all requests go to `127.0.0.1:4173`, none to `/api/`, none to a font host.
     - Commit message: `test(expense-auditor): add Playwright config and network spec`
     - _Requirements: 4.10, 20.6, 21.3, 21.8_
 
-  - [~] 13.2 Layout and scrollbar specs
+  - [x] 13.2 Layout and scrollbar specs
     - Add `e2e/layout.spec.ts`: for 1280x720, 1280x1080, 1920x720, 1920x1080 and 1440x900, every region (`.xr-doc`, `.xr-glass`, `.xr-photo`, `.xr-doctor`, `.xr-controls`) is inside the viewport, no two overlap except `.xr-controls` with `.xr-steel`, the pill centre is within 2 px of the header centre, and a `setViewportSize` change satisfies the layout again within 100 ms. Add scrollbar asserts at 1440x900 and 1280x720 (`scrollWidth === clientWidth` and `scrollHeight === clientHeight`) for the start screen and the signature case. Check the `statusNote` strip at 1280x720 and apply the `title` fallback from the notes if needed.
     - Commit message: `test(expense-auditor): add layout and scrollbar e2e specs`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.3, 21.5_
 
-  - [~] 13.3 Screenshot specs and reference images
+  - [-] 13.3 Screenshot specs and reference images
     - Add `e2e/start-screen.spec.ts` (waits for `document.fonts.ready` and the three film sheets, `toHaveScreenshot("start-screen.png")`) and `e2e/signature-case.spec.ts` (clicks the "Signature case" sheet, waits for `.xr-shell[data-intro="done"]` for at most 10 s, `toHaveScreenshot("signature-case.png")`). Generate the references once with `playwright test --update-snapshots` and commit `e2e/__screenshots__/`. Review both images: the leg anchors sit on the thighs (adjust `leg-left` and `leg-right` in `anchors.ts` and the anchor test if not), the glass card is cracked with the stamp, and nothing overlaps. Verify a missing reference fails a normal run.
     - Add a Playwright pixel check in `e2e/signature-case.spec.ts`: after `data-intro="done"` (motion allowed for this test), take a screenshot, read the bounding box of each fractured `.xr-burst`, sample the four box corners from the screenshot pixels and assert none is pure black (`#000000`). This guards against the blend-mode bug where the burst and splinters render as black squares because an ancestor forms a stacking context.
     - Commit message: `test(expense-auditor): add start screen and signature case reference screenshots`
