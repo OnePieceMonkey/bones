@@ -7,6 +7,7 @@ import "./styles/header.css";
 import "./styles/stage.css";
 import "./styles/panels.css";
 import "./styles/controls.css";
+import "./styles/intro.css";
 
 export * from "./types";
 
@@ -61,6 +62,8 @@ export { ResultPlate } from "./components/ResultPlate";
 export { XrayView } from "./components/XrayView";
 
 export { useReducedMotion } from "./hooks/useReducedMotion";
+export { useIntro } from "./hooks/useIntro";
+export type { UseIntroOptions } from "./hooks/useIntro";
 export { useTypewriter } from "./hooks/useTypewriter";
 export type { TypewriterOptions, TypewriterResult } from "./hooks/useTypewriter";
 export { HoveredRuleProvider, useHoveredRule } from "./hooks/useHoveredRule";

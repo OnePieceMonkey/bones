@@ -1,0 +1,79 @@
+/*
+ * One-shot intro. Timing lives in custom properties on the root so the
+ * TypeScript INTRO constants and this file cannot drift (css-constants test).
+ * Animated properties: transform, opacity, filter only. Every animation sits
+ * under .xr-shell.xr-live[data-intro="running"], so reduced motion shows the
+ * final state. fill-mode both keeps each element at its end state afterwards.
+ */
+.xr-shell {
+  --xr-t-flicker: 350ms;
+  --xr-t-cone-from: 250ms;
+  --xr-t-cone-to: 800ms;
+  --xr-t-sweep-from: 800ms;
+  --xr-t-sweep-to: 1500ms;
+  --xr-t-light-from: 1500ms;
+  --xr-t-light-ms: 400ms;
+}
+
+/* Scan line: base state is invisible; only the intro shows it. */
+.xr-photo::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12%;
+  background: linear-gradient(to bottom, transparent, rgba(120, 230, 255, 0.55), transparent);
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+@keyframes xr-intro-flicker {
+  0% { filter: brightness(0.3); }
+  20% { filter: brightness(1.15); }
+  40% { filter: brightness(0.5); }
+  70% { filter: brightness(1.08); }
+  100% { filter: brightness(1); }
+}
+@keyframes xr-intro-cone {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes xr-intro-sweep {
+  0% { opacity: 0; transform: translateY(-100%); }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(840%); }
+}
+@keyframes xr-intro-light {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.xr-shell.xr-live[data-intro="running"] .xr-viewport {
+  animation: xr-intro-flicker var(--xr-t-flicker) linear 0s both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-viewport::before {
+  animation: xr-intro-cone calc(var(--xr-t-cone-to) - var(--xr-t-cone-from)) ease-out var(--xr-t-cone-from) both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-photo::after {
+  animation: xr-intro-sweep calc(var(--xr-t-sweep-to) - var(--xr-t-sweep-from)) linear var(--xr-t-sweep-from) both;
+}
+.xr-shell.xr-live[data-intro="running"] .xr-hotspot {
+  animation: xr-intro-light var(--xr-t-light-ms) ease-out var(--xr-t-light, var(--xr-t-light-from)) both;
+}
+
+/* Reduced-motion override for this file (the motion guard checks each file). Same pair as shell.css. */
+.xr-shell[data-motion="reduce"],
+.xr-shell[data-motion="reduce"] * {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xr-shell[data-motion="auto"],
+  .xr-shell[data-motion="auto"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

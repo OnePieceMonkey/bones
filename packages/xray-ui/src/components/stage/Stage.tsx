@@ -5,6 +5,7 @@ import { useElementRect } from "../../hooks/useElementRect";
 import { useHoveredRule } from "../../hooks/useHoveredRule";
 import { placeBones, toCropPercent } from "../../model/anchors";
 import { hotspotState } from "../../model/hotspotState";
+import { introPlan } from "../../model/introOrder";
 import { placeRuleBox } from "../../model/ruleBoxPlacement";
 import { selectBones } from "../../model/selectors";
 import type { Anatomy, BoneView, CommonProps } from "../../types";
@@ -68,6 +69,7 @@ function RuleBoxLayer({ bone, anatomy, root, lightbox }: LayerProps) {
 export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) {
   const bones = selectBones(trace, anatomy);
   const placed = placeBones(bones);
+  const { startOf } = introPlan(bones, trace);
   const { setHoveredRuleId } = useHoveredRule();
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
   const [dismissedRuleId, setDismissedRuleId] = useState<string | null>(null);
@@ -112,6 +114,7 @@ export function Stage({ trace, anatomy, reducedMotion, className }: StageProps) 
                 bone={bone}
                 place={{ xPct: point.x, yPct: point.y }}
                 hotspotState={hotspotState(bone)}
+                lightDelayMs={startOf.get(bone) ?? 0}
                 {...(open ? { describedBy: tooltipId(bone.ruleId) } : {})}
                 {...(reducedMotion !== undefined ? { reducedMotion } : {})}
               />

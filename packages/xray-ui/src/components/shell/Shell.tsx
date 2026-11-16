@@ -1,5 +1,9 @@
 import type { ReactNode, Ref } from "react";
 import { HoveredRuleProvider } from "../../hooks/useHoveredRule";
+import { useIntro } from "../../hooks/useIntro";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+import { introPlan } from "../../model/introOrder";
+import { selectBones } from "../../model/selectors";
 import type { Anatomy, CommonProps, EffectiveResult, FilmSource, Trace } from "../../types";
 import { ControlPanel } from "../panel/ControlPanel";
 import { DoctorPanel } from "../panels/DoctorPanel";
@@ -62,9 +66,13 @@ export function Shell({
   headerActions,
   statusNote,
   introPhase,
+  introKey,
   reducedMotion,
   className,
 }: ShellProps) {
+  const reduced = useReducedMotion(reducedMotion);
+  const { schedule } = introPlan(selectBones(trace, anatomy), trace);
+  const phase = useIntro({ introKey, xray, reduced, schedule });
   // exactOptionalPropertyTypes: only pass optional props that are defined.
   const motion = reducedMotion === undefined ? {} : { reducedMotion };
   return (
@@ -75,7 +83,7 @@ export function Shell({
         {...(headerActions !== undefined ? { headerActions } : {})}
         {...(lightboxLabel !== undefined ? { lightboxLabel } : {})}
         {...(statusNote !== undefined ? { statusNote } : {})}
-        {...(introPhase !== undefined ? { introPhase } : {})}
+        introPhase={introPhase ?? phase}
         {...(className !== undefined ? { className } : {})}
         {...motion}
         controls={

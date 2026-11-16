@@ -14,6 +14,8 @@ export interface HotspotProps extends CommonProps {
   place: { xPct: number; yPct: number };
   hotspotState: HotspotState;
   describedBy?: string;
+  /** Intro light-up start in ms, exposed as `--xr-t-light`. */
+  lightDelayMs?: number;
   /** Extra content anchored to the hotspot (the tooltip, until the rule box replaces it). */
   children?: ReactNode;
 }
@@ -63,13 +65,24 @@ function FractureFx({ ruleId }: { ruleId: string }) {
  * BoneButton. State never depends on colour alone: the button keeps its icon,
  * state text and accessible name.
  */
-export function Hotspot({ bone, place, hotspotState, describedBy, className, reducedMotion, children }: HotspotProps) {
+export function Hotspot({
+  bone,
+  place,
+  hotspotState,
+  describedBy,
+  lightDelayMs,
+  className,
+  reducedMotion,
+  children,
+}: HotspotProps) {
+  const style = { left: `${r2(place.xPct)}%`, top: `${r2(place.yPct)}%` } as CSSProperties;
+  if (lightDelayMs !== undefined) (style as Record<string, string>)["--xr-t-light"] = `${lightDelayMs}ms`;
   return (
     <div
       className={cx("xr-hotspot", className)}
       data-state={hotspotState}
       data-rule-id={bone.ruleId}
-      style={{ left: `${r2(place.xPct)}%`, top: `${r2(place.yPct)}%` }}
+      style={style}
     >
       <span className={cx("xr-hs-ring", `xr-hs-ring--${hotspotState}`)} aria-hidden="true" />
       {hotspotState === "applied-no-change" && (
