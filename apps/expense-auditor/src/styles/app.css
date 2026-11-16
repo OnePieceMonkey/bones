@@ -28,39 +28,24 @@ main {
 }
 
 /* Start screen */
-.app-lead {
-  margin: 0 0 var(--xr-space-3);
-  color: var(--xr-text-dim);
-}
-
-.app-group {
-  margin: 0 0 var(--xr-space-3);
+.app-sheets {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--xr-space-3);
+  margin: 0;
   padding: 0;
   border: 0;
 }
 
-.app-samples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--xr-space-3);
-}
-
-.app-sample {
-  display: flex;
-  flex: 1 1 12rem;
-  flex-direction: column;
-  gap: var(--xr-space-1);
-}
-
-.app-blurb {
+.app-sheets + .app-status {
+  position: absolute;
+  bottom: var(--xr-space-3);
+  left: 50%;
   margin: 0;
-  color: var(--xr-text-dim);
-  font-size: 0.875rem;
-}
-
-.app-trip {
-  margin: var(--xr-space-2) 0 0;
-  color: var(--xr-text-dim);
+  transform: translateX(-50%);
 }
 
 /* Decision view */

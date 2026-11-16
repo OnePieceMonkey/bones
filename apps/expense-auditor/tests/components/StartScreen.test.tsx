@@ -1,19 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { DEFAULT_TRIP } from "../../src/extraction/samples";
-import { formatTripWindow } from "../../src/format/dates";
 import { StartScreen } from "../../src/ui/StartScreen";
 
 const NAMES = ["Signature case", "Clean meal", "Outside the trip window"];
 
 describe("StartScreen", () => {
-  it("shows the heading, plate, explanation and trip window", () => {
-    render(<StartScreen busy={false} error={null} onLoadSample={() => {}} />);
+  it("has the hidden h1 and three film sheets, each a button named by its title", () => {
+    const { container } = render(<StartScreen busy={false} error={null} onLoadSample={() => {}} />);
     expect(screen.getByRole("heading", { level: 1, name: "Expense Auditor" })).toBeInTheDocument();
-    expect(screen.getByText("Expense Auditor - RECORDED")).toBeInTheDocument();
-    expect(screen.getByText("The AI reads the receipt. The rules decide.")).toBeInTheDocument();
-    expect(screen.getByText(formatTripWindow(DEFAULT_TRIP))).toBeInTheDocument();
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+    expect(container.querySelectorAll(".xr-sheet")).toHaveLength(3);
+    for (const name of NAMES) expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    expect(screen.queryByText("The AI reads the receipt. The rules decide.")).toBeNull();
   });
 
   it("has the three sample buttons with blurbs and calls onLoadSample with the id", async () => {
@@ -21,7 +20,7 @@ describe("StartScreen", () => {
     render(<StartScreen busy={false} error={null} onLoadSample={onLoadSample} />);
     const group = screen.getByRole("group", { name: "Load sample receipt" });
     const buttons = screen.getAllByRole("button");
-    expect(buttons.map((b) => b.textContent)).toEqual(NAMES);
+    expect(buttons.map((b) => b.querySelector(".xr-sheet-title")?.textContent)).toEqual(NAMES);
     for (const b of buttons) {
       expect(group).toContainElement(b);
       expect(b).toHaveAttribute("type", "button");
