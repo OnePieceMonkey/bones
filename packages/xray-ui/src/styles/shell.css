@@ -1,0 +1,4 @@
+/* Failed asset images keep their layout box but show nothing. */
+[data-failed="true"] {
+  visibility: hidden;
+}

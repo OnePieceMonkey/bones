@@ -1,5 +1,6 @@
 import "./styles/tokens.css";
 import "./styles/xray.css";
+import "./styles/shell.css";
 
 export * from "./types";
 
