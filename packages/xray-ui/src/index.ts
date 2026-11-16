@@ -2,9 +2,13 @@ import "./styles/tokens.css";
 import "./styles/xray.css";
 import "./styles/shell.css";
 import "./styles/frame.css";
+import "./styles/fonts.css";
+import "./styles/header.css";
 
 export * from "./types";
 
+export { HeaderBar } from "./components/shell/HeaderBar";
+export { HeaderAction } from "./components/shell/HeaderAction";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";

@@ -1,0 +1,64 @@
+/* Header bar: wordmark and tagline, centred X-ray pill, right-aligned actions. */
+.xr-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  box-sizing: border-box;
+  height: calc(52 * var(--xr-u, 1px));
+  padding: 0 calc(20 * var(--xr-u, 1px));
+  background: var(--xr-bg-header);
+  color: var(--xr-text-header);
+}
+.xr-header-brand {
+  display: flex;
+  align-items: baseline;
+  gap: calc(16 * var(--xr-u, 1px));
+  justify-self: start;
+  min-width: 0;
+}
+.xr-wordmark {
+  font-family: "Cormorant SC", Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  font-size: max(18px, calc(30 * var(--xr-u, 1px)));
+  letter-spacing: 0.08em;
+}
+.xr-tagline {
+  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+  font-weight: 400;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.xr-header-pill {
+  justify-self: center;
+  padding: calc(3 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  border-radius: 999px;
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  letter-spacing: 0.1em;
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+}
+.xr-header-pill[data-on="true"] {
+  background: var(--xr-bg-cyan-fill);
+  color: var(--xr-text-on-cyan);
+}
+.xr-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: calc(14 * var(--xr-u, 1px));
+  justify-self: end;
+}
+.xr-header-action {
+  font: inherit;
+  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+  font-weight: 400;
+  padding: calc(4 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px));
+  color: var(--xr-text-header);
+  background: transparent;
+  border: 1px solid rgba(232, 244, 248, 0.35);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.xr-header-action:focus-visible {
+  outline: 3px solid var(--xr-focus, #3de8ff);
+  outline-offset: 2px;
+}
