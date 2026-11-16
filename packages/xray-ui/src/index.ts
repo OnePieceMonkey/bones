@@ -4,6 +4,7 @@ import "./styles/shell.css";
 import "./styles/frame.css";
 import "./styles/fonts.css";
 import "./styles/header.css";
+import "./styles/stage.css";
 
 export * from "./types";
 

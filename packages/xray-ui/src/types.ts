@@ -138,6 +138,10 @@ export interface CommonProps {
 export interface LightboxProps extends CommonProps {
   title?: string;
   xray: boolean;
+  /** Show the X-RAY ON/OFF pill. Default true. */
+  pill?: boolean;
+  /** Show the title as a visible plate. Default true. */
+  plate?: boolean;
   children?: ReactNode;
 }
 

@@ -41,6 +41,18 @@ describe("Lightbox", () => {
     expect(container.querySelector(".xr-pill")).toHaveAttribute("data-on", "false");
   });
 
+  it("hides pill and plate on request and keeps the title as aria-label", () => {
+    const { container } = render(<Lightbox title="T" xray pill={false} plate={false} />);
+    expect(container.querySelector(".xr-pill")).toBeNull();
+    expect(container.querySelector(".xr-title-plate")).toBeNull();
+    expect(container.querySelector("section")).toHaveAttribute("aria-label", "T");
+  });
+  it("marks the flat view with data-xray", () => {
+    const { container, rerender } = render(<Lightbox xray />);
+    expect(container.querySelector("section")).toHaveAttribute("data-xray", "true");
+    rerender(<Lightbox xray={false} />);
+    expect(container.querySelector("section")).toHaveAttribute("data-xray", "false");
+  });
   it("renders no img element", () => {
     const { container } = render(
       <Lightbox title="T" xray>

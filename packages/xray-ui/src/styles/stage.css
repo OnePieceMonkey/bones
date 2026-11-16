@@ -1,0 +1,24 @@
+/* Lightbox viewport: film background, light cone, flat view. */
+.xr-viewport {
+  isolation: isolate;
+  background: url("../assets/film.webp") center / cover no-repeat, #05090d;
+}
+.xr-viewport::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("../assets/light-cone.webp") top center / contain no-repeat;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* Flat view: same size, no film, no blend, no glow. */
+.xr-lightbox[data-xray="false"] .xr-viewport {
+  background: var(--xr-bg-paper);
+  box-shadow: none;
+}
+.xr-lightbox[data-xray="false"] .xr-viewport::before {
+  content: none;
+  mix-blend-mode: normal;
+  background: none;
+}
