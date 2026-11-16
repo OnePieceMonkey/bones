@@ -130,3 +130,39 @@
     transition: none;
   }
 }
+
+/* Control panel: steel plate in grid area ctrl, overlapping the frame's lower left corner. */
+.xr-cpanel {
+  grid-area: ctrl;
+  position: relative;
+  z-index: 2;
+  align-self: end;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: calc(8 * var(--xr-u, 1px));
+  min-width: 0;
+  margin: 0 0 calc(-18 * var(--xr-u, 1px)) calc(-18 * var(--xr-u, 1px));
+  padding: calc(22 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px));
+  background: url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat, #3a444b;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.35),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.6);
+}
+.xr-cpanel-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6 * var(--xr-u, 1px));
+  min-width: 0;
+}
+.xr-cpanel-plaque {
+  padding: calc(2 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
+  background: var(--xr-bg-metal-light);
+  color: var(--xr-text-on-metal);
+  font: 700 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border-radius: calc(2 * var(--xr-u, 1px));
+}
