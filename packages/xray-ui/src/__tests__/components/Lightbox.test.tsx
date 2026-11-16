@@ -50,9 +50,10 @@ describe("Lightbox", () => {
     expect(container.querySelector("img")).toBeNull();
   });
 
-  it("keeps the stylesheet free of url( and @import", () => {
+  // Changed on purpose: the new look needs bundled images, so the blanket url( ban
+  // is removed. The path-aware check in guards/assets-guard.test.ts replaces it.
+  it("keeps the stylesheet free of @import", () => {
     const css = readFileSync(resolve(__dirname, "../../styles/xray.css"), "utf8");
-    expect(css).not.toContain("url(");
     expect(css).not.toContain("@import");
   });
 });

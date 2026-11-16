@@ -52,7 +52,6 @@ describe("xray.css answer card rules", () => {
     expect(declarations(".xr-stamp-area").has("min-height")).toBe(true);
   });
 
-  it("uses no url() references", () => {
-    expect(css).not.toContain("url(");
-  });
+  // Removed on purpose: the new look needs bundled images, so the blanket url() ban
+  // is gone. The path-aware guard in guards/assets-guard.test.ts replaces it.
 });
