@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Cormorant SC";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("@fontsource/cormorant-sc/files/cormorant-sc-latin-700-normal.woff2") format("woff2");
+}
