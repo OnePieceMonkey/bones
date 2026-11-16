@@ -3,7 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import fc from "fast-check";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Knob } from "../../components/panel/Knob";
-import { knobAngle, stepVersion } from "../../model/gauge";
+import { Meter } from "../../components/panel/Meter";
+import { buildGaugeModel } from "../../model/confidence";
+import { selectBones } from "../../model/selectors";
+import { arbTraceAndAnatomy } from "../helpers/arbitraries";
+import { knobAngle, needleAngle, stepVersion } from "../../model/gauge";
 
 afterEach(cleanup);
 
@@ -65,5 +69,34 @@ describe("Knob", () => {
   it("falls back to index 0 for an unknown value", () => {
     render(<Knob versions={["v1", "v2"]} value="zz" onVersionChange={() => {}} />);
     expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0");
+  });
+});
+
+describe("Property 14: Meter value and needle angle", () => {
+  it("has a 0..100 scale, rounds the value, and uses needleAngle (null rests at needleAngle(null))", () => {
+    fc.assert(
+      fc.property(arbTraceAndAnatomy, fc.boolean(), ({ trace, anatomy }, withValue) => {
+        // Validates: Requirements 9.6, 9.7, 9.8
+        const t = withValue ? trace : { ...trace, confidence: {} };
+        const { container, unmount } = render(<Meter trace={t} anatomy={anatomy} />);
+        const meter = screen.getByRole("meter", { name: "AI READ CONFIDENCE" });
+        expect(meter).toHaveAttribute("aria-valuemin", "0");
+        expect(meter).toHaveAttribute("aria-valuemax", "100");
+        const { value } = buildGaugeModel(t, selectBones(t, anatomy));
+        const needle = container.querySelector(".xr-pmeter-needle")!;
+        expect(needle.getAttribute("data-angle")).toBe(String(needleAngle(value)));
+        expect(container.querySelector("svg circle")).not.toBeNull();
+        if (value === null) {
+          expect(meter).not.toHaveAttribute("aria-valuenow");
+          expect(meter).toHaveAttribute("aria-valuetext", "no confidence available");
+          expect(needle.getAttribute("data-angle")).toBe(String(needleAngle(null)));
+        } else {
+          expect(meter).toHaveAttribute("aria-valuenow", String(Math.round(100 * value)));
+          expect(meter.getAttribute("aria-valuetext")).toBe(`confidence ${value.toFixed(2)}`);
+        }
+        unmount();
+      }),
+      { numRuns: 100 },
+    );
   });
 });

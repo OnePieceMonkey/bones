@@ -21,6 +21,8 @@ export { ResultFooter } from "./components/panels/ResultFooter";
 export type { ResultFooterProps } from "./components/panels/ResultFooter";
 export { Knob } from "./components/panel/Knob";
 export type { KnobProps } from "./components/panel/Knob";
+export { Meter } from "./components/panel/Meter";
+export type { MeterProps } from "./components/panel/Meter";
 export { Lightbox } from "./components/Lightbox";
 export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";
