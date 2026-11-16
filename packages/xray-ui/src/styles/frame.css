@@ -1,0 +1,39 @@
+/* Brushed-steel frame around the lightbox. */
+.xr-steel {
+  position: relative;
+  box-sizing: border-box;
+  padding: calc(14 * var(--xr-u, 1px));
+  background: url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat, #3a444b;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.35),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.xr-screw {
+  position: absolute;
+  width: calc(14 * var(--xr-u, 1px));
+  height: calc(14 * var(--xr-u, 1px));
+  background: url("../assets/screw.webp") center / contain no-repeat;
+  transform: rotate(var(--xr-screw-rot, 0deg));
+  pointer-events: none;
+}
+
+.xr-screw--tl {
+  top: calc(3 * var(--xr-u, 1px));
+  left: calc(3 * var(--xr-u, 1px));
+}
+
+.xr-screw--tr {
+  top: calc(3 * var(--xr-u, 1px));
+  right: calc(3 * var(--xr-u, 1px));
+}
+
+.xr-screw--bl {
+  bottom: calc(3 * var(--xr-u, 1px));
+  left: calc(3 * var(--xr-u, 1px));
+}
+
+.xr-screw--br {
+  bottom: calc(3 * var(--xr-u, 1px));
+  right: calc(3 * var(--xr-u, 1px));
+}

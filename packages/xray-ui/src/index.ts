@@ -1,6 +1,7 @@
 import "./styles/tokens.css";
 import "./styles/xray.css";
 import "./styles/shell.css";
+import "./styles/frame.css";
 
 export * from "./types";
 
