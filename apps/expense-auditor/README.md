@@ -134,7 +134,7 @@ The function calls the Anthropic Messages API with `max_tokens` 16000 and `outpu
 - There is a per-IP rate limit of 10 requests per 10 minutes. It is best effort: the counter lives in memory of one function instance, and each instance and each restart has its own. Do not rely on it.
 - Set a spend limit at the AI provider. If your plan supports it, add a platform rate-limit rule (for example Vercel Firewall).
 - `vercel.json` sets `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and a Content Security Policy. The config smoke test checks the build settings in `vercel.json`. The headers are served and enforced only on Vercel. They do not apply to `pnpm dev` or `pnpm preview`, and they have not been tested in a deployed browser.
-- A guard test scans the client code in `src` for key names and key-like strings. It does not scan `api/` or this README.
+- A guard test (`tests/guards/no-secrets.node.test.ts`) builds the app with a canary key set in the environment. It fails if the canary, `x-api-key`, `anthropic-version`, `api.anthropic.com`, the variable names or key-like strings appear anywhere in the built `dist/`, or in `src`. It also fails on source maps. It does not scan `api/` (server code) or this README.
 - The server logs only status, a short code and duration. Not the image, not the key, not the IP address.
 
 ## Known limitations
