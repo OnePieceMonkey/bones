@@ -686,13 +686,13 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 6.7, 20.3, 20.5, 20.6, 20.7, 20.8_
     - Commit: `git add apps/expense-auditor/README.md && git commit -m "docs(expense-auditor): add README"`
 
-- [ ] 25. End-to-end test
-  - [-] 25.1 Add the Playwright configuration
+- [x] 25. End-to-end test
+  - [x] 25.1 Add the Playwright configuration
     - `apps/expense-auditor/playwright.config.ts`: merged into the existing config from the visual-polish spec (its screenshot settings, 1440x900 viewport and 60 s server timeout are kept) with the design.md settings (testDir `./e2e`, chromium only, `reducedMotion: "reduce"`, `acceptDownloads`, `baseURL` `http://127.0.0.1:4173`, `webServer` command `pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort` with `LIVE_EXTRACTION: "off"`, `reuseExistingServer: !process.env.CI`); the root alias `pnpm e2e` (task 7.4, `pnpm --filter @bones/expense-auditor test:e2e`) already exists and runs this config
     - Run `pnpm exec playwright install chromium` in `apps/expense-auditor` (environment step, not committed); run `pnpm --filter @bones/expense-auditor typecheck`
     - _Requirements: 6.3, 6.7, 19.5_
     - Commit: `git add apps/expense-auditor/playwright.config.ts && git commit -m "test(expense-auditor): add playwright config"`
-  - [~] 25.2 Write the signature-flow e2e spec
+  - [x] 25.2 Write the signature-flow e2e spec
     - `apps/expense-auditor/e2e/signature.spec.ts`, the single test of design.md: load "Signature case"; the X-RAY switch (`role="switch"`) is on right after the decision appears (reduced motion); `.xr-result-label` "PARTIALLY APPROVED" and `.xr-result-amount` "$41.50"; exactly two `button.xr-bone-btn[data-state='fractured']` inside the group "Decision skeleton" named "Line-item match, rule line-item-cap version 1.0.0, fractured" and "Alcohol, rule alcohol-deducting version 1.0.0, fractured"; the meal-limit bone `data-state="passed"` with the text "applied, no change"; the stamp "OVERRULED BY RULE" visible; focus the `slider` named "RULE VERSION", press ArrowRight twice, `aria-valuetext` "v3", "Replayed with v3" visible, plate unchanged; "Overrule" with "Dana Reviewer", a reason and "approved"; plate "APPROVED", "overruled by Dana Reviewer", "Rules decided: PARTIALLY APPROVED", still two fractured bones; "Download trace" file name `expense-trace-<8 hex>.json` whose JSON has `format`, `trace.result` `partially_approved`, `trace.amountCents` 4150, one override with `reviewerName`, `replacementResult` and matching `decisionId`, and `replayedFrom.ruleSetVersion` "1.0.0"
     - Layout and readability checks in the same test, after the stamp is visible: at viewport 1280x800 and again at 390x844, the bounding box of the stamp (`getByRole("note").filter({ hasText: "OVERRULED BY RULE" })`) intersects no `.xr-field-value` bounding box of the AI card; `getComputedStyle` gives a lower numeric `z-index` for `.xr-crack-overlay` than for `.xr-answer-body`, and every `.xr-field` has a background colour with alpha 1; the text of every AI card row contains neither "{" nor "[", and no row label matches `/[a-z][A-Z]/`; the page text contains "$480.00" and "$41.50" and never "EUR"
     - Run `pnpm e2e` from the repo root; it passes
@@ -700,13 +700,13 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Commit: `git add apps/expense-auditor/e2e && git commit -m "test(expense-auditor): signature flow e2e"`
 
 - [ ] 26. Manual verification checklist
-  - [~] 26.1 Write the manual check section in the README
+  - [-] 26.1 Write the manual check section in the README
     - Add a "Manual check before a release" section to `apps/expense-auditor/README.md` listing what a person looks at with `pnpm --filter @bones/expense-auditor dev` and then `pnpm --filter @bones/expense-auditor build` plus `pnpm --filter @bones/expense-auditor preview`: the first 10 seconds (plain receipt first, X-RAY switches on after about 0.6 s, fractures glow, ECG spikes red, answer card cracks, stamp lands), no console errors, the three samples and the three versions, keyboard-only use of the knob, switch, dialog and download, OS reduced-motion setting, the brushed-metal look against `design/mockups/bones-7-retro-b.png`, the CSP in the Vercel preview deploy (not applied by `vite preview`), live mode with a real key; mark it clearly as a manual step that no test replaces
     - _Requirements: 12.4, 12.5, 12.7, 18.1, 18.4, 20.6_
     - Commit: `git add apps/expense-auditor/README.md && git commit -m "docs(expense-auditor): add manual release check"`
 
-- [ ] 27. Final checkpoint
-  - [~] 27.1 Final checkpoint - everything green and committed
+- [x] 27. Final checkpoint
+  - [x] 27.1 Final checkpoint - everything green and committed
     - Run from the repo root: `pnpm test`, `pnpm typecheck`, `pnpm --filter @bones/expense-auditor build` and `pnpm e2e`; all must pass; the core domain-isolation test and the browser-barrel test are green
     - Run `git status` and confirm a clean working tree (everything committed, `.kiro/` tracked)
     - Manual step (not automated, see task 26.1): a person runs `pnpm --filter @bones/expense-auditor dev` and `preview` and works through the manual check list; report it as pending if it was not done

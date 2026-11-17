@@ -2214,6 +2214,16 @@
         "executionId": "3fe0d8d2-5269-46d3-8942-63920a1c094a",
         "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
         "timestamp": 1794748538480
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943129568
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943205770
       }
     ],
     "25.2 Write the signature-flow e2e spec": [
@@ -2221,6 +2231,16 @@
         "executionId": "3fe0d8d2-5269-46d3-8942-63920a1c094a",
         "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
         "timestamp": 1794748538542
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943208641
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943398354
       }
     ],
     "26.1 Write the manual check section in the README": [
@@ -2228,6 +2248,11 @@
         "executionId": "3fe0d8d2-5269-46d3-8942-63920a1c094a",
         "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
         "timestamp": 1794748538592
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943404681
       }
     ],
     "27.1 Final checkpoint - everything green and committed": [
@@ -2235,6 +2260,16 @@
         "executionId": "3fe0d8d2-5269-46d3-8942-63920a1c094a",
         "chatSessionId": "sess_67a0b406-2786-4e59-8528-51a8cfcb4f0c",
         "timestamp": 1794748538648
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943464314
+      },
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943544605
       }
     ],
     "1. Move the rule files to `rules/expense-auditor/`": [
@@ -2451,6 +2486,20 @@
         "executionId": "9194c0b2-4651-452e-8cfd-c78a6f351bde",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1794942011426
+      }
+    ],
+    "25. End-to-end test": [
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943398415
+      }
+    ],
+    "27. Final checkpoint": [
+      {
+        "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794943544679
       }
     ]
   }
