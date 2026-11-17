@@ -652,17 +652,20 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - `tests/guards/workspace-imports.node.test.ts`: in `src` every `@bones/` specifier is `@bones/core` or `@bones/xray-ui`; no `@bones/core/node`; no `node:` specifier or Node built-in (reuse the specifier regex style of Core's `browser-barrel.test.ts`); `shared/` and `api/_lib/` import nothing from `src/`
     - _Requirements: 6.6, 8.7, 19.12_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard workspace imports"`
-  - [-] 23.3 Write the secret scan guard
+  - [x] 23.3 Write the secret scan guard
     - `tests/guards/no-secrets.node.test.ts`: run `build` from `vite` programmatically with a temporary `outDir` and `logLevel: "silent"` (timeout 120 s), scan every output file and every file in `src` for `ANTHROPIC_API_KEY`, `LIVE_EXTRACTION`, `EXTRACTION_MODEL`, `x-api-key`, `/sk-[A-Za-z0-9_-]{20,}/`, `/sk-ant-/`; scan `src` for `/api[_-]?key/i` and `VITE_` names containing KEY or SECRET; assert no `.map` file; a match reports file and text
     - Canary build: the build runs with `ANTHROPIC_API_KEY="sk-canary-…"` (fixed random-looking string), `LIVE_EXTRACTION=on` and `EXTRACTION_MODEL=canary-model` set in `process.env` (no `VITE_` variable, no file on disk; env restored afterwards). Every output file (html, css, js, json) must not contain the canary value, `x-api-key`, `anthropic-version` (both case-insensitive) or `api.anthropic.com`; no `.map` file
     - Self-test: the scanner detects the canary, the headers, the host and a `.map` file in a fake dist written to an os temp dir
     - Shared helper `tests/helpers/build.ts` exports `buildOnce()` (cached per process, os temp `outDir`, `logLevel: "silent"`), `cleanupBuild()`, `listFiles()` and `CANARY_KEY`; task 23.6 reuses `buildOnce()`
     - _Requirements: 16.5, 19.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard against secrets in src and dist"`
-  - [~] 23.4 Write the hygiene guard
+  - [-] 23.4 Write the hygiene guard
     - `tests/guards/app-hygiene.node.test.ts`: `app.css` has no `transition`, `animation`, `@keyframes`; `src` has no `AudioContext`, `new Audio`, `<audio`; `src` has none of the words `login`, `logout`, `password`, `oauth`, `jwt`, `bearer`, `authenticate`, `cookie` as whole words
+    - Extension, Dr. Bones never calls an LLM. Already guarded and only referenced: xray-ui `source-hygiene.test.ts` (no fetch/XMLHttpRequest/WebSocket/api key/openai/anthropic import in xray-ui src) and `properties/chat-source.test.tsx` (chat text equals builder output, net spy sees zero calls); app `no-visual-in-app.node.test.ts` (auth words, audio, motion in src)
+    - `tests/guards/no-llm-in-chat.node.test.ts`: (a) xray-ui chat files `DrBonesChat.tsx`, `chat/ChatLog.tsx`, `panels/DoctorPanel.tsx`, `model/chat.ts` contain no fetch/XMLHttpRequest/WebSocket/EventSource/sendBeacon, no anthropic/openai/llm, no extraction adapter or port reference, and import only relative modules, `react` and `@bones/core`; (b) in app `src` only `extraction/HttpExtractionAdapter.ts` and `extraction/liveStatus.ts` use a network API (allow-list by file), and `ui/` files do not import them
+    - `tests/guards/no-llm-in-chat.runtime.test.tsx`: (c) with throwing stubs for fetch, XMLHttpRequest, WebSocket and EventSource (no real network), render `DecisionView` for the signature sample, check chat bubbles show, replay with the next rule version, and assert zero stub calls
     - _Requirements: 6.8, 18.4, 18.6, 20.5_
-    - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): hygiene guard"`
+    - Commit: `git add apps/expense-auditor .kiro/specs/expense-auditor/tasks.md && git commit -m "test(expense-auditor): hygiene and no-LLM-in-chat guards"`
   - [~] 23.5 Write the contrast guard
     - `tests/helpers/contrast.ts` (`relativeLuminance`, `contrastRatio`) and `tests/guards/contrast.node.test.ts`: read `packages/xray-ui/src/styles/tokens.css`, resolve the token pairs `app.css` uses (text on panel, dim text on panel, plate text on plate, focus on panel) and require at least 4.5 for text and 3 for the focus ring; every token named in `app.css` exists
     - _Requirements: 18.2_
