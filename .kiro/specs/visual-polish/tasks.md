@@ -393,7 +393,7 @@ Decisions recorded here:
     - Commit message: `test(expense-auditor): add layout and scrollbar e2e specs`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.3, 21.5_
 
-  - [-] 13.3 Screenshot specs and reference images
+  - [x] 13.3 Screenshot specs and reference images
     - Add `e2e/start-screen.spec.ts` (waits for `document.fonts.ready` and the three film sheets, `toHaveScreenshot("start-screen.png")`) and `e2e/signature-case.spec.ts` (clicks the "Signature case" sheet, waits for `.xr-shell[data-intro="done"]` for at most 10 s, `toHaveScreenshot("signature-case.png")`). Generate the references once with `playwright test --update-snapshots` and commit `e2e/__screenshots__/`. Review both images: the leg anchors sit on the thighs (adjust `leg-left` and `leg-right` in `anchors.ts` and the anchor test if not), the glass card is cracked with the stamp, and nothing overlaps. Verify a missing reference fails a normal run.
     - Add a Playwright pixel check in `e2e/signature-case.spec.ts`: after `data-intro="done"` (motion allowed for this test), take a screenshot, read the bounding box of each fractured `.xr-burst`, sample the four box corners from the screenshot pixels and assert none is pure black (`#000000`). This guards against the blend-mode bug where the burst and splinters render as black squares because an ancestor forms a stacking context.
     - Commit message: `test(expense-auditor): add start screen and signature case reference screenshots`
@@ -412,7 +412,7 @@ Decisions recorded here:
     - Commit message: `docs(xray-ui): document assets, scaling and reduced motion`
     - _Requirements: 1.5, 15.5_
 
-- [~] 15. Final checkpoint - full suite
+- [x] 15. Final checkpoint - full suite
   - Run `pnpm -r typecheck`, `pnpm -r test`, `pnpm --filter @bones/expense-auditor test:e2e` and `git diff --exit-code -- packages/core` against the commit before this feature. All must pass with no changed file under `packages/core`.
   - Confirm no test outside the named exceptions was edited (`git diff --stat` on test files shows only Toolbar, App, DecisionView, StartScreen, Lightbox, AnswerCard.styles, contrast and source-hygiene tests).
   - Ensure all tests pass, ask the user if questions arise.
