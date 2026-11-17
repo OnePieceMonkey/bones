@@ -127,3 +127,101 @@ export const arbOp: fc.Arbitrary<ArbOp> = fc.oneof(
   arbLabel.map((label): ArbOp => ({ type: "select", label })),
   arbOverrideForm.map((form): ArbOp => ({ type: "override", form })),
 );
+
+/** A model output object that satisfies `modelOutputSchema`. */
+export interface ArbModelOutput {
+  merchant: string;
+  receiptDate: string;
+  claimedTotalCents: number;
+  lineItems: { description: string; amount: number; isAlcohol: boolean }[];
+  confidence: { merchant: number; receiptDate: number; claimedTotalCents: number; lineItems: number };
+}
+
+const arbUnit: fc.Arbitrary<number> = fc.double({ min: 0, max: 1, noNaN: true });
+const arbText: fc.Arbitrary<string> = fc.string({ minLength: 1, maxLength: 40 });
+
+const arbModelOutputObject: fc.Arbitrary<ArbModelOutput> = fc.record({
+  merchant: arbText,
+  receiptDate: arbIsoDate,
+  claimedTotalCents: arbCents,
+  lineItems: fc.array(
+    fc.record({ description: arbText, amount: arbCents, isAlcohol: fc.boolean() }),
+    { minLength: 1, maxLength: 6 },
+  ),
+  confidence: fc.record({
+    merchant: arbUnit,
+    receiptDate: arbUnit,
+    claimedTotalCents: arbUnit,
+    lineItems: arbUnit,
+  }),
+});
+
+const arbIndent: fc.Arbitrary<number | undefined> = fc.constantFrom(undefined, 0, 2, 4);
+
+/** Valid provider text: the exact JSON string the model returns, with its parsed form. */
+export const arbValidModelOutput: fc.Arbitrary<{ output: ArbModelOutput; text: string }> = fc
+  .tuple(arbModelOutputObject, arbIndent)
+  .map(([output, indent]) => ({ output, text: JSON.stringify(output, null, indent) }));
+
+export type ModelOutputDefect =
+  | "extra-root-key"
+  | "extra-item-key"
+  | "extra-confidence-key"
+  | "confidence-out-of-range"
+  | "negative-cents"
+  | "fractional-cents"
+  | "bad-date";
+
+/** Provider text with exactly one injected defect. */
+export const arbBadModelOutput: fc.Arbitrary<{ defect: ModelOutputDefect; text: string }> = fc
+  .tuple(
+    arbModelOutputObject,
+    fc.constantFrom<ModelOutputDefect>(
+      "extra-root-key",
+      "extra-item-key",
+      "extra-confidence-key",
+      "confidence-out-of-range",
+      "negative-cents",
+      "fractional-cents",
+      "bad-date",
+    ),
+    fc.nat(),
+    fc.constantFrom("decision", "approved", "note", "x"),
+    fc.constantFrom("claimedTotalCents", "item"),
+    fc.constantFrom("merchant", "receiptDate", "claimedTotalCents", "lineItems"),
+    fc.oneof(fc.double({ min: 1.0001, max: 50, noNaN: true }), fc.double({ min: -50, max: -0.0001, noNaN: true })),
+    fc.integer({ min: 1, max: 100_000 }),
+    fc.integer({ min: 0, max: 99_999 }),
+    fc.constantFrom("2025-02-30", "2025-13-01", "14/03/2025", "2025-3-4", "yesterday", "", "2025-03-14T10:00:00Z", "0000-00-00"),
+    arbIndent,
+  )
+  .map(([base, defect, pick, extraKey, centsTarget, confKey, badUnit, negCents, fracBase, badDate, indent]) => {
+    const o = structuredClone(base) as Record<string, any>;
+    const i = pick % o.lineItems.length;
+    switch (defect) {
+      case "extra-root-key":
+        o[extraKey] = true;
+        break;
+      case "extra-item-key":
+        o.lineItems[i][extraKey] = "x";
+        break;
+      case "extra-confidence-key":
+        o.confidence[extraKey] = 0.5;
+        break;
+      case "confidence-out-of-range":
+        o.confidence[confKey] = badUnit;
+        break;
+      case "negative-cents":
+        if (centsTarget === "item") o.lineItems[i].amount = -negCents;
+        else o.claimedTotalCents = -negCents;
+        break;
+      case "fractional-cents":
+        if (centsTarget === "item") o.lineItems[i].amount = fracBase + 0.5;
+        else o.claimedTotalCents = fracBase + 0.5;
+        break;
+      case "bad-date":
+        o.receiptDate = badDate;
+        break;
+    }
+    return { defect, text: JSON.stringify(o, null, indent) };
+  });
