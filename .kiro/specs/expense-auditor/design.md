@@ -31,6 +31,7 @@ Sources are the live documentation pages named below. Content is paraphrased.
 - **Anthropic vision** ([Vision](https://platform.claude.com/docs/en/build-with-claude/vision)): an `image` content block with `source: { type: "base64", media_type, data }`, images before text work best, JPEG and PNG are supported, 10 MB base64 per image, 8000 x 8000 px maximum, standard tier resizes above 1568 px long edge. Claude Haiku 5.5 is the model the docs describe for high-volume extraction.
 - **Anthropic structured output** ([Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)): `output_config.format` with `type: "json_schema"` constrains the text block to a schema. Objects need `additionalProperties: false`; `minimum`, `maximum`, `minLength`, `maxLength` and array bounds above `minItems` 1 are not supported, so range checks happen in Zod. `stop_reason` can be `refusal` or `max_tokens`, and then the output may not match the schema (HTTP 200).
 - **Anthropic API version** ([API versions](https://platform.claude.com/docs/en/api/versioning)): the docs show `anthropic-version: 2026-10-21`. In that version `temperature`, `top_p` and `top_k` are removed and a request that sends one returns 400, so the function sends none of them.
+- **Anthropic thinking, `max_tokens` and effort** ([Adaptive thinking](https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking)): Claude Haiku 5.5 always runs adaptive thinking, and thinking tokens count against `max_tokens`. With `max_tokens: 4096` a valid receipt could end with `stop_reason: "max_tokens"` and the app would show `upstream_failed`. The request therefore uses `max_tokens: 16000` and `output_config.effort: "low"` (next to `output_config.format`) to keep thinking short. It sends no `thinking` field (neither `"disabled"` nor `budget_tokens`; both return 400) and no `tool_choice`, `temperature`, `top_p` or `top_k`. A `max_tokens` stop still maps to an upstream failure.
 - **Playwright**: `npm view @playwright/test` lists 1.65.1 with `engines.node >= 20` (local Node is 25). Pinned exactly.
 - **Workspace versions**: `react` 18.3.1, `vite` 5.4.21, `vitest` 1.6.0, `fast-check` 3.19.0, `typescript` 5.4.5, `zod` 3.23.8, `jsdom` 24.1.0 and the Testing Library versions are copied from `packages/xray-ui/package.json`, so the lockfile keeps one copy of each.
 
@@ -1280,22 +1281,22 @@ export const ANTHROPIC_VERSION = "2026-10-21";     // from the API versions page
 export function createAnthropicClient(opts: { apiKey: string; model: string; fetchImpl: typeof fetch; timeoutMs?: number }): LlmClient;
 ```
 
-Request (timeout 25 s with `AbortController`; `max_tokens: 4096`):
+Request (timeout 25 s with `AbortController`; `max_tokens: 16000`, `output_config.effort: "low"`):
 
 ```json
 {
   "model": "<EXTRACTION_MODEL>",
-  "max_tokens": 4096,
+  "max_tokens": 16000,
   "system": "<SYSTEM_PROMPT>",
   "messages": [{ "role": "user", "content": [
     { "type": "image", "source": { "type": "base64", "media_type": "<mediaType>", "data": "<imageBase64>" } },
     { "type": "text", "text": "Read this receipt and fill the JSON schema." }
   ] }],
-  "output_config": { "format": { "type": "json_schema", "schema": "<MODEL_JSON_SCHEMA>" } }
+  "output_config": { "effort": "low", "format": { "type": "json_schema", "schema": "<MODEL_JSON_SCHEMA>" } }
 }
 ```
 
-Headers: `content-type: application/json`, `x-api-key`, `anthropic-version`. The image comes before the text, as the docs recommend. `readReceipt` returns `{ ok: false, kind: "upstream" }` for a thrown fetch, abort, any non-2xx status, a body that is not JSON, `stop_reason` equal to `refusal` or `max_tokens`, or no `text` content block; otherwise `{ ok: true, text }` with the first text block's text. There are no retries (Requirement 16 does not ask for them and a retry doubles spend). The key is only placed in the `x-api-key` header.
+Headers: `content-type: application/json`, `x-api-key`, `anthropic-version`. The body has no `thinking` field, no `tool_choice`, `temperature`, `top_p` or `top_k`. The image comes before the text, as the docs recommend. `readReceipt` returns `{ ok: false, kind: "upstream" }` for a thrown fetch, abort, any non-2xx status, a body that is not JSON, `stop_reason` equal to `refusal` or `max_tokens`, or no `text` content block; otherwise `{ ok: true, text }` with the first text block's text. There are no retries (Requirement 16 does not ask for them and a retry doubles spend). The key is only placed in the `x-api-key` header.
 
 `SYSTEM_PROMPT` (fixed text in `api/_lib/schema.ts`):
 
@@ -1810,7 +1811,7 @@ fc.assert(fc.property(arbIsoDate, (iso) => {
 - Rejections without provider call: wrong method (405 plus `Allow`), foreign `Origin`, malformed JSON, unknown key in the body, bad base64, magic bytes of a GIF declared as JPEG, body over `MAX_BODY_CHARS`.
 - Provider failure (`{ ok: false, kind: "upstream" }`) gives 502 `upstream_failed`; strict-validation failure gives 502 `model_output_invalid`.
 - Properties 17 to 21 run here with fast-check against the same helpers.
-- `provider.node.test.ts` with `fakeFetch`: URL, headers (`x-api-key`, `anthropic-version` equal to the constant, `content-type`), body has `model`, `max_tokens`, `system`, an `image` block before the `text` block, `output_config.format.type === "json_schema"`, and none of `temperature`, `top_p`, `top_k`; failure mappings (rejected fetch, 500, `stop_reason: "refusal"`, `"max_tokens"`, no text block) all give `{ ok: false, kind: "upstream" }` with no message field.
+- `provider.node.test.ts` with `fakeFetch`: URL, headers (`x-api-key`, `anthropic-version` equal to the constant, `content-type`), body has `model`, `max_tokens` 16000, `system`, an `image` block before the `text` block, `output_config.effort === "low"`, `output_config.format.type === "json_schema"`, and none of `thinking`, `tool_choice`, `temperature`, `top_p`, `top_k`; failure mappings (rejected fetch, 500, `stop_reason: "refusal"`, `"max_tokens"`, no text block) all give `{ ok: false, kind: "upstream" }` with no message field.
 - `schema.node.test.ts`: `MODEL_JSON_SCHEMA` has `additionalProperties: false` on every object, no `minimum`, `maximum` or `format` other than `date`, and no key matching `/decision|approv|verdict|reject|allow/i`; `SYSTEM_PROMPT` contains "never judge".
 
 ### E2E (`e2e/signature.spec.ts`)

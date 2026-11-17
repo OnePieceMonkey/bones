@@ -529,16 +529,16 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Commit: none (verification only)
 
 - [ ] 21. Live mode: server
-  - [~] 21.1 Implement the wire contract
+  - [x] 21.1 Implement the wire contract
     - `shared/wire.ts` as in design.md: `MAX_IMAGE_BYTES` (3 MiB), `MAX_BODY_CHARS`, `MEDIA_TYPES`, `extractRequestSchema`, `modelOutputSchema` (strict, `centsSchema`, `unit` 0 to 1, no decision field), `extractionResultWireSchema`, `ERROR_CODES`, `errorBodySchema`, `liveStatusSchema`, `toExtractionResult`; imports only `zod` and `./iso`
     - _Requirements: 16.2, 16.6, 16.7, 16.8_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add extract wire contract"`
-  - [~] 21.2 Implement the model schema and prompts with tests
+  - [x] 21.2 Implement the model schema and prompts with tests
     - `api/_lib/schema.ts`: `MODEL_JSON_SCHEMA` (every object `additionalProperties: false`, all keys required, no `minimum`/`maximum`) and `SYSTEM_PROMPT` as in design.md
     - `tests/api/schema.node.test.ts`: `additionalProperties: false` on every object, only the `date` format, no key matching `/decision|approv|verdict|reject|allow/i`, the prompt contains "never judge"; `MODEL_JSON_SCHEMA` accepts what `modelOutputSchema` accepts for a valid example
     - _Requirements: 16.6_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add model schema and prompt"`
-  - [~] 21.3 Implement the rate limiter
+  - [x] 21.3 Implement the rate limiter
     - `api/_lib/rateLimit.ts`: `RATE_LIMIT_MAX = 10`, `RATE_LIMIT_WINDOW_MS = 10 * 60_000`, `clientKey(headers)` (first `x-forwarded-for` entry, else `x-real-ip`, else "unknown"), `checkRateLimit(store, key, now)` with expiry on access and a sweep when `store.size > 1000`; unit tests in `tests/api/rateLimit.node.test.ts` (first 10 allowed, 11th rejected with `retryAfterSec`, window expiry, independent keys, sweep)
     - _Requirements: 16.14_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add per-IP rate limiter"`
@@ -547,12 +547,12 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - **Property 21: Per-IP rate limit**
     - **Validates: Requirements 16.14**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 21 rate limit"`
-  - [~] 21.5 Implement the provider client
-    - `api/_lib/provider.ts`: `ANTHROPIC_URL`, `ANTHROPIC_VERSION = "2026-10-21"`, `createAnthropicClient({ apiKey, model, fetchImpl, timeoutMs })` returning an `LlmClient`; request with the image block before the text block, `output_config.format` JSON schema, `max_tokens` 4096, no `temperature`, `top_p` or `top_k`, 25 s abort timeout, the key only in the `x-api-key` header; every failure (thrown fetch, abort, non-2xx, non-JSON body, `stop_reason` `refusal` or `max_tokens`, no text block) returns `{ ok: false, kind: "upstream" }` without any message text; no retries
+  - [-] 21.5 Implement the provider client
+    - `api/_lib/provider.ts`: `ANTHROPIC_URL`, `ANTHROPIC_VERSION = "2026-10-21"`, `createAnthropicClient({ apiKey, model, fetchImpl, timeoutMs })` returning an `LlmClient`; request with the image block before the text block, `output_config.format` JSON schema plus `output_config.effort` `"low"`, `max_tokens` 16000, no `thinking`, `tool_choice`, `temperature`, `top_p` or `top_k`, 25 s abort timeout, the key only in the `x-api-key` header; every failure (thrown fetch, abort, non-2xx, non-JSON body, `stop_reason` `refusal` or `max_tokens`, no text block) returns `{ ok: false, kind: "upstream" }` without any message text; no retries
     - _Requirements: 16.5, 16.6, 16.11, 16.16_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add provider client"`
   - [~] 21.6 Write provider client tests
-    - `tests/api/provider.node.test.ts` with `fakeFetch`: URL, headers (`x-api-key`, `anthropic-version` equal to the constant, `content-type`), body keys, image before text, `output_config.format.type` `json_schema`, none of `temperature`, `top_p`, `top_k`; success returns `{ ok: true, text }`; all failure mappings return `{ ok: false, kind: "upstream" }` with no message field
+    - `tests/api/provider.node.test.ts` with `fakeFetch`: URL, headers (`x-api-key`, `anthropic-version` equal to the constant, `content-type`), body keys, image before text, `output_config.format.type` `json_schema`, `output_config.effort` `"low"`, `max_tokens` 16000, none of `thinking`, `tool_choice`, `temperature`, `top_p`, `top_k`; success returns `{ ok: true, text }`; all failure mappings return `{ ok: false, kind: "upstream" }` with no message field
     - _Requirements: 16.5, 16.6, 16.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): provider client"`
   - [~] 21.7 Implement the extract handler
