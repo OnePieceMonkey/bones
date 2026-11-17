@@ -1,17 +1,31 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { isCoreError } from "@bones/core";
+import { isCoreError, override, replay } from "@bones/core";
 import type { CoreError } from "@bones/core";
 import { App } from "../../src/App";
-import { createProductionSession } from "../../src/state/sessionStore";
+import { SAMPLES, sampleSchema } from "../../src/extraction/samples";
+import { makePortFactory } from "../../src/pipeline/ports";
+import { createProductionSession, createSessionStore } from "../../src/state/sessionStore";
 import type { SessionStore } from "../../src/state/sessionStore";
+import { counterPorts } from "../helpers/fakes";
+import { loadTestBundle } from "../helpers/fixtures";
 
-let fetchSpy: ReturnType<typeof vi.fn<[], Promise<Response>>>;
+let fetchSpy: ReturnType<typeof vi.fn<[RequestInfo | URL, (RequestInit | undefined)?], Promise<Response>>>;
+
+const statusResponse = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+/** Only the status GET is allowed; any other request (receipt data, POST) fails. */
+const onlyStatusRequests = () => {
+  expect(fetchSpy.mock.calls.length).toBeGreaterThan(0);
+  for (const [url, init] of fetchSpy.mock.calls) {
+    expect(url).toBe("/api/extract");
+    expect(init?.method).toBe("GET");
+  }
+};
 let downloads: number;
 
 beforeEach(() => {
-  fetchSpy = vi.fn(async () => new Response("{}"));
+  fetchSpy = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit | undefined) => statusResponse({ live: false }));
   vi.stubGlobal("fetch", fetchSpy);
   Object.defineProperty(window, "matchMedia", {
     configurable: true,
@@ -82,7 +96,7 @@ describe("App", () => {
     expect(screen.getByText("Expense Auditor - RECORDED")).toBeInTheDocument();
 
     expect(document.activeElement).toBe(screen.getByRole("heading", { level: 1, name: "Expense Auditor" }));
-    expect(fetchSpy).not.toHaveBeenCalled();
+    onlyStatusRequests();
   });
 
   it("goes back with Load another receipt and drops replay and override state; no fetch during replay or export", async () => {
@@ -113,7 +127,7 @@ describe("App", () => {
     expect(screen.queryByText(/Replayed with/)).toBeNull();
     expect(document.querySelector(".xr-result")).not.toHaveTextContent("overruled by");
     expect(screen.getByRole("slider")).toHaveAttribute("aria-valuetext", "v1");
-    expect(fetchSpy).not.toHaveBeenCalled();
+    onlyStatusRequests();
   });
 
   it("shows an error panel when the rule bundle is broken", () => {
@@ -142,6 +156,69 @@ describe("App", () => {
     render(<App store={store} />);
     await userEvent.click(screen.getByRole("button", { name: "Outside the trip window" }));
     await waitFor(() => expect(screen.getByRole("switch")).toBeInTheDocument());
-    expect(fetchSpy).not.toHaveBeenCalled();
+    onlyStatusRequests();
+  });
+
+  describe("live status", () => {
+    it("shows the upload control when the status says live: true", async () => {
+      fetchSpy.mockImplementation(async () => statusResponse({ live: true }));
+      render(<App store={productionStore()} />);
+      expect(await screen.findByLabelText("Upload receipt photo")).toBeInTheDocument();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      onlyStatusRequests();
+    });
+
+    it("hides the upload control for live: false", async () => {
+      render(<App store={productionStore()} />);
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+      await new Promise((r) => setTimeout(r, 0));
+      expect(screen.queryByLabelText("Upload receipt photo")).toBeNull();
+      onlyStatusRequests();
+    });
+
+    it("hides the upload control when the status request fails", async () => {
+      fetchSpy.mockImplementation(async () => {
+        throw new TypeError("offline");
+      });
+      render(<App store={productionStore()} />);
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1));
+      await new Promise((r) => setTimeout(r, 0));
+      expect(screen.queryByLabelText("Upload receipt photo")).toBeNull();
+      expect(screen.getByRole("group", { name: "Load sample receipt" })).toBeInTheDocument();
+    });
+
+    it("shows the LIVE plate for a live decision", async () => {
+      const bundle = loadTestBundle();
+      if (isCoreError(bundle)) throw new Error(JSON.stringify(bundle));
+      const clean = sampleSchema.parse(SAMPLES.find((x) => (x as { id?: unknown }).id === "clean"));
+      const store = createSessionStore({
+        bundle,
+        samples: SAMPLES,
+        portFactory: makePortFactory(counterPorts()),
+        sha256: async () => "cd".repeat(32),
+        replayFn: replay,
+        overrideFn: override,
+        prefersReducedMotion: () => true,
+        makeLiveAdapter: () => ({ extract: async () => clean.extraction }),
+        revokeObjectUrl: () => undefined,
+      });
+      render(<App store={store} />);
+      await act(async () => {
+        await store.loadPhoto({
+          image: { bytes: new Uint8Array([1, 2, 3]), mediaType: "image/jpeg", previewUrl: "blob:p" },
+          fileName: "r.jpg",
+          trip: { start: "2024-03-10", end: "2024-03-20" },
+        });
+      });
+      await screen.findByRole("switch");
+      expect(screen.getByRole("region", { name: "Expense Auditor - LIVE" })).toBeInTheDocument();
+    });
+
+    it("shows the RECORDED plate for a sample decision", async () => {
+      render(<App store={productionStore()} />);
+      await userEvent.click(screen.getByRole("button", { name: "Clean meal" }));
+      await screen.findByRole("switch");
+      expect(screen.getByRole("region", { name: "Expense Auditor - RECORDED" })).toBeInTheDocument();
+    });
   });
 });

@@ -1,6 +1,7 @@
-import { Component, useEffect, useRef } from "react";
+import { Component, useEffect, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import type { CoreError } from "@bones/core";
+import { fetchLiveStatus } from "./extraction/liveStatus";
 import { prepareImage } from "./extraction/imageResize";
 import { useSession } from "./state/sessionStore";
 import type { SessionStore } from "./state/sessionStore";
@@ -9,8 +10,6 @@ import { ErrorPanel } from "./ui/ErrorPanel";
 import { StartScreen } from "./ui/StartScreen";
 
 export interface AppProps {
-  /** True when the server reports live reading (task 22.11 wires the check). */
-  liveAvailable?: boolean;
   store?: SessionStore | null;
   /** Set when the rule bundle failed to load. */
   bundleError?: CoreError | null;
@@ -36,8 +35,18 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
   }
 }
 
-function Screens({ store, liveAvailable }: { store: SessionStore; liveAvailable: boolean }) {
+function Screens({ store }: { store: SessionStore }) {
   const state = useSession(store);
+  const [liveAvailable, setLiveAvailable] = useState(false);
+  useEffect(() => {
+    let active = true;
+    void fetchLiveStatus().then((live) => {
+      if (active) setLiveAvailable(live);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
   const mainRef = useRef<HTMLElement>(null);
   const previous = useRef(state.screen);
   useEffect(() => {
@@ -63,7 +72,7 @@ function Screens({ store, liveAvailable }: { store: SessionStore; liveAvailable:
   );
 }
 
-export function App({ store = null, bundleError = null, liveAvailable = false }: AppProps) {
+export function App({ store = null, bundleError = null }: AppProps) {
   return (
     <ErrorBoundary>
       {store === null ? (
@@ -72,7 +81,7 @@ export function App({ store = null, bundleError = null, liveAvailable = false }:
           <ErrorPanel error={bundleError} title="The rules could not be loaded" />
         </main>
       ) : (
-        <Screens store={store} liveAvailable={liveAvailable} />
+        <Screens store={store} />
       )}
     </ErrorBoundary>
   );
