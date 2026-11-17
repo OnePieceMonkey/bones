@@ -48,6 +48,10 @@ main {
   transform: translateX(-50%);
 }
 
+.app-live-form ~ .app-status {
+  bottom: calc(96 * var(--xr-u, 1px));
+}
+
 /* Decision view */
 .app-note {
   display: inline-block;

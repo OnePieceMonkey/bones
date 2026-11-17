@@ -55,6 +55,8 @@ export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";
 export { Tooltip } from "./components/Tooltip";
 export { EcgLine } from "./components/EcgLine";
+export { FormStrip, FormStripField } from "./components/FormStrip";
+export type { FormStripProps, FormStripFieldProps } from "./components/FormStrip";
 export { StartHeadline } from "./components/StartHeadline";
 export type { StartHeadlineProps } from "./components/StartHeadline";
 export { FilmClip } from "./components/FilmClip";
