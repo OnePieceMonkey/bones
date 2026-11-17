@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { isCoreError, override, replay } from "@bones/core";
 import type { CoreError } from "@bones/core";
-import { SAMPLES } from "../../src/extraction/samples";
+import { SAMPLES, sampleSchema } from "../../src/extraction/samples";
 import { makePortFactory } from "../../src/pipeline/ports";
 import { createSessionStore } from "../../src/state/sessionStore";
 import type { SessionDeps } from "../../src/state/sessionStore";
@@ -9,6 +9,17 @@ import type { DecisionState } from "../../src/state/reducer";
 import { displayedTrace, effectiveView } from "../../src/state/selectors";
 import { counterPorts } from "../helpers/fakes";
 import { loadTestBundle } from "../helpers/fixtures";
+
+function liveExtraction() {
+  const clean = sampleSchema.parse(SAMPLES.find((x) => (x as { id?: unknown }).id === "clean"));
+  return clean.extraction;
+}
+
+function makeImage(previewUrl = "blob:preview-1") {
+  return { bytes: new Uint8Array([1, 2, 3, 250]), mediaType: "image/jpeg" as const, previewUrl };
+}
+
+const TRIP = { start: "2024-03-10", end: "2024-03-20" };
 
 function makeDeps(over: Partial<SessionDeps> = {}): SessionDeps & { replayFn: ReturnType<typeof vi.fn> } {
   const bundle = loadTestBundle();
@@ -22,6 +33,8 @@ function makeDeps(over: Partial<SessionDeps> = {}): SessionDeps & { replayFn: Re
     replayFn: replayFn as unknown as typeof replay,
     overrideFn: override,
     prefersReducedMotion: () => false,
+    makeLiveAdapter: () => ({ extract: async () => liveExtraction() }),
+    revokeObjectUrl: () => undefined,
     ...over,
   } as SessionDeps & { replayFn: ReturnType<typeof vi.fn> };
 }
@@ -183,5 +196,69 @@ describe("session store", () => {
     off();
     store.dispatchIntro({ type: "user", xray: false });
     expect(listener.mock.calls.length).toBe(calls + 1);
+  });
+
+  it("loadPhoto with a valid live extraction opens a decision with origin live and the hashed bytes equal the prepared bytes", async () => {
+    const image = makeImage();
+    const hashed: Uint8Array[] = [];
+    const mediaTypes: string[] = [];
+    const store = createSessionStore(
+      makeDeps({
+        sha256: async (b) => {
+          hashed.push(b);
+          return "cd".repeat(32);
+        },
+        makeLiveAdapter: (m) => {
+          mediaTypes.push(m);
+          return { extract: async () => liveExtraction() };
+        },
+      }),
+    );
+    await store.loadPhoto({ image, fileName: "r.jpg", trip: TRIP });
+    const s = store.getState() as DecisionState;
+    expect(s.screen).toBe("decision");
+    expect(s.origin).toEqual({ kind: "live", fileName: "r.jpg" });
+    expect(s.source).toEqual({ kind: "image", src: "blob:preview-1", alt: "Uploaded receipt photo" });
+    expect(s.original.inputHash).toBe("cd".repeat(32));
+    expect(hashed).toHaveLength(1);
+    expect(hashed[0]).toBe(image.bytes);
+    expect(mediaTypes).toEqual(["image/jpeg"]);
+  });
+
+  it("loadPhoto passes the prepared bytes to the adapter", async () => {
+    const image = makeImage();
+    const received: unknown[] = [];
+    const store = createSessionStore(
+      makeDeps({
+        makeLiveAdapter: () => ({
+          extract: async (input) => {
+            received.push(input);
+            return liveExtraction();
+          },
+        }),
+      }),
+    );
+    await store.loadPhoto({ image, fileName: "r.jpg", trip: TRIP });
+    expect(received[0]).toBe(image.bytes);
+  });
+
+  it("loadPhoto with an extraction_failed error gives load_failed", async () => {
+    const error: CoreError = { kind: "extraction_failed", message: "down", reason: "network" };
+    const store = createSessionStore(makeDeps({ makeLiveAdapter: () => ({ extract: async () => error }) }));
+    await store.loadPhoto({ image: makeImage(), fileName: "r.jpg", trip: TRIP });
+    const s = store.getState();
+    expect(s.screen).toBe("start");
+    expect(s.screen === "start" && s.busy).toBe(false);
+    expect(s.screen === "start" && s.error).toEqual({ kind: "core", error });
+  });
+
+  it("reset revokes the preview URL once", async () => {
+    const revoke = vi.fn();
+    const store = createSessionStore(makeDeps({ revokeObjectUrl: revoke }));
+    await store.loadPhoto({ image: makeImage("blob:abc"), fileName: "r.jpg", trip: TRIP });
+    store.reset();
+    store.reset();
+    expect(revoke).toHaveBeenCalledTimes(1);
+    expect(revoke).toHaveBeenCalledWith("blob:abc");
   });
 });

@@ -37,6 +37,8 @@ describe("Property 13: Replay memoization", () => {
             }) as typeof replay,
             overrideFn: override,
             prefersReducedMotion: () => false,
+            makeLiveAdapter: () => ({ extract: async () => ({ kind: "extraction_failed" as const, message: "not used", reason: "network" as const }) }),
+            revokeObjectUrl: () => undefined,
           };
           // A live adapter factory that must never be reached during selection.
           Object.assign(deps, {

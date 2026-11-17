@@ -23,6 +23,8 @@ function makeStore(replayFn: typeof replay = replay): SessionStore {
     replayFn,
     overrideFn: override,
     prefersReducedMotion: () => true,
+    makeLiveAdapter: () => ({ extract: async () => ({ kind: "extraction_failed" as const, message: "not used", reason: "network" as const }) }),
+    revokeObjectUrl: () => undefined,
   });
 }
 

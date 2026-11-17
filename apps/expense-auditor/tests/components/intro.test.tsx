@@ -38,6 +38,8 @@ function makeStore(): SessionStore {
     replayFn: replay,
     overrideFn: override,
     prefersReducedMotion: () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    makeLiveAdapter: () => ({ extract: async () => ({ kind: "extraction_failed" as const, message: "not used", reason: "network" as const }) }),
+    revokeObjectUrl: () => undefined,
   });
 }
 

@@ -1,9 +1,11 @@
 import { useSyncExternalStore } from "react";
 import { isCoreError, override as coreOverride, replay as coreReplay } from "@bones/core";
-import type { CoreError, DecisionResult, override, replay } from "@bones/core";
+import type { CoreError, DecisionResult, ExtractionPort, override, replay } from "@bones/core";
+import { HttpExtractionAdapter } from "../extraction/HttpExtractionAdapter";
+import type { PreparedImage } from "../extraction/imageResize";
 import { RecordedSampleAdapter } from "../extraction/RecordedSampleAdapter";
 import { SAMPLES, sampleSchema } from "../extraction/samples";
-import type { SampleId } from "../extraction/samples";
+import type { SampleId, TripWindow } from "../extraction/samples";
 import { sha256Hex } from "../pipeline/hash";
 import { makePortFactory } from "../pipeline/ports";
 import type { PortFactory } from "../pipeline/ports";
@@ -23,6 +25,14 @@ export interface SessionDeps {
   replayFn: typeof replay;
   overrideFn: typeof override;
   prefersReducedMotion: () => boolean;
+  makeLiveAdapter: (mediaType: PreparedImage["mediaType"]) => ExtractionPort;
+  revokeObjectUrl: (url: string) => void;
+}
+
+export interface PhotoRequest {
+  image: PreparedImage;
+  fileName: string;
+  trip: TripWindow;
 }
 
 export interface OverrideForm {
@@ -39,6 +49,7 @@ export interface SessionStore {
   getState(): AppState;
   subscribe(listener: () => void): () => void;
   loadSample(id: SampleId): Promise<void>;
+  loadPhoto(request: PhotoRequest): Promise<void>;
   selectVersion(label: VersionLabel): void;
   submitOverride(form: OverrideForm): OverrideOutcome;
   dispatchIntro(event: IntroEvent): void;
@@ -57,7 +68,19 @@ function thrown(e: unknown): CoreError {
 export function createSessionStore(deps: SessionDeps): SessionStore {
   let state: AppState = initialState;
   let sessionCounter = 0;
+  let previewUrl: string | null = null;
   const listeners = new Set<() => void>();
+
+  const releasePreview = (): void => {
+    if (previewUrl === null) return;
+    const url = previewUrl;
+    previewUrl = null;
+    try {
+      deps.revokeObjectUrl(url);
+    } catch {
+      // Revoking is best effort.
+    }
+  };
 
   const dispatch = (action: Action): void => {
     const next = reducer(state, action);
@@ -109,6 +132,36 @@ export function createSessionStore(deps: SessionDeps): SessionStore {
         origin: { kind: "sample", sampleId: id },
         trip: sample.trip,
         source: { kind: "text", text: sample.receiptText },
+        original: result,
+        reducedMotion: deps.prefersReducedMotion(),
+      });
+    } catch (e) {
+      fail(thrown(e));
+    }
+  }
+
+  async function loadPhoto({ image, fileName, trip }: PhotoRequest): Promise<void> {
+    dispatch({ type: "load_started" });
+    if (previewUrl !== null && previewUrl !== image.previewUrl) releasePreview();
+    previewUrl = image.previewUrl;
+    try {
+      const result = await runPipeline({
+        input: { raw: image.bytes, bytes: image.bytes },
+        adapter: deps.makeLiveAdapter(image.mediaType),
+        trip,
+        ruleSetLabel: "v1",
+        bundle: deps.bundle,
+        portFactory: deps.portFactory,
+        sha256: deps.sha256,
+      });
+      if (isCoreError(result)) return fail(result);
+      sessionCounter += 1;
+      dispatch({
+        type: "decision_ready",
+        sessionId: `session-${sessionCounter}`,
+        origin: { kind: "live", fileName },
+        trip,
+        source: { kind: "image", src: image.previewUrl, alt: "Uploaded receipt photo" },
         original: result,
         reducedMotion: deps.prefersReducedMotion(),
       });
@@ -170,11 +223,15 @@ export function createSessionStore(deps: SessionDeps): SessionStore {
       };
     },
     loadSample,
+    loadPhoto,
     selectVersion,
     submitOverride,
     dispatchIntro: (event) => dispatch({ type: "intro", event }),
     clearNotice: () => dispatch({ type: "notice_cleared" }),
-    reset: () => dispatch({ type: "reset" }),
+    reset: () => {
+      releasePreview();
+      dispatch({ type: "reset" });
+    },
   };
 }
 
@@ -191,6 +248,8 @@ export function createProductionSession(
     sha256: sha256Hex,
     replayFn: coreReplay,
     overrideFn: coreOverride,
+    makeLiveAdapter: (mediaType) => new HttpExtractionAdapter({ mediaType }),
+    revokeObjectUrl: (url) => URL.revokeObjectURL(url),
     prefersReducedMotion: () =>
       typeof window !== "undefined" &&
       typeof window.matchMedia === "function" &&
