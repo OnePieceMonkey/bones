@@ -643,7 +643,7 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 16.2, 16.17, 17.1, 17.2, 17.3_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): wire live status and LIVE title plate"`
 
-- [ ] 23. Guard tests
+- [x] 23. Guard tests
   - [x] 23.1 Write the no-case-files guard
     - `tests/guards/no-case-files.node.test.ts`: walk `src`, `api`, `shared`, `tests` and `e2e`; fail on any import specifier or path containing `case-files` (build the pattern from two parts so the guard does not match its own source)
     - _Requirements: 19.10_
@@ -659,29 +659,29 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Shared helper `tests/helpers/build.ts` exports `buildOnce()` (cached per process, os temp `outDir`, `logLevel: "silent"`), `cleanupBuild()`, `listFiles()` and `CANARY_KEY`; task 23.6 reuses `buildOnce()`
     - _Requirements: 16.5, 19.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard against secrets in src and dist"`
-  - [-] 23.4 Write the hygiene guard
+  - [x] 23.4 Write the hygiene guard
     - `tests/guards/app-hygiene.node.test.ts`: `app.css` has no `transition`, `animation`, `@keyframes`; `src` has no `AudioContext`, `new Audio`, `<audio`; `src` has none of the words `login`, `logout`, `password`, `oauth`, `jwt`, `bearer`, `authenticate`, `cookie` as whole words
     - Extension, Dr. Bones never calls an LLM. Already guarded and only referenced: xray-ui `source-hygiene.test.ts` (no fetch/XMLHttpRequest/WebSocket/api key/openai/anthropic import in xray-ui src) and `properties/chat-source.test.tsx` (chat text equals builder output, net spy sees zero calls); app `no-visual-in-app.node.test.ts` (auth words, audio, motion in src)
     - `tests/guards/no-llm-in-chat.node.test.ts`: (a) xray-ui chat files `DrBonesChat.tsx`, `chat/ChatLog.tsx`, `panels/DoctorPanel.tsx`, `model/chat.ts` contain no fetch/XMLHttpRequest/WebSocket/EventSource/sendBeacon, no anthropic/openai/llm, no extraction adapter or port reference, and import only relative modules, `react` and `@bones/core`; (b) in app `src` only `extraction/HttpExtractionAdapter.ts` and `extraction/liveStatus.ts` use a network API (allow-list by file), and `ui/` files do not import them
     - `tests/guards/no-llm-in-chat.runtime.test.tsx`: (c) with throwing stubs for fetch, XMLHttpRequest, WebSocket and EventSource (no real network), render `DecisionView` for the signature sample, check chat bubbles show, replay with the next rule version, and assert zero stub calls
     - _Requirements: 6.8, 18.4, 18.6, 20.5_
     - Commit: `git add apps/expense-auditor .kiro/specs/expense-auditor/tasks.md && git commit -m "test(expense-auditor): hygiene and no-LLM-in-chat guards"`
-  - [~] 23.5 Write the contrast guard
+  - [x] 23.5 Write the contrast guard
     - `tests/helpers/contrast.ts` (`relativeLuminance`, `contrastRatio`) and `tests/guards/contrast.node.test.ts`: read `packages/xray-ui/src/styles/tokens.css`, resolve the token pairs `app.css` uses (text on panel, dim text on panel, plate text on plate, focus on panel) and require at least 4.5 for text and 3 for the focus ring; every token named in `app.css` exists
     - _Requirements: 18.2_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): contrast guard"`
 
-  - [~] 23.6 Write the no-EUR guard
+  - [x] 23.6 Write the no-EUR guard
     - `tests/guards/no-eur.node.test.ts`: whole-word `EUR` (case-sensitive) does not appear in `src`, `recorded`, `e2e` and in the `dist` of the programmatic build used by the secret scan; `packages/xray-ui/demo/anatomy.ts` and `packages/xray-ui/README.md` do not contain it either; the guard file itself builds the pattern from two string parts so it does not match itself
     - _Requirements: 11.11, 19.15, 21.13_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): no EUR guard"`
-- [ ] 24. Deploy files and README
-  - [~] 24.1 Add `vercel.json`, `.env.example` and the config smoke test
+- [x] 24. Deploy files and README
+  - [x] 24.1 Add `vercel.json`, `.env.example` and the config smoke test
     - `apps/expense-auditor/vercel.json` exactly as in design.md (framework `vite`, `installCommand` `pnpm install --frozen-lockfile`, `buildCommand` `pnpm build`, `outputDirectory` `dist`, `functions` `api/extract.ts` with `maxDuration` 30, the security headers and CSP); `.env.example` with `LIVE_EXTRACTION=off`, `ANTHROPIC_API_KEY=` (empty) and `EXTRACTION_MODEL=claude-haiku-5-5`
     - `tests/guards/config-smoke.node.test.ts`: parse `vercel.json` (framework, output directory, function path, `maxDuration`), `.env.example` (`LIVE_EXTRACTION=off`, nothing after `ANTHROPIC_API_KEY=`) and `package.json` (name, scripts, exact pins without `^` or `~`)
     - _Requirements: 6.1, 6.2, 20.1, 20.2, 20.4_
     - Commit: `git add apps/expense-auditor && git commit -m "chore(expense-auditor): add vercel config and env example"`
-  - [~] 24.2 Write the App README
+  - [x] 24.2 Write the App README
     - `apps/expense-auditor/README.md`: why the LLM never decides, in plain language, with the table of the five Bones parts (extraction: `RecordedSampleAdapter`, `HttpExtractionAdapter` and the Zod schema; rules: `rules/expense-auditor/`; trace: the frozen Trace and the "Download trace" file; override: the Overrule dialog; X-ray: `XrayView`); "Try it" steps (install, `pnpm dev`, load "Signature case" and what to see: "$41.50", two fractured bones, cracked card, stamp "OVERRULED BY RULE"; unit tests; `pnpm exec playwright install chromium` then `pnpm e2e`; live mode locally with `.env.local`; live mode on Vercel with root directory `apps/expense-auditor`, "Include source files outside of the Root Directory in the Build Step", install and build commands, the `GET /api/extract` post-deploy check); security notes (key only in server environment, `LIVE_EXTRACTION` kill switch, 3 MiB size cap, best-effort per-IP rate limit, provider spend limit and platform rate-limit rule recommended); the known limitations list from design.md that matter to users
     - _Requirements: 6.7, 20.3, 20.5, 20.6, 20.7, 20.8_
     - Commit: `git add apps/expense-auditor/README.md && git commit -m "docs(expense-auditor): add README"`
