@@ -528,7 +528,7 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 6.4, 6.5, 6.6, 8.7_
     - Commit: none (verification only)
 
-- [ ] 21. Live mode: server
+- [x] 21. Live mode: server
   - [x] 21.1 Implement the wire contract
     - `shared/wire.ts` as in design.md: `MAX_IMAGE_BYTES` (3 MiB), `MAX_BODY_CHARS`, `MEDIA_TYPES`, `extractRequestSchema`, `modelOutputSchema` (strict, `centsSchema`, `unit` 0 to 1, no decision field), `extractionResultWireSchema`, `ERROR_CODES`, `errorBodySchema`, `liveStatusSchema`, `toExtractionResult`; imports only `zod` and `./iso`
     - _Requirements: 16.2, 16.6, 16.7, 16.8_
@@ -542,102 +542,102 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - `api/_lib/rateLimit.ts`: `RATE_LIMIT_MAX = 10`, `RATE_LIMIT_WINDOW_MS = 10 * 60_000`, `clientKey(headers)` (first `x-forwarded-for` entry, else `x-real-ip`, else "unknown"), `checkRateLimit(store, key, now)` with expiry on access and a sweep when `store.size > 1000`; unit tests in `tests/api/rateLimit.node.test.ts` (first 10 allowed, 11th rejected with `retryAfterSec`, window expiry, independent keys, sweep)
     - _Requirements: 16.14_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add per-IP rate limiter"`
-  - [~] 21.4 Write property test for the rate limit
+  - [x] 21.4 Write property test for the rate limit
     - `tests/properties/rate-limit.node.test.ts`, tag `// Feature: expense-auditor, Property 21: Per-IP rate limit`
     - **Property 21: Per-IP rate limit**
     - **Validates: Requirements 16.14**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 21 rate limit"`
-  - [-] 21.5 Implement the provider client
+  - [x] 21.5 Implement the provider client
     - `api/_lib/provider.ts`: `ANTHROPIC_URL`, `ANTHROPIC_VERSION = "2026-10-21"`, `createAnthropicClient({ apiKey, model, fetchImpl, timeoutMs })` returning an `LlmClient`; request with the image block before the text block, `output_config.format` JSON schema plus `output_config.effort` `"low"`, `max_tokens` 16000, no `thinking`, `tool_choice`, `temperature`, `top_p` or `top_k`, 25 s abort timeout, the key only in the `x-api-key` header; every failure (thrown fetch, abort, non-2xx, non-JSON body, `stop_reason` `refusal` or `max_tokens`, no text block) returns `{ ok: false, kind: "upstream" }` without any message text; no retries
     - _Requirements: 16.5, 16.6, 16.11, 16.16_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add provider client"`
-  - [~] 21.6 Write provider client tests
+  - [x] 21.6 Write provider client tests
     - `tests/api/provider.node.test.ts` with `fakeFetch`: URL, headers (`x-api-key`, `anthropic-version` equal to the constant, `content-type`), body keys, image before text, `output_config.format.type` `json_schema`, `output_config.effort` `"low"`, `max_tokens` 16000, none of `thinking`, `tool_choice`, `temperature`, `top_p`, `top_k`; success returns `{ ok: true, text }`; all failure mappings return `{ ok: false, kind: "upstream" }` with no message field
     - _Requirements: 16.5, 16.6, 16.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): provider client"`
-  - [~] 21.7 Implement the extract handler
+  - [x] 21.7 Implement the extract handler
     - `api/_lib/handler.ts`: `LlmClient`, `RateLimitStore`, `HandlerDeps`, `createExtractHandler(deps)` returning `(req: Request) => Promise<Response>`; check order method, live flag (`LIVE_EXTRACTION === "on"` and non-empty key and model, read from `deps.env` only), origin, rate limit, body size, parse (`extractRequestSchema`, base64 decode, magic bytes of JPEG or PNG matching `mediaType`), 3 MiB decoded cap, provider call, strict `modelOutputSchema` validation; status and body table of design.md; headers `content-type`, `cache-control: no-store`, `x-content-type-options: nosniff`; `GET` answers only `{ live }`; `log` receives status, code and duration only; imports only `zod`, `../../shared/*` and `./*`
     - _Requirements: 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8, 16.11, 16.12, 16.14, 16.15_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add extract handler"`
-  - [~] 21.8 Write handler tests
+  - [x] 21.8 Write handler tests
     - `tests/api/handler.node.test.ts` with `createExtractHandler({ env, llm: fakeLlm, now, rateLimitStore: new Map() })`: GET `{ live: true }` only with all three variables, body has exactly one key; POST success equals `toExtractionResult(parsed, text)`; rejections without a provider call (405 with `Allow`, foreign `Origin`, malformed JSON, unknown key, bad base64, GIF bytes declared as JPEG, body over `MAX_BODY_CHARS`); provider failure gives 502 `upstream_failed`; strict validation failure gives 502 `model_output_invalid`; 429 with `Retry-After`; response headers
     - _Requirements: 16.2, 16.3, 16.4, 16.7, 16.8, 16.11, 16.12, 16.14, 16.15, 19.2_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): extract handler"`
-  - [~] 21.9 Write property test for the kill switch
+  - [x] 21.9 Write property test for the kill switch
     - `tests/properties/kill-switch.node.test.ts`, tag `// Feature: expense-auditor, Property 17: The kill switch blocks the provider`; `arbEnvNotOn` defined inside the test file (unset, empty, "ON", "true", "1", any non-"on" text) and any POST body: 403 `disabled`, the fake LLM is never called, GET is exactly `{"live":false}`
     - **Property 17: The kill switch blocks the provider**
     - **Validates: Requirements 16.2, 16.3, 16.4**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 17 kill switch"`
-  - [~] 21.10 Write property test that the key never leaves the server
+  - [x] 21.10 Write property test that the key never leaves the server
     - `tests/properties/key-never-leaks.node.test.ts`, tag `// Feature: expense-auditor, Property 18: The key never leaves the server`; random bodies, provider outcomes and thrown fetch messages containing the key; the key is absent from response bodies, headers and logged events, and appears in outgoing provider requests only as the `x-api-key` header value
     - **Property 18: The key never leaves the server**
     - **Validates: Requirements 16.5, 19.2**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 18 key never leaks"`
-  - [~] 21.11 Write property test for model output validation
+  - [x] 21.11 Write property test for model output validation
     - Add `arbValidModelOutput` and `arbBadModelOutput` to the arbitraries helper; `tests/properties/model-output.node.test.ts`, tag `// Feature: expense-auditor, Property 19: Model output validation is strict and lossless`; valid output gives 200 with `rawModelOutput` equal to the exact provider text; one injected defect (extra key at any level, confidence outside 0 to 1, negative or fractional cents, non-date `receiptDate`) gives 502 `model_output_invalid`
     - **Property 19: Model output validation is strict and lossless**
     - **Validates: Requirements 16.6, 16.7, 16.8**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 19 model output validation"`
-  - [~] 21.12 Write property test for the size cap
+  - [x] 21.12 Write property test for the size cap
     - `tests/properties/size-cap.node.test.ts`, tag `// Feature: expense-auditor, Property 20: Size cap`; decoded sizes around 3 MiB: the provider is called if and only if the size is at most 3 MiB, larger images give 413 with no provider call
     - **Property 20: Size cap**
     - **Validates: Requirements 16.12**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 20 size cap"`
-  - [~] 21.13 Add the function entry
+  - [x] 21.13 Add the function entry
     - `api/extract.ts`: one default export `{ fetch(request) }` that builds the handler from `process.env`, `createAnthropicClient({ apiKey: env.ANTHROPIC_API_KEY ?? "", model: env.EXTRACTION_MODEL ?? "", fetchImpl: fetch })`, `Date.now`, a module-level `Map` store and a `console.log(JSON.stringify(event))` logger; it imports only `./_lib/*` (and `zod` through them), nothing from `src/`
     - Add `tests/api/entry.node.test.ts`: with no environment variables `GET` returns `{"live":false}` and `POST` returns 403 `disabled`, with no network access
     - _Requirements: 16.2, 16.3, 16.4, 16.5, 20.1_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add extract function entry"`
-  - [~] 21.14 Add the dev middleware for `pnpm dev`
+  - [x] 21.14 Add the dev middleware for `pnpm dev`
     - In `apps/expense-auditor/vite.config.ts` add the `devExtractApi` plugin from design.md (serve only, never in `vite build`): loads `.env.local` into the server process only, mounts `/api/extract` through `server.ssrLoadModule("/api/extract.ts")`, converts the Node request to a Web `Request` and forwards `x-forwarded-for`; run `pnpm --filter @bones/expense-auditor build` and `pnpm typecheck`
     - _Requirements: 16.2, 16.5, 20.6_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add dev middleware for the extract function"`
 
-- [ ] 22. Live mode: client
-  - [~] 22.1 Implement `HttpExtractionAdapter`
+- [x] 22. Live mode: client
+  - [x] 22.1 Implement `HttpExtractionAdapter`
     - `src/extraction/HttpExtractionAdapter.ts` as in design.md: `guardInput`, string input gives `validation_failed` (`input`: "expected image bytes"), base64 in 0x8000-byte chunks, `POST` with a body of exactly `imageBase64` and `mediaType`, abort timeout 30 s, thrown fetch or abort gives `extraction_failed` `network`, non-2xx parsed with `errorBodySchema` gives the wire `reason` (unparseable gives `upstream` for 500 or more, else `bad_response`), 2xx validated with `extractionResultWireSchema` (any failure gives `bad_response`); no retry on 4xx
     - _Requirements: 16.1, 16.7, 16.9, 16.10_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add http extraction adapter"`
-  - [~] 22.2 Write adapter tests with a mocked fetch
+  - [x] 22.2 Write adapter tests with a mocked fetch
     - `tests/unit/httpAdapter.node.test.ts`: request body keys are exactly `imageBase64` and `mediaType`; 200 valid returns the extraction; 403 `disabled`; rejected promise gives `network`; 200 with a wrong shape gives `bad_response`; 502 with an unparseable body gives `upstream`; no second call after a 4xx; string input gives `validation_failed`
     - _Requirements: 16.1, 16.7, 16.9, 16.10, 19.1_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): http extraction adapter"`
-  - [~] 22.3 Implement the live status check
+  - [x] 22.3 Implement the live status check
     - `src/extraction/liveStatus.ts`: `fetchLiveStatus(fetchImpl, endpoint, timeoutMs = 3000)` using `GET`, true only when `res.ok`, the body parses and `liveStatusSchema` accepts `{ live: true }`; HTML bodies, network errors, timeouts and bad JSON give `false`; sends no receipt data
     - _Requirements: 16.2, 16.17_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add live status check"`
-  - [~] 22.4 Write live status tests
+  - [x] 22.4 Write live status tests
     - `tests/unit/liveStatus.node.test.ts`: `{ live: true }` gives true; `{ live: false }`, an HTML fallback page, a rejected fetch, an abort after the timeout (fake timers) and a body with an extra key give false
     - _Requirements: 16.2_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): live status check"`
-  - [~] 22.5 Implement image preparation
+  - [x] 22.5 Implement image preparation
     - `src/extraction/imageResize.ts`: `MAX_EDGE = 1600`, `JPEG_QUALITY = 0.85`, `MAX_RAW_FILE_BYTES` (20 MiB), `PreparedImage`, pure `fitWithin`, injectable `ImageEnv`, `browserImageEnv` (`createImageBitmap`, `OffscreenCanvas` with a `canvas` fallback, white fill for PNG), `prepareImage(file, env)` returning `PreparedImage | UploadProblem`: type check (JPEG and PNG only), raw-size cap, downsized JPEG, fallback to the original bytes when canvas fails and the file is within 3 MiB, `too_large` after encoding above 3 MiB
     - _Requirements: 12.11, 16.12, 16.13_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add image preparation"`
-  - [~] 22.6 Write property test for image geometry
+  - [x] 22.6 Write property test for image geometry
     - `tests/properties/image-geometry.node.test.ts`, tag `// Feature: expense-auditor, Property 22: Image geometry`; `fitWithin` returns integers of at least 1, long edge at most 1600, no enlargement, aspect ratio within one pixel of rounding
     - **Property 22: Image geometry**
     - **Validates: Requirements 16.13**
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): property 22 image geometry"`
-  - [~] 22.7 Write image preparation unit tests
+  - [x] 22.7 Write image preparation unit tests
     - `tests/unit/imageResize.node.test.ts` with a fake `ImageEnv`: a GIF gives `{ reason: "type" }`; a file above the raw cap gives `too_large`; an encode result above 3 MiB gives `too_large`; the decoder failing falls back to the original bytes within 3 MiB and gives `unreadable` above it; a PNG is converted to JPEG
     - _Requirements: 12.11, 16.13_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): image preparation"`
-  - [~] 22.8 Add photo loading to the session store
+  - [x] 22.8 Add photo loading to the session store
     - Extend `SessionDeps` with `makeLiveAdapter` and `revokeObjectUrl`; add `loadPhoto({ image, fileName, trip })` to `SessionStore` (adapter from `makeLiveAdapter(image.mediaType)`, input bytes are the prepared bytes, source `{ kind: "image", src: previewUrl, alt: "Uploaded receipt photo" }`, origin `{ kind: "live", fileName }`); `reset` revokes the preview URL once; `createProductionSession` passes `new HttpExtractionAdapter(...)` and `URL.revokeObjectURL`
     - Add tests to `tests/unit/sessionStore.node.test.ts`: a fake live adapter returning a valid extraction gives a decision with origin `live`; an `extraction_failed` error gives `load_failed`; `reset` calls `revokeObjectUrl`; the hashed bytes equal the prepared bytes
     - _Requirements: 10.3, 10.7, 12.10, 16.1_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add photo loading to the session store"`
-  - [~] 22.9 Add the live controls to `StartScreen`
+  - [x] 22.9 Add the live controls to `StartScreen`
     - Extend `StartScreen` with `liveAvailable` and `onLoadPhoto`: when true render a `<fieldset>` "Live receipt photo" with the labelled controls "Upload receipt photo" (`accept="image/jpeg,image/png"`), "Trip start" and "Trip end" (`type="date"`, required, prefilled 2024-03-10 and 2024-03-20) and the button "Read receipt"; when false none of these nodes exist; a wrong type or an oversized prepared image shows the upload message and does not call `onLoadPhoto`; plate shows "- LIVE" while a file is selected, otherwise "- RECORDED"
     - Wire `prepareImage` in `App.tsx` so `onLoadPhoto` receives a `PreparedImage` and the trip window
     - _Requirements: 12.2, 12.3, 12.11, 17.3, 18.3_
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): add live controls to StartScreen"`
-  - [~] 22.10 Write live control tests
+  - [x] 22.10 Write live control tests
     - Extend `tests/components/StartScreen.test.tsx`: with `liveAvailable` true the labelled upload control and two date inputs prefilled "2024-03-10" and "2024-03-20" exist; with false they do not; a `.gif` file and an oversized prepared image show a readable message and a `fetch` spy stays at zero; selecting a valid file changes the plate to "Expense Auditor - LIVE"
     - _Requirements: 12.2, 12.3, 12.11, 17.3_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): live controls"`
-  - [~] 22.11 Wire the live status and the LIVE title plate
+  - [x] 22.11 Wire the live status and the LIVE title plate
     - In `App.tsx` call `fetchLiveStatus` once in an effect with an empty dependency list and pass `liveAvailable` to `StartScreen`; confirm `DecisionView` passes "Expense Auditor - LIVE" for `origin.kind === "live"`
     - Extend `tests/components/App.test.tsx`: a status response `{ live: true }` shows the upload control, `{ live: false }` and a failed status request hide it; a live decision shows the plate "Expense Auditor - LIVE" and a sample decision shows "Expense Auditor - RECORDED"; only the status request is made while on the start screen
     - _Requirements: 16.2, 16.17, 17.1, 17.2, 17.3_
