@@ -137,6 +137,75 @@ The function calls the Anthropic Messages API with `max_tokens` 16000 and `outpu
 - A guard test (`tests/guards/no-secrets.node.test.ts`) builds the app with a canary key set in the environment. It fails if the canary, `x-api-key`, `anthropic-version`, `api.anthropic.com`, the variable names or key-like strings appear anywhere in the built `dist/`, or in `src`. It also fails on source maps. It does not scan `api/` (server code) or this README.
 - The server logs only status, a short code and duration. Not the image, not the key, not the IP address.
 
+## Manual check before a release
+
+**This is a manual step. No automated test replaces it.** A person has to do it with their own eyes and hands. The e2e and unit tests cover layout, timing logic and guards, but they cannot judge how the screen looks, feels or sounds. None of the items below is ticked: copy the list into your release notes or an issue and tick it there as you go.
+
+Start with the dev server: `pnpm --filter @bones/expense-auditor dev`. Later, run `pnpm --filter @bones/expense-auditor build` and then `pnpm --filter @bones/expense-auditor preview`, and repeat the items marked "(also in preview)". Keep the browser console open the whole time.
+
+### First 10 seconds
+
+- [ ] Open the start screen. Receipts appear as film sheets. A photo upload form shows only in Live mode.
+- [ ] Click **Signature case**. The plain receipt shows first, with no skeleton.
+- [ ] The film flickers once, then a light cone falls on the film.
+- [ ] A scan line sweeps over the film.
+- [ ] The X-RAY overlay switches on after about 0.6 s, and the bones light up one by one.
+- [ ] Failed rules show fractured bones: red glow, a burst of splinters, a short screen shake and a pulse ring.
+- [ ] The ECG line across the skeleton spikes red at each fracture.
+- [ ] The AI answer card cracks like glass and the stamp "OVERRULED BY RULE" lands on it.
+- [ ] Dr. Bones types out the explanation in the chat panel.
+- [ ] No console errors or warnings appear during the whole sequence (also in preview).
+
+### Samples, versions and controls
+
+- [ ] Load all three samples: Signature case, Clean meal, Outside the trip window. Each result matches what the sample promises (Signature case: two fractured bones, stamp shown; Clean meal: approved).
+- [ ] Turn the RULE VERSION knob to v1, v2 and v3 on each sample. The decision replays with that rule set version and the skeleton, card and chat update.
+- [ ] The AI READ CONFIDENCE needle sits on the right value. Its alignment with the scale was never checked visually, so look closely at the needle pivot and the scale marks.
+- [ ] The X-RAY switch turns the overlay off and on again. The plain receipt is shown when it is off.
+- [ ] Hover a rule box, then focus it with the keyboard. A line connects the box to its bone.
+- [ ] The leg bones of the skeleton sit where they belong. The leg anchor points (44,58) and (57,58) were never checked visually. Look at where the leg bones attach and where lines to them end.
+- [ ] Click **Human override**. The dialog "Overrule decision" opens, a result can be chosen and saved, and the override shows next to the original decision. The original trace is unchanged.
+- [ ] **Download trace** in the header saves a JSON file. Open it and check that it holds the decision and any override.
+- [ ] **Load another receipt** in the header returns to the start screen.
+
+### Keyboard only
+
+Put the mouse away for this block.
+
+- [ ] Tab reaches every control in a sensible order, and the focus ring is always visible.
+- [ ] The RULE VERSION knob changes version with the keyboard.
+- [ ] The X-RAY switch toggles with the keyboard.
+- [ ] The override dialog opens, takes focus, can be completed and closed with the keyboard, and returns focus to the button.
+- [ ] **Download trace** and **Load another receipt** work with the keyboard.
+
+### Reduced motion
+
+- [ ] Turn on "reduce motion" in the operating system settings and reload. The signature case shows a calm still image: no flicker, no light cone movement, no scan line, no shake, no moving ECG, no burst. The result (fractures, cracked card, stamp) is still readable.
+- [ ] Turn the setting off again and confirm the full intro returns.
+- [ ] Sound is off by default and stays off.
+
+### Layout and look
+
+- [ ] At 1440x900, the start screen and the decision view each fit on one screen with no page scroll.
+- [ ] At 1280x720, the same: no page scroll and nothing cut off.
+- [ ] Compare the screen with `design/mockups/bones-7-retro-b.png`: brushed-metal frame, dark lightbox with cyan glow, control strip at the bottom left, film clips, red fracture glow. Note every difference you think is wrong.
+- [ ] Text is readable on every surface (lightbox, cards, chat, control strip).
+
+### Dev server and live mode
+
+- [ ] The dev middleware has never been run by hand. With `pnpm dev`, open `/api/extract` in the browser (a GET). It answers with a small JSON object that says whether live reading is on.
+- [ ] With live reading off (the default), the photo upload form is not shown.
+- [ ] With live reading on and a real key in `.env.local` (see "Live mode locally"), upload a real receipt photo. A decision appears, the AI answer card shows what was read, and the rules decide. Check that the key does not appear in the network tab or in the page source.
+- [ ] Upload something that is not a receipt, or an image that is too large. The error panel shows a calm, generic message with no provider text.
+
+### Vercel preview deploy
+
+- [ ] Deploy a Vercel preview from a branch. `vite preview` does not apply the headers from `vercel.json`, so only the deployed preview can show them.
+- [ ] In the deployed preview, the console shows no Content Security Policy violations, and fonts, styles, images and the canvas layer all load.
+- [ ] In the network tab, only the app's own origin is contacted.
+- [ ] `GET /api/extract` on the preview answers as expected. With live reading on and a real key set in the Vercel environment variables, a real photo is read.
+- [ ] The response headers include `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and `Content-Security-Policy`.
+
 ## Known limitations
 
 - **No persistence.** State lives in memory. A reload discards the trace, the replays and the overrides. **Download trace** is the only record.
