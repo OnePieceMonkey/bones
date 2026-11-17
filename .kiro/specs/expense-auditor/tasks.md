@@ -644,16 +644,19 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Commit: `git add apps/expense-auditor && git commit -m "feat(expense-auditor): wire live status and LIVE title plate"`
 
 - [ ] 23. Guard tests
-  - [~] 23.1 Write the no-case-files guard
+  - [x] 23.1 Write the no-case-files guard
     - `tests/guards/no-case-files.node.test.ts`: walk `src`, `api`, `shared`, `tests` and `e2e`; fail on any import specifier or path containing `case-files` (build the pattern from two parts so the guard does not match its own source)
     - _Requirements: 19.10_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard against case-files imports"`
-  - [~] 23.2 Write the workspace-import guard
+  - [x] 23.2 Write the workspace-import guard
     - `tests/guards/workspace-imports.node.test.ts`: in `src` every `@bones/` specifier is `@bones/core` or `@bones/xray-ui`; no `@bones/core/node`; no `node:` specifier or Node built-in (reuse the specifier regex style of Core's `browser-barrel.test.ts`); `shared/` and `api/_lib/` import nothing from `src/`
     - _Requirements: 6.6, 8.7, 19.12_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard workspace imports"`
-  - [~] 23.3 Write the secret scan guard
+  - [-] 23.3 Write the secret scan guard
     - `tests/guards/no-secrets.node.test.ts`: run `build` from `vite` programmatically with a temporary `outDir` and `logLevel: "silent"` (timeout 120 s), scan every output file and every file in `src` for `ANTHROPIC_API_KEY`, `LIVE_EXTRACTION`, `EXTRACTION_MODEL`, `x-api-key`, `/sk-[A-Za-z0-9_-]{20,}/`, `/sk-ant-/`; scan `src` for `/api[_-]?key/i` and `VITE_` names containing KEY or SECRET; assert no `.map` file; a match reports file and text
+    - Canary build: the build runs with `ANTHROPIC_API_KEY="sk-canary-…"` (fixed random-looking string), `LIVE_EXTRACTION=on` and `EXTRACTION_MODEL=canary-model` set in `process.env` (no `VITE_` variable, no file on disk; env restored afterwards). Every output file (html, css, js, json) must not contain the canary value, `x-api-key`, `anthropic-version` (both case-insensitive) or `api.anthropic.com`; no `.map` file
+    - Self-test: the scanner detects the canary, the headers, the host and a `.map` file in a fake dist written to an os temp dir
+    - Shared helper `tests/helpers/build.ts` exports `buildOnce()` (cached per process, os temp `outDir`, `logLevel: "silent"`), `cleanupBuild()`, `listFiles()` and `CANARY_KEY`; task 23.6 reuses `buildOnce()`
     - _Requirements: 16.5, 19.11_
     - Commit: `git add apps/expense-auditor && git commit -m "test(expense-auditor): guard against secrets in src and dist"`
   - [~] 23.4 Write the hygiene guard
