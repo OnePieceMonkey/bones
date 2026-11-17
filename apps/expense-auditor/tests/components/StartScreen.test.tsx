@@ -38,6 +38,72 @@ describe("StartScreen", () => {
     expect(container.querySelector("input")).toBeNull();
   });
 
+  describe("live controls", () => {
+    const noop = () => {};
+    const png = () => new File([new Uint8Array([1, 2, 3])], "r.png", { type: "image/png" });
+
+    it("renders the labelled upload control and prefilled trip dates when liveAvailable", () => {
+      render(<StartScreen busy={false} error={null} onLoadSample={noop} liveAvailable onLoadPhoto={noop} />);
+      expect(screen.getByRole("group", { name: "Live receipt photo" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Upload receipt photo")).toHaveAttribute("accept", "image/jpeg,image/png");
+      expect(screen.getByLabelText("Trip start")).toHaveValue("2024-03-10");
+      expect(screen.getByLabelText("Trip end")).toHaveValue("2024-03-20");
+      expect(screen.getByRole("button", { name: "Read receipt" })).toBeInTheDocument();
+    });
+
+    it("renders none of the live nodes when liveAvailable is false", () => {
+      const { container } = render(<StartScreen busy={false} error={null} onLoadSample={noop} />);
+      expect(screen.queryByLabelText("Upload receipt photo")).toBeNull();
+      expect(screen.queryByLabelText("Trip start")).toBeNull();
+      expect(screen.queryByLabelText("Trip end")).toBeNull();
+      expect(screen.queryByRole("button", { name: "Read receipt" })).toBeNull();
+      expect(screen.queryByRole("group", { name: "Live receipt photo" })).toBeNull();
+      expect(container.querySelector("input")).toBeNull();
+    });
+
+    it("shows a message for a .gif and calls neither fetch nor onLoadPhoto", async () => {
+      const fetchSpy = vi.spyOn(globalThis, "fetch");
+      const onLoadPhoto = vi.fn();
+      const user = userEvent.setup({ applyAccept: false });
+      render(<StartScreen busy={false} error={null} onLoadSample={noop} liveAvailable onLoadPhoto={onLoadPhoto} />);
+      await user.upload(
+        screen.getByLabelText("Upload receipt photo"),
+        new File([new Uint8Array([1])], "x.gif", { type: "image/gif" }),
+      );
+      expect(screen.getByRole("alert")).toHaveTextContent("Choose a JPEG or PNG photo.");
+      expect(screen.getByRole("region", { name: "Expense Auditor - RECORDED" })).toBeInTheDocument();
+      expect(onLoadPhoto).not.toHaveBeenCalled();
+      expect(fetchSpy).not.toHaveBeenCalled();
+      fetchSpy.mockRestore();
+    });
+
+    it("shows a message for an oversized prepared image and calls neither fetch nor onLoadPhoto", async () => {
+      const fetchSpy = vi.spyOn(globalThis, "fetch");
+      const onLoadPhoto = vi.fn();
+      const prepare = vi.fn(async () => ({
+        reason: "too_large" as const,
+        message: "This photo is too large even after shrinking.",
+      }));
+      render(
+        <StartScreen busy={false} error={null} onLoadSample={noop} liveAvailable onLoadPhoto={onLoadPhoto} prepare={prepare} />,
+      );
+      await userEvent.upload(screen.getByLabelText("Upload receipt photo"), png());
+      await userEvent.click(screen.getByRole("button", { name: "Read receipt" }));
+      expect(prepare).toHaveBeenCalledTimes(1);
+      expect(await screen.findByRole("alert")).toHaveTextContent("too large");
+      expect(onLoadPhoto).not.toHaveBeenCalled();
+      expect(fetchSpy).not.toHaveBeenCalled();
+      fetchSpy.mockRestore();
+    });
+
+    it("changes the hidden lightbox label to LIVE once a valid file is selected", async () => {
+      render(<StartScreen busy={false} error={null} onLoadSample={noop} liveAvailable onLoadPhoto={noop} />);
+      expect(screen.getByRole("region", { name: "Expense Auditor - RECORDED" })).toBeInTheDocument();
+      await userEvent.upload(screen.getByLabelText("Upload receipt photo"), png());
+      expect(screen.getByRole("region", { name: "Expense Auditor - LIVE" })).toBeInTheDocument();
+    });
+  });
+
   it("busy disables the buttons and shows the status", () => {
     render(<StartScreen busy error={null} onLoadSample={() => {}} />);
     expect(screen.getByRole("status")).toHaveTextContent("Reading receipt");
