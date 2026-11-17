@@ -19,15 +19,44 @@
   overflow: visible;
   transition: transform 500ms ease;
 }
-.xr-sheet-thumb {
+.xr-sheet-paper {
+  position: relative;
   align-self: center;
   flex: none;
-  width: calc(62 * var(--xr-u, 1px));
-  height: calc(110 * var(--xr-u, 1px));
-  object-fit: cover;
-  opacity: 0.55;
+  width: calc(90 * var(--xr-u, 1px));
+  height: calc(130 * var(--xr-u, 1px));
+  overflow: hidden;
   border-radius: 2px;
+  transform: rotate(var(--xr-tilt, 0deg));
+  pointer-events: none;
 }
+.xr-sheet-thumb {
+  /* paper.webp is 562x1000 but its opaque strip is only 209x678 at (179,160).
+     Scale the strip to the 90 px frame width (x0.43) and crop it to 130 px. */
+  position: absolute;
+  display: block;
+  max-width: none;
+  width: calc(242 * var(--xr-u, 1px));
+  height: calc(430 * var(--xr-u, 1px));
+  left: calc(-77 * var(--xr-u, 1px));
+  top: calc(-72 * var(--xr-u, 1px));
+  opacity: 0.55;
+}
+.xr-sheet-line {
+  position: absolute;
+  left: 12%;
+  right: 8%;
+  overflow: hidden;
+  white-space: pre;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: max(7px, calc(9 * var(--xr-u, 1px)));
+  line-height: 1;
+  color: rgba(30, 24, 14, 0.7);
+}
+.xr-sheet-line:nth-of-type(1) { top: 26%; }
+.xr-sheet-line:nth-of-type(2) { top: 40%; }
+.xr-sheet-line:nth-of-type(3) { top: 54%; }
+.xr-sheet-line:nth-of-type(4) { top: 68%; }
 /* Cyan edge glow: a pseudo-element whose opacity fades in on hover. */
 .xr-sheet::after {
   content: "";

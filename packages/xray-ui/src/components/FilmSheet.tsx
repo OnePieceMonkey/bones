@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { CommonProps } from "../types";
 import { cx } from "../cx";
 import { paperUrl } from "../assets";
@@ -14,6 +15,17 @@ export interface FilmSheetProps extends CommonProps {
   /** True while this sheet is being loaded: it slides in. */
   selected?: boolean;
   onSelect: () => void;
+}
+
+/** Neutral placeholder strokes drawn over the thumbnail. Decorative only. */
+const PAPER_LINES = ["━━━━ ━━ ━━━", "── ──── ───", "━━━ ── ━━━━", "──── ━━"];
+const TILTS = [-3, 2, -1];
+
+/** Deterministic tilt in degrees from the title (no randomness). */
+function tiltFor(title: string): number {
+  let h = 0;
+  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
+  return TILTS[h % TILTS.length] as number;
 }
 
 /**
@@ -45,7 +57,12 @@ export function FilmSheet({
       onClick={onSelect}
     >
       <span className="xr-sheet-clip" aria-hidden="true" />
-      <AssetImage src={paperUrl} width={62} height={110} className="xr-sheet-thumb" />
+      <span className="xr-sheet-paper" aria-hidden="true" style={{ "--xr-tilt": `${tiltFor(title)}deg` } as CSSProperties}>
+        <AssetImage src={paperUrl} width={90} height={130} className="xr-sheet-thumb" />
+        {PAPER_LINES.map((line, i) => (
+          <span key={i} className="xr-sheet-line">{line}</span>
+        ))}
+      </span>
       <span id={`${id}-title`} className="xr-sheet-title">{title}</span>
       <span id={descId} className="xr-sheet-desc">
         {description}

@@ -46,7 +46,12 @@ describe("FilmSheet", () => {
     expect(img).toHaveAttribute("alt", "");
     expect(img).toHaveAttribute("aria-hidden", "true");
     expect(img).toHaveAttribute("width");
-    expect(img).toHaveAttribute("height");
+    expect(img).toHaveAttribute("width", "90");
+    expect(img).toHaveAttribute("height", "130");
+    const paper = container.querySelector(".xr-sheet-paper");
+    expect(paper).toHaveAttribute("aria-hidden", "true");
+    expect(paper?.querySelectorAll(".xr-sheet-line").length).toBeGreaterThanOrEqual(3);
+    expect(paper?.getAttribute("style")).toMatch(/--xr-tilt: (-3|2|-1)deg/);
     const b = screen.getByRole("button", { name: "T" });
     expect(b).toHaveAccessibleDescription("D");
   });
