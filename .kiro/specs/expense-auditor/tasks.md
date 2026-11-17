@@ -687,8 +687,8 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Commit: `git add apps/expense-auditor/README.md && git commit -m "docs(expense-auditor): add README"`
 
 - [ ] 25. End-to-end test
-  - [~] 25.1 Add the Playwright configuration
-    - `apps/expense-auditor/playwright.config.ts` as in design.md (testDir `./e2e`, chromium only, `reducedMotion: "reduce"`, `acceptDownloads`, `baseURL` `http://127.0.0.1:4173`, `webServer` command `pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort` with `LIVE_EXTRACTION: "off"`, `reuseExistingServer: !process.env.CI`)
+  - [-] 25.1 Add the Playwright configuration
+    - `apps/expense-auditor/playwright.config.ts`: merged into the existing config from the visual-polish spec (its screenshot settings, 1440x900 viewport and 60 s server timeout are kept) with the design.md settings (testDir `./e2e`, chromium only, `reducedMotion: "reduce"`, `acceptDownloads`, `baseURL` `http://127.0.0.1:4173`, `webServer` command `pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort` with `LIVE_EXTRACTION: "off"`, `reuseExistingServer: !process.env.CI`); the root alias `pnpm e2e` (task 7.4, `pnpm --filter @bones/expense-auditor test:e2e`) already exists and runs this config
     - Run `pnpm exec playwright install chromium` in `apps/expense-auditor` (environment step, not committed); run `pnpm --filter @bones/expense-auditor typecheck`
     - _Requirements: 6.3, 6.7, 19.5_
     - Commit: `git add apps/expense-auditor/playwright.config.ts && git commit -m "test(expense-auditor): add playwright config"`
