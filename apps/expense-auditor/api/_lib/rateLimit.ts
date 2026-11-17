@@ -1,5 +1,7 @@
 // Per-IP fixed-window rate limiter. Best effort: the store lives in one warm
 // function instance. The IP is a map key in memory only and is never logged.
+import type { RateLimitStore } from "./handler";
+
 export const RATE_LIMIT_MAX = 10;
 export const RATE_LIMIT_WINDOW_MS = 10 * 60_000;
 const SWEEP_THRESHOLD = 1000;
@@ -9,12 +11,6 @@ export interface RateLimitEntry {
   resetAt: number;
 }
 
-export interface RateLimitStore {
-  get(key: string): RateLimitEntry | undefined;
-  set(key: string, v: RateLimitEntry): void;
-  delete(key: string): void;
-  readonly size: number;
-}
 
 export function clientKey(headers: Headers): string {
   const forwarded = headers.get("x-forwarded-for");

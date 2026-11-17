@@ -3,13 +3,7 @@
 // { ok: false, kind: "upstream" } with no provider text; there are no retries.
 import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT } from "./schema";
 
-// Structurally identical to LlmClient in ./handler (design.md); declared here so
-// this module does not depend on the handler.
-interface LlmClient {
-  readReceipt(args: { imageBase64: string; mediaType: "image/jpeg" | "image/png" }): Promise<
-    { ok: true; text: string } | { ok: false; kind: "upstream" }
-  >;
-}
+import type { LlmClient } from "./handler";
 
 export const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 // From the API versions page. In this version temperature, top_p and top_k are removed.
