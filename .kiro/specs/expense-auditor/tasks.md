@@ -714,6 +714,15 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - _Requirements: 6.3, 6.4, 6.5, 19.1, 19.5, 19.12_
     - Commit: none (verification only)
 
+- [ ] 28. OpenRouter as a second LLM provider (live extraction server)
+  - [ ] 28.1 Add the OpenRouter provider, selection, tests and docs
+    - Keep the Anthropic provider and its tests unchanged. Server-side env only, never `VITE_`: `LLM_PROVIDER` ("anthropic" | "openrouter", default "anthropic"), `OPENROUTER_API_KEY` (used when `LLM_PROVIDER=openrouter`); `EXTRACTION_MODEL` stays (for OpenRouter "anthropic/claude-haiku-5.5"). The handler and `GET /api/extract` report `live: true` only when `LIVE_EXTRACTION=on`, the model is set and the key of the SELECTED provider is set
+    - New `api/_lib/openrouter.ts` with the same `LlmClient` port: `POST https://openrouter.ai/api/v1/chat/completions`; headers `content-type: application/json`, `Authorization: Bearer <key>`, `X-OpenRouter-Title: Bones Expense Auditor` (key only in the Authorization header); body `{ model, max_tokens: 16000, messages: [system SYSTEM_PROMPT, user [image_url data URL, text USER_TEXT]], response_format: { type: "json_schema", json_schema: { name: "receipt", strict: true, schema: MODEL_JSON_SCHEMA } }, reasoning: { effort: "low", exclude: true }, provider: { require_parameters: true } }`; success only when HTTP ok, `choices[0].finish_reason === "stop"` and `choices[0].message.content` is a non-empty string; everything else (non-2xx, an `error` object in the body, finish_reason `length`, `content_filter` or `error`, missing content, 25 s timeout, network error) gives `{ ok: false, kind: "upstream" }` with no provider text; no retries; reuse `SYSTEM_PROMPT`, `USER_TEXT` and `MODEL_JSON_SCHEMA` (do not fork them)
+    - Tests with fakeFetch only: `tests/api/openrouter.node.test.ts` pins URL, headers, body fields and every failure path; extend the key-never-leaks property (also an `OPENROUTER_API_KEY` canary) and the canary build guard (also an OpenRouter canary; `openrouter.ai` and `Bearer` must not appear in dist/); handler tests for provider selection and the live true/false rules; entry still works with no env
+    - Docs: design.md provider section, `.env.example` (`LLM_PROVIDER=anthropic`, `OPENROUTER_API_KEY=` empty), README live-mode section
+    - Rules: no real API call, no `.env.local`, no deploy, no push
+    - Commit: `git add apps/expense-auditor .kiro/specs/expense-auditor/design.md && git commit -m "feat(expense-auditor): add OpenRouter provider"`
+
 ## Notes
 
 - Tasks marked with `*` are optional unit tests. All property tests, the money filter, error-model, replay, guard, component, intro-timing and e2e tests are required.
