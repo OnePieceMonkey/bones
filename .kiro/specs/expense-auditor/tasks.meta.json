@@ -2253,6 +2253,11 @@
         "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1794943404681
+      },
+      {
+        "executionId": "a7ecaf30-44e3-4ea7-9c06-1ee0bb61dd50",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794992871196
       }
     ],
     "27.1 Final checkpoint - everything green and committed": [
@@ -2500,6 +2505,30 @@
         "executionId": "26d2fc06-ff53-4d28-aff5-8f01d9398434",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1794943544679
+      }
+    ],
+    "28.1 Add the OpenRouter provider, selection, tests and docs": [
+      {
+        "executionId": "a7ecaf30-44e3-4ea7-9c06-1ee0bb61dd50",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794992868393
+      },
+      {
+        "executionId": "a7ecaf30-44e3-4ea7-9c06-1ee0bb61dd50",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794992871277
+      },
+      {
+        "executionId": "a7ecaf30-44e3-4ea7-9c06-1ee0bb61dd50",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794993077394
+      }
+    ],
+    "28. OpenRouter as a second LLM provider (live extraction server)": [
+      {
+        "executionId": "a7ecaf30-44e3-4ea7-9c06-1ee0bb61dd50",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1794993077499
       }
     ]
   }
