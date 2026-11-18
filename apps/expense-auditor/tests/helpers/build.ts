@@ -9,8 +9,12 @@ const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 /** Fake secret placed in the build environment. It must never appear in any output file. */
 export const CANARY_KEY = "sk-canary-q7Zx3Lm9Rt2VbN8cKd5HwY1pAe6UfJ0g";
 
+/** Fake OpenRouter secret, same rule. */
+export const OPENROUTER_CANARY_KEY = "sk-or-canary-Hn4Qe8Ws1Zd6Yc3Vb9Mk2Tr7Lp5Xa0Jf";
 const CANARY_ENV: Record<string, string> = {
   ANTHROPIC_API_KEY: CANARY_KEY,
+  OPENROUTER_API_KEY: OPENROUTER_CANARY_KEY,
+  LLM_PROVIDER: "openrouter",
   LIVE_EXTRACTION: "on",
   EXTRACTION_MODEL: "canary-model",
 };

@@ -39,6 +39,8 @@ describe("config smoke", () => {
     const env = new Map(lines.map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1)]));
     expect(env.get("LIVE_EXTRACTION")).toBe("off");
     expect(env.get("ANTHROPIC_API_KEY")).toBe("");
+    expect(env.get("LLM_PROVIDER")).toBe("anthropic");
+    expect(env.get("OPENROUTER_API_KEY")).toBe("");
     expect(env.get("EXTRACTION_MODEL")).toBe("claude-haiku-5-5");
   });
 

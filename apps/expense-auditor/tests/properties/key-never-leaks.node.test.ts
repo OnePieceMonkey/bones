@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { createExtractHandler } from "../../api/_lib/handler";
+import { createOpenRouterClient } from "../../api/_lib/openrouter";
 import { createAnthropicClient } from "../../api/_lib/provider";
 import { fakeFetch, makeRequest } from "../helpers/fakes";
 
@@ -47,8 +48,9 @@ const arbHeaders = (key: string): fc.Arbitrary<Record<string, string>> =>
     { requiredKeys: [] },
   );
 
-function providerFetch(p: Provider, key: string) {
+function providerFetch(p: Provider, key: string, which: Which) {
   return fakeFetch((_url, _init) => {
+    if (which === "openrouter") return openRouterResponse(p, key);
     switch (p.kind) {
       case "throw":
         throw new Error(`connect failed using x-api-key ${key}`);
@@ -64,19 +66,46 @@ function providerFetch(p: Provider, key: string) {
   });
 }
 
+type Which = "anthropic" | "openrouter";
+const arbWhich = fc.constantFrom<Which>("anthropic", "openrouter");
+// OpenRouter-style answers, including error objects and a thrown fetch that carries the key.
+function openRouterResponse(p: Provider, key: string): Response {
+  const choice = (finish_reason: string | null, content: unknown) =>
+    Response.json({ choices: [{ finish_reason, message: { role: "assistant", content } }] });
+  switch (p.kind) {
+    case "throw":
+      throw new Error(`connect failed using Authorization: Bearer ${key}`);
+    case "status":
+      return new Response(JSON.stringify({ error: { code: p.status, message: `invalid key ${key}` } }), { status: p.status });
+    case "stop":
+      return p.reason === "refusal"
+        ? Response.json({ error: { code: 400, message: `moderation ${key}` } })
+        : choice("length", key);
+    case "text": {
+      const text = p.text === "valid" ? VALID_OUTPUT : p.text === "garbage" ? `not json ${key}` : `{"merchant":"${key}"}`;
+      return choice("stop", text);
+    }
+  }
+}
 // Feature: expense-auditor, Property 18: The key never leaves the server
 // **Validates: Requirements 16.5, 19.2**
 describe("Property 18: The key never leaves the server", () => {
-  it("keeps the key out of responses and logs and sends it only as the x-api-key header", async () => {
+  it("keeps the key out of responses and logs and sends it only as the provider auth header (x-api-key or Authorization)", async () => {
     await fc.assert(
       fc.asyncProperty(
-        arbKey.chain((key) => fc.tuple(fc.constant(key), arbProvider, arbBody(key), arbHeaders(key))),
-        async ([key, provider, body, headers]) => {
-          const fetchImpl = providerFetch(provider, key);
+        arbKey.chain((key) => fc.tuple(fc.constant(key), arbProvider, arbBody(key), arbHeaders(key), arbWhich)),
+        async ([key, provider, body, headers, which]) => {
+          const fetchImpl = providerFetch(provider, key, which);
           const logged: unknown[] = [];
           const handler = createExtractHandler({
-            env: { LIVE_EXTRACTION: "on", ANTHROPIC_API_KEY: key, EXTRACTION_MODEL: "model-test" },
-            llm: createAnthropicClient({ apiKey: key, model: "model-test", fetchImpl }),
+            env:
+              which === "openrouter"
+                ? { LIVE_EXTRACTION: "on", LLM_PROVIDER: "openrouter", OPENROUTER_API_KEY: key, EXTRACTION_MODEL: "model-test" }
+                : { LIVE_EXTRACTION: "on", ANTHROPIC_API_KEY: key, EXTRACTION_MODEL: "model-test" },
+            llm:
+              which === "openrouter"
+                ? createOpenRouterClient({ apiKey: key, model: "model-test", fetchImpl })
+                : createAnthropicClient({ apiKey: key, model: "model-test", fetchImpl }),
             now: () => 1_700_000_000_000,
             rateLimitStore: new Map(),
             log: (e) => logged.push(e),
@@ -100,6 +129,7 @@ describe("Property 18: The key never leaves the server", () => {
             expect(String(init?.body ?? "")).not.toContain(key);
             for (const [name, value] of Object.entries(init?.headers as Record<string, string>)) {
               if (name === "x-api-key") expect(value).toBe(key);
+              else if (name === "Authorization") expect(value).toBe(`Bearer ${key}`);
               else expect(`${name}:${value}`).not.toContain(key);
             }
           }

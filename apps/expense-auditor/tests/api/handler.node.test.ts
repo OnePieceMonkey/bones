@@ -280,3 +280,40 @@ describe("logging", () => {
     expect(JSON.stringify(logs)).not.toContain(KEY);
   });
 });
+
+describe("provider selection and live rules", () => {
+  const OR_KEY = "sk-or-test-key-not-real";
+  const ANTHROPIC = { LIVE_EXTRACTION: "on", ANTHROPIC_API_KEY: KEY, EXTRACTION_MODEL: "m" };
+  const OPENROUTER = { LIVE_EXTRACTION: "on", LLM_PROVIDER: "openrouter", OPENROUTER_API_KEY: OR_KEY, EXTRACTION_MODEL: "m" };
+  it.each<[string, HandlerDeps["env"], boolean]>([
+    ["anthropic by default", ANTHROPIC, true],
+    ["anthropic explicit", { ...ANTHROPIC, LLM_PROVIDER: "anthropic" }, true],
+    ["openrouter with its key", OPENROUTER, true],
+    ["anthropic: key missing", { ...ANTHROPIC, ANTHROPIC_API_KEY: undefined }, false],
+    ["anthropic: only the OpenRouter key", { ...ANTHROPIC, ANTHROPIC_API_KEY: "", OPENROUTER_API_KEY: OR_KEY }, false],
+    ["anthropic: model missing", { ...ANTHROPIC, EXTRACTION_MODEL: "" }, false],
+    ["anthropic: flag not on", { ...ANTHROPIC, LIVE_EXTRACTION: "off" }, false],
+    ["openrouter: key missing", { ...OPENROUTER, OPENROUTER_API_KEY: undefined }, false],
+    ["openrouter: key blank", { ...OPENROUTER, OPENROUTER_API_KEY: "  " }, false],
+    ["openrouter: only the Anthropic key", { ...OPENROUTER, OPENROUTER_API_KEY: "", ANTHROPIC_API_KEY: KEY }, false],
+    ["openrouter: model missing", { ...OPENROUTER, EXTRACTION_MODEL: undefined }, false],
+    ["openrouter: flag not on", { ...OPENROUTER, LIVE_EXTRACTION: "ON" }, false],
+    ["unknown provider with both keys", { ...ANTHROPIC, LLM_PROVIDER: "other", OPENROUTER_API_KEY: OR_KEY }, false],
+    ["empty provider value", { ...ANTHROPIC, LLM_PROVIDER: "" }, false],
+  ])("%s", async (_name, env, live) => {
+    const { handler, llm } = setup(undefined, env);
+    const get = await handler(makeRequest("GET"));
+    const body = await get.json();
+    expect(body).toEqual({ live });
+    expect(Object.keys(body)).toHaveLength(1);
+    const post = await handler(makeRequest("POST", jpegBody));
+    if (live) {
+      expect(post.status).toBe(200);
+      expect(llm.calls).toHaveLength(1);
+    } else {
+      expect(post.status).toBe(403);
+      expect((await errorOf(post)).code).toBe("disabled");
+      expect(llm.calls).toHaveLength(0);
+    }
+  });
+});

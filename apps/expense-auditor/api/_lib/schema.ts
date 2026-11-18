@@ -14,6 +14,8 @@ export const SYSTEM_PROMPT =
   "If a value is hard to read, give your best literal reading and a low confidence (below 0.5) instead of guessing with high confidence. " +
   "`confidence` values are numbers from 0 to 1.";
 
+export const USER_TEXT = "Read this receipt and fill the JSON schema.";
+
 export const MODEL_JSON_SCHEMA = {
   type: "object",
   additionalProperties: false,

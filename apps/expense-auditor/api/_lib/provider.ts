@@ -1,7 +1,7 @@
 // Anthropic Messages API client behind the LlmClient port. Plain fetch, no SDK.
 // The key is only placed in the x-api-key header. Every failure collapses to
 // { ok: false, kind: "upstream" } with no provider text; there are no retries.
-import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT } from "./schema";
+import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT, USER_TEXT } from "./schema";
 
 import type { LlmClient } from "./handler";
 
@@ -15,7 +15,6 @@ export const ANTHROPIC_VERSION = "2026-10-21";
 const MAX_TOKENS = 16000;
 const EFFORT = "low";
 const DEFAULT_TIMEOUT_MS = 25_000;
-const USER_TEXT = "Read this receipt and fill the JSON schema.";
 
 const FAILED = { ok: false, kind: "upstream" } as const;
 

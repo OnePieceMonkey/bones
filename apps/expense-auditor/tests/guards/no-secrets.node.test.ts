@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { buildOnce, CANARY_KEY, cleanupBuild } from "../helpers/build";
+import { buildOnce, CANARY_KEY, cleanupBuild, OPENROUTER_CANARY_KEY } from "../helpers/build";
 
 // Requirements 16.5, 19.11: no key, key name, provider header or provider host reaches the browser bundle.
 const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -16,6 +16,8 @@ interface Pattern {
 
 const NAMES: Pattern[] = [
   { label: "ANTHROPIC_API_KEY", re: /ANTHROPIC_API_KEY/ },
+  { label: "OPENROUTER_API_KEY", re: /OPENROUTER_API_KEY/ },
+  { label: "LLM_PROVIDER", re: /LLM_PROVIDER/ },
   { label: "LIVE_EXTRACTION", re: /LIVE_EXTRACTION/ },
   { label: "EXTRACTION_MODEL", re: /EXTRACTION_MODEL/ },
   { label: "sk- token", re: /sk-[A-Za-z0-9_-]{20,}/ },
@@ -25,6 +27,9 @@ const NAMES: Pattern[] = [
 /** Extra checks for the built output: canary value and provider wire details. */
 const DIST_EXTRA: Pattern[] = [
   { label: "canary key", re: new RegExp(CANARY_KEY.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) },
+  { label: "openrouter canary key", re: new RegExp(OPENROUTER_CANARY_KEY.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) },
+  { label: "openrouter.ai", re: /openrouter\.ai/i },
+  { label: "Bearer", re: /bearer/i },
   { label: "x-api-key", re: /x-api-key/i },
   { label: "anthropic-version", re: /anthropic-version/i },
   { label: "api.anthropic.com", re: /api\.anthropic\.com/i },
@@ -92,7 +97,7 @@ describe("secret scan", () => {
       const dirty = join(dir, "assets", "a.js");
       const map = join(dir, "assets", "a.js.map");
       writeFileSync(clean, "<html>/api/extract</html>");
-      writeFileSync(dirty, `fetch("https://API.Anthropic.com/v1",{headers:{"X-API-Key":"${CANARY_KEY}","Anthropic-Version":"1"}})`);
+      writeFileSync(dirty, `fetch("https://API.Anthropic.com/v1",{headers:{"X-API-Key":"${CANARY_KEY}","Anthropic-Version":"1",Authorization:"Bearer ${OPENROUTER_CANARY_KEY}"}});fetch("https://openrouter.ai/api")`);
       writeFileSync(map, "{}");
       const hits = scanDist(dir, [clean, dirty, map]);
       const text = hits.join("\n");
@@ -100,6 +105,9 @@ describe("secret scan", () => {
       expect(text).toContain("x-api-key");
       expect(text).toContain("anthropic-version");
       expect(text).toContain("api.anthropic.com");
+      expect(text).toContain("openrouter canary key");
+      expect(text).toContain("openrouter.ai");
+      expect(text).toContain("Bearer");
       expect(text).toContain("a.js.map: source map");
       expect(hits.some((h) => h.startsWith("index.html"))).toBe(false);
     } finally {

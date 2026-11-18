@@ -103,7 +103,7 @@ The reference file names do not include the operating system. Font rendering can
 ## Live mode locally
 
 1. Copy `.env.example` to `.env.local` in `apps/expense-auditor`. `.env.local` is ignored by git. Never commit it.
-2. Set `LIVE_EXTRACTION=on` and put your key after `ANTHROPIC_API_KEY=`. `EXTRACTION_MODEL` is the model id (the example file has the default).
+2. Set `LIVE_EXTRACTION=on`, choose a provider with `LLM_PROVIDER` and put the key of that provider in the file. `EXTRACTION_MODEL` is the model id for that provider (see "Choosing a provider" below).
 3. Run `pnpm dev`. The dev server loads these variables on the server side only and serves `/api/extract`.
 4. Open the app. The photo upload form appears when the server reports that live reading is on.
 
@@ -116,12 +116,27 @@ The dev middleware in `vite.config.ts` that serves `/api/extract` has no automat
 1. Create a Vercel project from this repository. Set **Root Directory** to `apps/expense-auditor`.
 2. In the Root Directory settings, turn on **Include source files outside of the Root Directory in the Build Step**. The build needs `rules/` and `packages/*`.
 3. Install command: `pnpm install --frozen-lockfile`. Build command: `pnpm build`. Output directory: `dist`. These are already in `vercel.json`.
-4. In the project environment variables set `ANTHROPIC_API_KEY`, `EXTRACTION_MODEL` and `LIVE_EXTRACTION=on`.
+4. In the project environment variables set `LLM_PROVIDER`, the key of that provider (`ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY`), `EXTRACTION_MODEL` and `LIVE_EXTRACTION=on`.
 5. After the first deploy, call `GET /api/extract`. It must answer `{"live":true}`. With `LIVE_EXTRACTION` off, or with a missing key or model, it answers `{"live":false}`.
 
 The first real deploy and the first real provider call are manual steps. Nothing in this repository has made them. These points are not verified yet and need a check on the first deploy: the working directory Vercel uses for the install command, which pnpm major version Vercel picks, whether the Content Security Policy in `vercel.json` blocks any asset, and whether your plan offers Firewall rate-limit rules.
 
+### Choosing a provider
+
+Two providers are supported. Set `LLM_PROVIDER` to pick one. All of these are server-side variables.
+
+| `LLM_PROVIDER` | Key variable | `EXTRACTION_MODEL` example |
+| --- | --- | --- |
+| `anthropic` (default when unset) | `ANTHROPIC_API_KEY` | `claude-haiku-5-5` |
+| `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-haiku-5.5` |
+
+Live reading is on only when `LIVE_EXTRACTION=on`, the model is set and the key of the selected provider is set. The key of the other provider is ignored. An unknown `LLM_PROVIDER` value counts as a misconfiguration: `GET /api/extract` answers `{"live":false}` and `POST` answers 403. Both keys stay on the server and are never put in the client.
+
+With `LLM_PROVIDER=openrouter` the function calls the OpenRouter chat completions API with the same `max_tokens` of 16000, `reasoning` set to low effort with the reasoning text excluded, and `provider.require_parameters` so the JSON schema is always honoured. Any failure gives the same generic error and no provider text, and there are no retries.
+
 ### Provider settings
+
+The text below describes the Anthropic default.
 
 The function calls the Anthropic Messages API with `max_tokens` 16000 and `output_config.effort` set to `"low"`. It sends no `thinking` field. The model thinks adaptively, and those thinking tokens count against `max_tokens`. A large cap with low effort leaves room for the JSON answer, so it is not cut off. If the answer is cut off or the model refuses, the function returns a generic failure and shows no provider text. There are no retries. The request shape is pinned by a test against a fake `fetch`.
 
@@ -134,7 +149,7 @@ The function calls the Anthropic Messages API with `max_tokens` 16000 and `outpu
 - There is a per-IP rate limit of 10 requests per 10 minutes. It is best effort: the counter lives in memory of one function instance, and each instance and each restart has its own. Do not rely on it.
 - Set a spend limit at the AI provider. If your plan supports it, add a platform rate-limit rule (for example Vercel Firewall).
 - `vercel.json` sets `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and a Content Security Policy. The config smoke test checks the build settings in `vercel.json`. The headers are served and enforced only on Vercel. They do not apply to `pnpm dev` or `pnpm preview`, and they have not been tested in a deployed browser.
-- A guard test (`tests/guards/no-secrets.node.test.ts`) builds the app with a canary key set in the environment. It fails if the canary, `x-api-key`, `anthropic-version`, `api.anthropic.com`, the variable names or key-like strings appear anywhere in the built `dist/`, or in `src`. It also fails on source maps. It does not scan `api/` (server code) or this README.
+- A guard test (`tests/guards/no-secrets.node.test.ts`) builds the app with a canary key set in the environment. It fails if the Anthropic or OpenRouter canary key, `x-api-key`, `anthropic-version`, `api.anthropic.com`, `openrouter.ai`, `Bearer`, the variable names (including `OPENROUTER_API_KEY` and `LLM_PROVIDER`) or key-like strings appear anywhere in the built `dist/`, or in `src`. It also fails on source maps. It does not scan `api/` (server code) or this README.
 - The server logs only status, a short code and duration. Not the image, not the key, not the IP address.
 
 ## Manual check before a release

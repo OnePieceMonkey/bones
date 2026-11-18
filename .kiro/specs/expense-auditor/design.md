@@ -451,6 +451,7 @@ apps/expense-auditor/
       schema.ts           MODEL_JSON_SCHEMA, prompts
       rateLimit.ts        createRateLimiter(store, limit, windowMs)
       provider.ts         createAnthropicClient({ apiKey, model, fetchImpl, timeoutMs })
+      openrouter.ts       createOpenRouterClient({ apiKey, model, fetchImpl, timeoutMs })
   src/
     main.tsx  App.tsx
     state/    reducer.ts  sessionStore.ts  selectors.ts  intro.ts
@@ -1163,7 +1164,7 @@ Environment variables (server only; none uses the `VITE_` prefix):
 | `ANTHROPIC_API_KEY` | Provider key |
 | `EXTRACTION_MODEL` | Model id, recommended `claude-haiku-5-5` (listed as vision- and structured-output-capable in the docs) |
 
-`live` is true only when `LIVE_EXTRACTION === "on"` and the key and the model are non-empty. A half-configured server therefore reports `{ live: false }`.
+`live` is true only when `LIVE_EXTRACTION === "on"` and the key of the selected provider and the model are non-empty (see "Provider selection and `api/_lib/openrouter.ts`" below). A half-configured server therefore reports `{ live: false }`.
 
 #### `shared/wire.ts` (used by `src` and `api`)
 
@@ -1325,6 +1326,38 @@ Headers: `content-type: application/json`, `x-api-key`, `anthropic-version`. The
 
 Range rules (cents 0 to 10^12, confidence 0 to 1, at least one line item) are enforced by `modelOutputSchema` after the response, because the API does not support those constraints. The schema has no field named like a decision, verdict or approval.
 
+#### Provider selection and `api/_lib/openrouter.ts` (second provider)
+Both providers sit behind the same `LlmClient` port. `api/extract.ts` builds exactly one client from `process.env` and passes it to the handler; the handler never sees a key.
+| Name | Meaning |
+| --- | --- |
+| `LLM_PROVIDER` | `anthropic` (default when unset) or `openrouter`. Any other value is a misconfiguration: `live` is false and `POST` answers 403 `disabled` |
+| `ANTHROPIC_API_KEY` | Key used when the provider is `anthropic` |
+| `OPENROUTER_API_KEY` | Key used when the provider is `openrouter` |
+| `EXTRACTION_MODEL` | Model id for the selected provider: `claude-haiku-5-5` for Anthropic, `anthropic/claude-haiku-5.5` for OpenRouter |
+`live` is true only when `LIVE_EXTRACTION === "on"`, `EXTRACTION_MODEL` is non-empty and the key of the SELECTED provider is non-empty. The key of the other provider does not count. With `LLM_PROVIDER` unset the behaviour is exactly the Anthropic behaviour described above. `SYSTEM_PROMPT`, `USER_TEXT` and `MODEL_JSON_SCHEMA` live in `api/_lib/schema.ts` and are shared by both clients.
+```typescript
+export const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+export function createOpenRouterClient(opts: { apiKey: string; model: string; fetchImpl: typeof fetch; timeoutMs?: number }): LlmClient;
+```
+Request (same 25 s `AbortController` timeout): `POST` with headers `content-type: application/json`, `Authorization: Bearer <key>` and `X-OpenRouter-Title: Bones Expense Auditor`. Body:
+```json
+{
+  "model": "<EXTRACTION_MODEL>",
+  "max_tokens": 16000,
+  "messages": [
+    { "role": "system", "content": "<SYSTEM_PROMPT>" },
+    { "role": "user", "content": [
+      { "type": "image_url", "image_url": { "url": "data:<mediaType>;base64,<imageBase64>" } },
+      { "type": "text", "text": "Read this receipt and fill the JSON schema." }
+    ] }
+  ],
+  "response_format": { "type": "json_schema", "json_schema": { "name": "receipt", "strict": true, "schema": "<MODEL_JSON_SCHEMA>" } },
+  "reasoning": { "effort": "low", "exclude": true },
+  "provider": { "require_parameters": true }
+}
+```
+`reasoning.exclude` keeps reasoning text out of the answer, so `message.content` holds only the JSON. Reasoning tokens still count against `max_tokens`, so the cap stays at 16000 with low effort, as for Anthropic. `provider.require_parameters` makes OpenRouter route only to upstreams that honour `response_format`, so the schema is never silently ignored. The body has no `temperature`, `top_p`, `top_k` or `tools`. The key is only placed in the `Authorization` header.
+Response mapping: success only when the HTTP status is 2xx, the body has no `error` object, `choices[0].finish_reason === "stop"` and `choices[0].message.content` is a non-empty string; the result is `{ ok: true, text: content }`. Every other case returns `{ ok: false, kind: "upstream" }` with no provider text: non-2xx (401, 402, 429, 500 and so on), a 2xx body with an `error` object, `finish_reason` of `length`, `content_filter`, `error`, `tool_calls` or null, missing `choices`, missing, empty or non-string content, a body that is not JSON, a thrown fetch, and the timeout. There are no retries. The handler then maps this to 502 `upstream_failed` as before. The client bundle never contains `openrouter.ai`, `Bearer`, the OpenRouter key or the new variable names; the canary build guard checks this.
 #### `src/extraction/HttpExtractionAdapter.ts` (Requirement 16.1, 16.7 to 16.10)
 
 ```typescript
@@ -1401,7 +1434,9 @@ Verification status: the points below were checked against the pages in the rese
 ```
 # Server-side only. Never prefix these with VITE_. Never commit a real .env file.
 LIVE_EXTRACTION=off
+LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=
+OPENROUTER_API_KEY=
 EXTRACTION_MODEL=claude-haiku-5-5
 ```
 

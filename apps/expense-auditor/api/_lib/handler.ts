@@ -107,10 +107,15 @@ function matchesMagic(b64: string, mediaType: "image/jpeg" | "image/png"): boole
 }
 
 export function createExtractHandler(deps: HandlerDeps): (req: Request) => Promise<Response> {
+  // LLM_PROVIDER picks which key counts. Unset means "anthropic"; any other value is a misconfiguration.
+  const providerKey = (): string | undefined => {
+    const provider = deps.env.LLM_PROVIDER ?? "anthropic";
+    if (provider === "anthropic") return deps.env.ANTHROPIC_API_KEY;
+    if (provider === "openrouter") return deps.env.OPENROUTER_API_KEY;
+    return undefined;
+  };
   const isLive = (): boolean =>
-    deps.env.LIVE_EXTRACTION === "on" &&
-    nonEmpty(deps.env.ANTHROPIC_API_KEY) &&
-    nonEmpty(deps.env.EXTRACTION_MODEL);
+    deps.env.LIVE_EXTRACTION === "on" && nonEmpty(providerKey()) && nonEmpty(deps.env.EXTRACTION_MODEL);
 
   async function handle(req: Request): Promise<{ res: Response; code: string }> {
     const done = (res: Response, code: string) => ({ res, code });
