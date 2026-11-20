@@ -1,7 +1,7 @@
 /* Control panel parts: rule version knob. */
 .xr-pknob {
   position: relative;
-  width: calc(120 * var(--xr-u, 1px));
+  width: calc(192 * var(--xr-u, 1px));
   aspect-ratio: 1 / 1;
   box-sizing: border-box;
 }
@@ -13,7 +13,7 @@
 }
 .xr-shell .xr-pknob-dial {
   position: absolute;
-  inset: 17%;
+  inset: 12%;
   transform-origin: 50% 50%;
   transition: transform 350ms cubic-bezier(0.3, 1.4, 0.5, 1);
 }
@@ -32,6 +32,11 @@
   height: 100%;
   pointer-events: none;
 }
+.xr-pknob-ticks line {
+  stroke: var(--xr-text-on-steel);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
 .xr-pknob-label {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -41,7 +46,7 @@
   background: none;
   color: var(--xr-text-on-steel);
   text-shadow: var(--xr-engrave);
-  font: 500 max(11px, calc(12 * var(--xr-u, 1px))) / 1.2 var(--xr-font-sans);
+  font: 500 max(11px, calc(13 * var(--xr-u, 1px))) / 1 var(--xr-font-sans);
   cursor: pointer;
 }
 .xr-pknob-label[data-active="true"] {
@@ -207,7 +212,7 @@
   background: none;
   color: var(--xr-text-on-steel);
   text-shadow: var(--xr-engrave);
-  font: 500 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 var(--xr-font-sans);
-  letter-spacing: 0.04em;
+  font: 500 max(11px, calc(13 * var(--xr-u, 1px))) / 1 var(--xr-font-sans);
+  letter-spacing: 0.1em;
   white-space: nowrap;
 }

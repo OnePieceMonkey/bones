@@ -15,10 +15,10 @@ export interface KnobTick {
   y2: number;
 }
 
-export const KNOB = { center: 50, labelRadius: 46 } as const;
+export const KNOB = { center: 50, labelRadius: 47 } as const;
 
 const TICK_INNER = 40.5;
-const TICK_OUTER = 44;
+const TICK_OUTER = 43;
 
 const r1 = (v: number): number => Math.round(v * 10) / 10;
 

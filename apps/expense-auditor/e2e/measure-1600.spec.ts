@@ -522,3 +522,89 @@ test("the meter is a rectangle with a red zone and its needle moves by transform
   const props = [...src.matchAll(/([a-z-]+)\s*:/g)].map((x) => x[1]).filter((p) => p !== "from" && p !== "to");
   expect([...new Set(props)]).toEqual(["transform"]);
 });
+
+// visual-polish-2 task 6.6: large knob with engraved labels (R5.2, R5.3, R5.9, R5.11).
+// Old dial: 79.2 u (99 px at 1600x900). New dial: 144.8 u (181 px at 1600x900).
+for (const size of SIZES) {
+  test(`knob dial is 1.8 to 2.2 times the old 79 u dial and the panel fits at ${size.width}x${size.height} (R5.2, R5.11)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const rect = (sel: string) => document.querySelector(sel)!.getBoundingClientRect();
+      // --xr-u is a calc() expression; resolve it through a probe element.
+      const probe = document.createElement("div");
+      probe.style.cssText = "position:absolute;visibility:hidden;width:calc(100 * var(--xr-u))";
+      document.querySelector(".xr-shell")!.appendChild(probe);
+      const u = probe.getBoundingClientRect().width / 100;
+      probe.remove();
+      const dial = document.querySelector<HTMLElement>(".xr-pknob-dial")!;
+      const panel = rect(".xr-cpanel");
+      const box = rect(".xr-viewport");
+      const doc = rect(".xr-doc");
+      const doctor = rect(".xr-doctor");
+      const items = [...document.querySelectorAll(".xr-cpanel-item")].map((i) => i.getBoundingClientRect());
+      const plaques = [...document.querySelectorAll(".xr-cpanel-item")].map((item) => {
+        const p = item.querySelector(".xr-cpanel-plaque")!.getBoundingClientRect();
+        const c = item.querySelector(".xr-pknob, .xr-pmeter, .xr-ptoggle")!.getBoundingClientRect();
+        return {
+          dx: Math.abs(p.left + p.width / 2 - (c.left + c.width / 2)),
+          dy: Math.max(0, p.top - c.bottom, c.top - p.bottom),
+          shadow: getComputedStyle(item.querySelector(".xr-cpanel-plaque")!).textShadow,
+        };
+      });
+      const labels = [...document.querySelectorAll(".xr-pknob-label")].map((l) => {
+        const s = getComputedStyle(l);
+        return {
+          text: l.textContent,
+          border: [s.borderTopWidth, s.borderRightWidth, s.borderBottomWidth, s.borderLeftWidth],
+          bg: s.backgroundColor,
+          active: l.getAttribute("data-active"),
+          color: s.color,
+        };
+      });
+      return {
+        u,
+        dial: dial.offsetWidth,
+        panel: { l: panel.left, r: panel.right, t: panel.top, b: panel.bottom },
+        box: { l: box.left, r: box.right, t: box.top, b: box.bottom },
+        docBottom: doc.bottom,
+        doctorLeft: doctor.left,
+        itemsRight: Math.max(...items.map((i) => i.right)),
+        itemsLeft: Math.min(...items.map((i) => i.left)),
+        plaques,
+        labels,
+        scrollH: document.documentElement.scrollHeight,
+        scrollW: document.documentElement.scrollWidth,
+      };
+    });
+    const ratio = m.dial / (79 * m.u);
+    expect(ratio).toBeGreaterThanOrEqual(1.8);
+    expect(ratio).toBeLessThanOrEqual(2.2);
+    for (const p of m.plaques) {
+      expect(p.dx).toBeLessThanOrEqual(8);
+      expect(p.dy).toBeLessThanOrEqual(40);
+      expect(p.shadow).toContain("rgba(255, 255, 255");
+    }
+    expect(m.labels.map((l) => l.text)).toEqual(["v1", "v2", "v3"]);
+    for (const l of m.labels) {
+      expect(l.border).toEqual(["0px", "0px", "0px", "0px"]);
+      expect(l.bg).toBe("rgba(0, 0, 0, 0)");
+    }
+    const active = m.labels.filter((l) => l.active === "true");
+    const inactive = m.labels.filter((l) => l.active !== "true");
+    expect(active).toHaveLength(1);
+    for (const l of inactive) expect(l.color).not.toBe(active[0]!.color);
+    // Whole panel inside the lightbox, clear of the document and doctor panels, controls inside the panel, no page scroll.
+    expect(m.panel.l).toBeGreaterThanOrEqual(m.box.l - 15 * m.u);
+    expect(m.panel.b).toBeLessThanOrEqual(m.box.b + 15 * m.u);
+    expect(m.panel.r).toBeLessThanOrEqual(m.doctorLeft);
+    expect(m.itemsRight).toBeLessThanOrEqual(m.panel.r);
+    expect(m.itemsLeft).toBeGreaterThanOrEqual(m.panel.l);
+    expect(m.docBottom).toBeLessThanOrEqual(m.panel.t + 1);
+    expect(m.scrollH).toBeLessThanOrEqual(size.height);
+    expect(m.scrollW).toBeLessThanOrEqual(size.width);
+  });
+}

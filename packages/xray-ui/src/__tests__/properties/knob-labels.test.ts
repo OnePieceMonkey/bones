@@ -35,9 +35,9 @@ describe("knobLabelPositions", () => {
   it("places v1 v2 v3 as in the design and gives one tick per detent", () => {
     const l = knobLabelPositions(3, 1);
     expect(l.map((p) => [p.x, p.y])).toEqual([
-      [10.2, 73],
-      [50, 4],
-      [89.8, 73],
+      [9.3, 73.5],
+      [50, 3],
+      [90.7, 73.5],
     ]);
     expect(knobTicks(3)).toHaveLength(3);
   });
