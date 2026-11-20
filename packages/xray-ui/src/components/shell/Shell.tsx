@@ -40,6 +40,8 @@ export interface ShellProps extends CommonProps {
   headerActions?: ReactNode;
   /** Status text shown in the header, right of the tagline. */
   statusNote?: ReactNode;
+  /** Hidden context text for the header (kept in the DOM, not drawn). */
+  contextNote?: ReactNode;
   introPhase?: IntroPhase;
 }
 
@@ -66,6 +68,7 @@ export function Shell({
   effective,
   headerActions,
   statusNote,
+  contextNote,
   introPhase,
   introKey,
   reducedMotion,
@@ -86,6 +89,7 @@ export function Shell({
         {...(headerActions !== undefined ? { headerActions } : {})}
         {...(lightboxLabel !== undefined ? { lightboxLabel } : {})}
         {...(statusNote !== undefined ? { statusNote } : {})}
+        {...(contextNote !== undefined ? { contextNote } : {})}
         introPhase={introPhase ?? phase}
         {...(shakeClass !== "" && !reduced ? { lightboxClassName: shakeClass } : {})}
         {...(className !== undefined ? { className } : {})}

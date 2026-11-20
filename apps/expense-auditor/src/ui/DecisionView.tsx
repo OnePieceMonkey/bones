@@ -59,12 +59,8 @@ export function DecisionView({ state, store, reducedMotion }: DecisionViewProps)
         onOverride={() => setDialogOpen(true)}
         overrideRef={overruleRef}
         headerActions={<Toolbar state={state} store={store} />}
-        statusNote={
-          <>
-            <VersionNote note={replayNote(state)} />
-            <span className="app-trip-text">{formatTripWindow(state.trip)}</span>
-          </>
-        }
+        statusNote={<VersionNote note={replayNote(state)} />}
+        contextNote={formatTripWindow(state.trip)}
         {...(effective === null ? {} : { effective })}
         {...motion}
       />

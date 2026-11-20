@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HeaderBar } from "../../components/shell/HeaderBar";
 import { HeaderAction } from "../../components/shell/HeaderAction";
+import { IconDownload } from "../../components/HeaderIcons";
 
 describe("HeaderBar", () => {
   it("shows wordmark and tagline", () => {
@@ -42,5 +43,21 @@ describe("HeaderBar status note", () => {
     const note = screen.getByText("Trip: Mar 10 - Mar 20, 2024");
     expect(header?.contains(note)).toBe(true);
     expect(note.closest("[aria-live]")?.getAttribute("aria-live")).toBe("polite");
+  });
+});
+
+describe("HeaderBar contextNote and action icon", () => {
+  it("keeps the context note in the DOM, visually hidden", () => {
+    const { container } = render(<HeaderBar xray contextNote="Window: A - B" />);
+    const note = screen.getByText("Window: A - B");
+    expect(container.querySelector(".xr-header-brand")?.contains(note)).toBe(true);
+    expect(note.classList.contains("xr-visually-hidden")).toBe(true);
+  });
+  it("renders an aria-hidden icon span and keeps the button name", () => {
+    const { container } = render(<HeaderAction icon={<IconDownload />}>Download trace</HeaderAction>);
+    const icon = container.querySelector(".xr-header-action-icon");
+    expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    expect(icon?.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByRole("button", { name: "Download trace" })).toBeTruthy();
   });
 });

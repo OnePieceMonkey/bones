@@ -1,4 +1,4 @@
-import { HeaderAction } from "@bones/xray-ui";
+import { HeaderAction, IconDownload, IconLoad } from "@bones/xray-ui";
 import { buildExport, downloadText, exportFileName, serializeExport } from "../export/exportTrace";
 import type { DecisionState } from "../state/reducer";
 import type { SessionStore } from "../state/sessionStore";
@@ -15,13 +15,14 @@ export function Toolbar({ state, store, download = downloadText }: ToolbarProps)
   return (
     <div role="toolbar" aria-label="Decision actions" className="app-toolbar">
       <HeaderAction
+        icon={<IconDownload />}
         onClick={() =>
           download(exportFileName(displayedTrace(state)), serializeExport(buildExport(state)))
         }
       >
         Download trace
       </HeaderAction>
-      <HeaderAction onClick={() => store.reset()}>Load another receipt</HeaderAction>
+      <HeaderAction icon={<IconLoad />} onClick={() => store.reset()}>Load another receipt</HeaderAction>
     </div>
   );
 }

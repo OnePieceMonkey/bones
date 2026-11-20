@@ -21,6 +21,7 @@ export { DoctorPanel } from "./components/panels/DoctorPanel";
 export type { DoctorPanelProps } from "./components/panels/DoctorPanel";
 export { HeaderBar } from "./components/shell/HeaderBar";
 export { HeaderAction } from "./components/shell/HeaderAction";
+export { IconDownload, IconLoad } from "./components/HeaderIcons";
 export { Shell } from "./components/shell/Shell";
 export type { ShellProps } from "./components/shell/Shell";
 export { ShellFrame } from "./components/shell/ShellFrame";

@@ -23,6 +23,8 @@ export interface ShellFrameProps extends CommonProps {
   children?: ReactNode;
   /** Status text shown in the header, right of the tagline (aria-live polite). */
   statusNote?: ReactNode;
+  /** Hidden context text for the header. */
+  contextNote?: ReactNode;
   introPhase?: IntroPhase;
   /** Extra class on the lightbox (the fracture shake). */
   lightboxClassName?: string;
@@ -40,6 +42,7 @@ export function ShellFrame({
   controls,
   children,
   statusNote,
+  contextNote,
   introPhase = "idle",
   lightboxClassName,
   reducedMotion,
@@ -61,6 +64,7 @@ export function ShellFrame({
         xray={xray}
         {...(headerActions !== undefined ? { headerActions } : {})}
         {...(statusNote !== undefined ? { statusNote } : {})}
+        {...(contextNote !== undefined ? { contextNote } : {})}
       />
       <SteelFrame className="xr-shell-frame">
         <Lightbox
