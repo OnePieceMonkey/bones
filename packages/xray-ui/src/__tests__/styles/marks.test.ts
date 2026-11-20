@@ -18,8 +18,9 @@ const LABEL_SELECTORS = [
   ".xr-pknob-label",
   ".xr-doc .xr-mark-tag",
   ".xr-doc .xr-mark--line",
+  ".xr-doc .xr-mark-text",
 ];
-const UNDERLINE_SELECTORS = new Set([".xr-doc .xr-mark--line"]);
+const UNDERLINE_SELECTORS = new Set([".xr-doc .xr-mark-text"]);
 
 function isEmptyBox(value: string): boolean {
   return /^(0|none|transparent|0px)$/.test(value.trim());
@@ -35,7 +36,7 @@ describe("Property 8: No label selector draws a box", () => {
         expect(isEmptyBox(value), `${selector} ${prop}: ${value}`).toBe(true);
       }
       if (prop === "border-bottom") {
-        expect(underline && /^(1\.5px|2px) solid var\(--xr-cyan\)$/.test(value), `${selector} ${prop}: ${value}`).toBe(
+        expect(underline && /^(1|2)px solid (var\(--xr-cyan\)|rgba\(61, 232, 255, 0\.3[0-9]?\))$/.test(value), `${selector} ${prop}: ${value}`).toBe(
           !isEmptyBox(value),
         );
       }
@@ -48,10 +49,19 @@ describe("Property 8: No label selector draws a box", () => {
     }
   });
 
-  it("the highlighted underline only widens the bottom border", () => {
-    const d = mergedDeclarations('.xr-doc .xr-mark--line[data-highlighted="true"]');
-    expect(d["border-bottom-width"]).toBe("2px");
-    expect(d["border-bottom"]).toMatch(/solid var\(--xr-cyan\)/);
+  it("the underline is 1 px at about 0.35 alpha at rest and full cyan on hover or highlight (R4.6)", () => {
+    const rest = mergedDeclarations(".xr-doc .xr-mark-text");
+    expect(rest["border-bottom"]).toMatch(/^1px solid rgba\(61, 232, 255, 0\.(3|35|4)\)$/);
+    expect(rest["display"]).toBe("inline-block");
+    for (const sel of [".xr-doc .xr-mark-text:hover", '.xr-doc .xr-mark--line[data-highlighted="true"] > .xr-mark-text']) {
+      const d = mergedDeclarations(sel);
+      expect(d["border-bottom"], sel).toBe("2px solid var(--xr-cyan)");
+      expect(d["box-shadow"], sel).toContain("--xr-cyan-glow");
+    }
+    // The line element itself draws nothing: the underline is not as wide as the paper.
+    const line = mergedDeclarations(".xr-doc .xr-mark--line");
+    expect(line["border"]).toBe("0");
+    expect(line["border-bottom"]).toBeUndefined();
   });
 });
 
@@ -93,6 +103,7 @@ describe("Property 10: Hidden mark label stays accessible", () => {
     expect(tag["display"]).not.toBe("none");
     expect(tag["visibility"]).toBeUndefined();
     expect(mergedDeclarations(".xr-doc .xr-mark:hover .xr-mark-tag")["opacity"]).toBe("1");
+    expect(mergedDeclarations(".xr-doc .xr-mark-text:hover .xr-mark-tag")["opacity"]).toBe("1");
     expect(mergedDeclarations('.xr-doc .xr-mark-tag[data-highlighted="true"]')["opacity"]).toBe("1");
   });
 });

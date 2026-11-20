@@ -191,57 +191,70 @@ test("header layout holds when the wordmark font fails to load (R2.7)", async ({
   }
 });
 
-// visual-polish-2 task 4.1: white tilted paper on blue-grey film (R4.1 to R4.4, R4.11).
-test("paper is white, tilted, on a larger blue-grey film with two clips (R4.1 to R4.4)", async ({ page }) => {
+// visual-polish-2 task 4.1 and checkpoint 5 verdict: white tilted paper, 65-70 percent of the film width, on a
+// blue-grey film that fills the panel (R4.1 to R4.4, R4.11).
+test("paper is white, tilted, on a blue-grey film with two clips (R4.1, R4.2, R4.4)", async ({ page }) => {
   await openSample(page, /signature case/i);
   const m = await page.evaluate(() => {
     const doc = document.querySelector(".xr-doc")!;
     const paper = document.querySelector(".xr-doc-paper")!;
-    const u = Math.max(1, Math.min(window.innerWidth / 1280, window.innerHeight / 720));
     const d = doc.getBoundingClientRect();
-    const film = { left: d.left + 2 * u, right: d.right - 2 * u, top: d.top + 2 * u, bottom: d.bottom - 2 * u };
     const ps = getComputedStyle(paper);
     const mat = new DOMMatrixReadOnly(ps.transform);
     const angle = (Math.atan2(mat.b, mat.a) * 180) / Math.PI;
     const filmBg = getComputedStyle(doc, "::before").backgroundImage;
     const rgbs = [...filmBg.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)].map((x) => [Number(x[1]), Number(x[2]), Number(x[3])]);
     const avg = [0, 1, 2].map((i) => rgbs.reduce((s, c) => s + c[i]!, 0) / rgbs.length);
-    // Untransformed paper box: offset size around the same centre.
-    const pr = paper.getBoundingClientRect();
-    const cx = pr.left + pr.width / 2;
-    const cy = pr.top + pr.height / 2;
-    const w = (paper as HTMLElement).offsetWidth;
-    const h = (paper as HTMLElement).offsetHeight;
     const clips = [...document.querySelectorAll(".xr-doc .xr-clip")].map((c) => {
       const r = c.getBoundingClientRect();
       return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
     });
-    return {
-      bg: ps.backgroundColor,
-      angle,
-      film,
-      paper: { left: cx - w / 2, right: cx + w / 2, top: cy - h / 2, bottom: cy + h / 2 },
-      avg,
-      clips,
-    };
+    return { bg: ps.backgroundColor, angle, film: { left: d.left, right: d.right, top: d.top, bottom: d.bottom }, avg, clips };
   });
   const channels = (m.bg.match(/\d+/g) ?? []).slice(0, 3).map(Number);
   for (const c of channels) expect(c, `paper colour ${m.bg}`).toBeGreaterThanOrEqual(235);
   expect(Math.abs(m.angle)).toBeGreaterThanOrEqual(1);
   expect(Math.abs(m.angle)).toBeLessThanOrEqual(4);
   expect(m.avg[2]! - m.avg[0]!, "film blue minus red").toBeGreaterThanOrEqual(10);
-  expect(m.paper.left - m.film.left, "film margin left").toBeGreaterThanOrEqual(8);
-  expect(m.film.right - m.paper.right, "film margin right").toBeGreaterThanOrEqual(8);
-  expect(m.paper.top - m.film.top, "film margin top").toBeGreaterThanOrEqual(8);
-  expect(m.film.bottom - m.paper.bottom, "film margin bottom").toBeGreaterThanOrEqual(8);
   expect(m.clips).toHaveLength(2);
   for (const c of m.clips) {
     expect(c.left, "clip inside film").toBeGreaterThanOrEqual(m.film.left);
     expect(c.right, "clip inside film").toBeLessThanOrEqual(m.film.right);
-    expect(c.top, "clip touches film top edge").toBeLessThanOrEqual(m.film.top + 6); // 2 deg paper tilt moves the clip box a few px
+    expect(c.top, "clip touches film top edge").toBeLessThanOrEqual(m.film.top + 6);
     expect(c.bottom, "clip touches film top edge").toBeGreaterThan(m.film.top);
   }
 });
+for (const size of SIZES) {
+  test(`film fills the panel and the paper is 65-70 percent of it with 24 px film around at ${size.width}x${size.height} (R4.3)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const doc = document.querySelector(".xr-doc") as HTMLElement;
+      const paper = document.querySelector(".xr-doc-paper") as HTMLElement;
+      const cell = doc.getBoundingClientRect();
+      const pr = paper.getBoundingClientRect(); // rotated bounds: the strictest margins
+      const filmH = parseFloat(getComputedStyle(doc, "::before").height);
+      const filmW = parseFloat(getComputedStyle(doc, "::before").width);
+      return {
+        panelH: cell.height,
+        filmH,
+        filmW,
+        ratio: paper.offsetWidth / filmW,
+        left: pr.left - cell.left,
+        right: cell.right - pr.right,
+        below: cell.bottom - pr.bottom,
+      };
+    });
+    expect(Math.abs(m.filmH - m.panelH), "film height equals panel height").toBeLessThanOrEqual(1);
+    expect(m.ratio).toBeGreaterThanOrEqual(0.65);
+    expect(m.ratio).toBeLessThanOrEqual(0.7);
+    expect(m.left, "film left of paper").toBeGreaterThanOrEqual(24);
+    expect(m.right, "film right of paper").toBeGreaterThanOrEqual(24);
+    expect(m.below, "film below paper").toBeGreaterThanOrEqual(24);
+  });
+}
 for (const size of SIZES) {
   test(`document panel stays inside the lightbox, off stage and controls at ${size.width}x${size.height} (R4.11)`, async ({ page }) => {
     await page.setViewportSize(size);
@@ -266,38 +279,69 @@ for (const size of SIZES) {
   });
 }
 
-// visual-polish-2 task 4.2: cyan underline marks, hover labels, centred scan line (R1.1, R4.5 to R4.10).
-test("mark labels are hidden at rest, shown on hover and hotspot focus; underline is cyan (R4.5 to R4.8)", async ({ page }) => {
+// visual-polish-2 task 4.2 and checkpoint 5 verdict: near-invisible underline marks that hug the text (R1.1, R4.5 to R4.8).
+test("marks are nearly invisible at rest, hug the text, and turn full cyan with a label on hover (R4.6 to R4.8)", async ({ page }) => {
   await openSample(page, /signature case/i);
-  const style = (sel: string) =>
-    page.$eval(sel, (el) => {
-      const s = getComputedStyle(el);
-      return { opacity: Number(s.opacity), visibility: s.visibility, display: s.display, bottom: s.borderBottomWidth, bottomColor: s.borderBottomColor, shadow: s.boxShadow, top: s.borderTopWidth, left: s.borderLeftWidth, right: s.borderRightWidth, bg: s.backgroundColor };
+  const read = () =>
+    page.evaluate(() => {
+      const text = document.querySelector(".xr-doc .xr-mark-text") as HTMLElement;
+      const tag = text.querySelector(".xr-mark-tag") as HTMLElement;
+      const s = getComputedStyle(text);
+      const ts = getComputedStyle(tag);
+      // Width of the text itself, without the absolutely positioned label.
+      const range = document.createRange();
+      const node = Array.from(text.childNodes).find((n) => n.nodeType === Node.TEXT_NODE)!;
+      range.selectNodeContents(node);
+      const alpha = /rgba\([^)]*,\s*([0-9.]+)\)/.exec(s.borderBottomColor);
+      return {
+        textW: range.getBoundingClientRect().width,
+        markW: text.getBoundingClientRect().width,
+        lineW: (text.parentElement as HTMLElement).getBoundingClientRect().width,
+        bottom: s.borderBottomWidth,
+        color: s.borderBottomColor,
+        alpha: alpha ? Number(alpha[1]) : 1,
+        sides: [s.borderTopWidth, s.borderLeftWidth, s.borderRightWidth],
+        bg: s.backgroundColor,
+        tagOpacity: Number(ts.opacity),
+        tagVisibility: ts.visibility,
+        tagDisplay: ts.display,
+        tagBox: tag.getBoundingClientRect().width,
+      };
     });
-  const tag = page.locator(".xr-doc .xr-mark-tag").first();
-  await expect(tag).toBeAttached();
-  const rest = await style(".xr-doc .xr-mark-tag");
-  expect(rest.opacity).toBe(0);
-  expect(rest.visibility).toBe("visible");
-  expect(rest.display).not.toBe("none");
-  const line = await style(".xr-doc .xr-mark--line");
-  expect(parseFloat(line.bottom)).toBeGreaterThanOrEqual(1);
-  expect(parseFloat(line.bottom)).toBeLessThanOrEqual(2.5);
-  expect([line.top, line.left, line.right]).toEqual(["0px", "0px", "0px"]);
-  expect(line.bottomColor).toBe("rgb(61, 232, 255)");
-  expect(line.shadow).not.toBe("none");
-  expect(line.bg).toBe("rgba(0, 0, 0, 0)");
-  // Hover on the mark line shows its label.
-  await page.locator(".xr-doc .xr-mark--line").first().hover();
-  await expect.poll(async () => (await style(".xr-doc .xr-mark-tag")).opacity).toBe(1);
+  await expect(page.locator(".xr-doc .xr-mark-tag").first()).toBeAttached();
+  const rest = await read();
+  expect(Math.abs(rest.markW - rest.textW), "mark width within 2 px of text width").toBeLessThanOrEqual(2);
+  expect(rest.markW, "mark is narrower than its line").toBeLessThan(rest.lineW);
+  expect(rest.bottom).toBe("1px");
+  expect(rest.alpha).toBeGreaterThanOrEqual(0.3);
+  expect(rest.alpha).toBeLessThanOrEqual(0.4);
+  expect(rest.sides).toEqual(["0px", "0px", "0px"]);
+  expect(rest.bg).toBe("rgba(0, 0, 0, 0)");
+  expect(rest.tagOpacity).toBe(0);
+  expect(rest.tagVisibility).toBe("visible");
+  expect(rest.tagDisplay).not.toBe("none");
+  // Hover on the marked text: full cyan, glow, label shown.
+  await page.locator(".xr-doc .xr-mark-text").first().hover();
+  await expect.poll(async () => (await read()).tagOpacity).toBe(1);
+  const hov = await read();
+  expect(hov.color).toBe("rgb(61, 232, 255)");
+  expect(hov.alpha).toBe(1);
+  expect(hov.tagBox).toBeGreaterThan(0);
   await page.mouse.move(2, 2);
-  await expect.poll(async () => (await style(".xr-doc .xr-mark-tag")).opacity).toBe(0);
-  // Focus on a linked hotspot shows the label; no new tab stops in the document.
+  await expect.poll(async () => (await read()).tagOpacity).toBe(0);
+  expect((await read()).alpha).toBeLessThanOrEqual(0.4);
+  // Focus on a linked hotspot highlights the mark; no new tab stops in the document.
   const before = await page.locator(".xr-doc [tabindex], .xr-doc button, .xr-doc a").count();
   await page.getByRole("button", { name: /^Line-item match, rule line-item-cap/ }).focus();
   await expect.poll(async () => page.$$eval('.xr-doc .xr-mark-tag[data-highlighted="true"]', (e) => e.length)).toBeGreaterThan(0);
-  const shown = await page.$eval('.xr-doc .xr-mark-tag[data-highlighted="true"]', (el) => ({ o: Number(getComputedStyle(el).opacity), b: getComputedStyle(el).borderTopWidth, bg: getComputedStyle(el).backgroundColor, sh: getComputedStyle(el).boxShadow }));
-  expect(shown).toEqual({ o: 1, b: "0px", bg: "rgba(0, 0, 0, 0)", sh: "none" });
+  const shown = await page.$eval('.xr-doc .xr-mark--line[data-highlighted="true"]', (line) => {
+    const text = line.querySelector(".xr-mark-text") as HTMLElement;
+    const tag = text.querySelector(".xr-mark-tag") as HTMLElement;
+    const s = getComputedStyle(text);
+    const t = getComputedStyle(tag);
+    return { o: Number(t.opacity), b: t.borderTopWidth, bg: t.backgroundColor, sh: t.boxShadow, color: s.borderBottomColor, glow: s.boxShadow !== "none" };
+  });
+  expect(shown).toEqual({ o: 1, b: "0px", bg: "rgba(0, 0, 0, 0)", sh: "none", color: "rgb(61, 232, 255)", glow: true });
   expect(await page.locator(".xr-doc [tabindex], .xr-doc button, .xr-doc a").count()).toBe(before);
 });
 test("scan line is red, thin, centred on the total row and spans the paper (R4.9)", async ({ page }) => {

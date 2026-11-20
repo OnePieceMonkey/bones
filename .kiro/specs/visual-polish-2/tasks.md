@@ -52,8 +52,8 @@ Decisions recorded here:
 
 ## Tasks
 
-- [ ] 1. Preparation: guards, tokens, chromium-1600 project (ledger S0)
-  - [ ] 1.1 Playwright project chromium-1600, reference and scroll specs
+- [x] 1. Preparation: guards, tokens, chromium-1600 project (ledger S0)
+  - [x] 1.1 Playwright project chromium-1600, reference and scroll specs
     - Files: `apps/expense-auditor/playwright.config.ts`, `e2e/reference-1600.spec.ts` (new), `e2e/measure-1600.spec.ts` (new), `e2e/layout.spec.ts`, `e2e/__screenshots__/reference-1600.spec.ts/` (new PNGs).
     - Config: add project `chromium-1600` with viewport 1600x900, `reducedMotion: "reduce"`, `colorScheme: "dark"`, `testMatch: /(reference-1600|measure-1600)\.spec\.ts/`. Add `testIgnore: /(reference-1600|measure-1600)\.spec\.ts/` to project `chromium`. Keep `updateSnapshots: "none"`, `snapshotPathTemplate`, `maxDiffPixelRatio: 0.001`, `threshold: 0.2`.
     - `reference-1600.spec.ts`: two tests, `start-screen-1600.png` and `signature-case-1600.png` with `toHaveScreenshot`, `animations: "disabled"`, `await document.fonts.ready`, wait for the three film sheets and for `.xr-shell[data-intro="done"]` (same waits as the 1440 specs). The baseline PNGs are taken from the current look with Regenerate_1600.
@@ -63,13 +63,13 @@ Decisions recorded here:
     - Commit message: `test(expense-auditor): add chromium-1600 project with reference and scroll specs`
     - _Requirements: 10.1, 10.2, 10.3, 10.6, 11.1, 11.2, 11.3_
 
-  - [ ] 1.2 Skip the two 1440 reference tests
+  - [x] 1.2 Skip the two 1440 reference tests
     - Files: `apps/expense-auditor/e2e/signature-case.spec.ts`, `e2e/start-screen.spec.ts`.
     - Add `test.skip(true, "refs return in the last task (visual-polish-2 R11.9)")` to the reference-screenshot test of each file only. The burst-corner test in `signature-case.spec.ts` and every other spec stay active. The 1440 PNGs are not touched.
     - Commit message: `test(expense-auditor): skip 1440 reference tests until the final task`
     - _Requirements: 11.5, 11.9_
 
-  - [ ] 1.3 New tokens and contrast pairs (no look change)
+  - [x] 1.3 New tokens and contrast pairs (no look change)
     - Files: `packages/xray-ui/src/styles/tokens.css`, `packages/xray-ui/src/__tests__/contrast.test.ts`, `packages/xray-ui/src/__tests__/styles/tokens.test.ts` (new).
     - Add only tokens that no existing rule reads, so pixels do not change: `--xr-font-serif`, `--xr-font-sans`, `--xr-font-mono` (values from the design token table, D1), `--xr-text-on-steel-active`, `--xr-steel-sheen`, `--xr-engrave`, `--xr-engrave-active`, `--xr-bg-film`, `--xr-bg-film-deep`, `--xr-line-phone`, `--xr-bg-pillbtn`, `--xr-text-pillbtn`, `--xr-line-pillbtn`, `--xr-bg-header-glass`, `--xr-line-header`, `--xr-bg-pill`, `--xr-text-pill`, `--xr-line-pill`, `--xr-stamp-alpha` (plain number 0.82), `--xr-meter-face-a`, `--xr-meter-face-b`, `--xr-text-on-meter`, `--xr-meter-zone`, `--xr-meter-bezel`. Tokens that change an existing value (`--xr-text-on-steel`, `--xr-bg-paper-doc`, `--xr-bg-bubble`, `--xr-text-bubble`, `--xr-bg-phone-head`) change in the task that uses them (2.1, 4.1, 7.2).
     - `tokens.test.ts`: every token above exists in `tokens.css`; the colour tokens used in a contrast pair are six-digit hex (`--xr-bg-pill`, `--xr-bg-header-glass` are rgba and are checked by their alpha, at most 0.35 for the pill).
@@ -80,7 +80,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add visual-polish-2 tokens and start the contrast pair table`
     - _Requirements: 1.5, 2.1, 7.4, 7.5, 9.3_
 
-  - [ ] 1.4 CSS source helpers and the 120 u size guard
+  - [x] 1.4 CSS source helpers and the 120 u size guard
     - Files: `packages/xray-ui/src/__tests__/styles/helpers.ts` (new), `packages/xray-ui/src/__tests__/styles/size-limit.test.ts` (new).
     - `helpers.ts`: `readStyles()` (all `styles/*.css`), `block(selector)`, `mergedDeclarations(selector)` (merges every block whose selector list contains the selector, in file order), `declarations()` (every property and value with file and selector). Use the same `block()` style as `GlassCard.layout.test.tsx`. Later property tests (8, 9, 10) use these helpers.
     - `size-limit.test.ts`: scan `styles/*.css` for `calc\((\d+(?:\.\d+)?) \*` and fail above 120 outside the selectors `.xr-pknob`, `.xr-pmeter`, `.xr-cpanel`. Pre-existing larger values (`.xr-sheet`, `.xr-burst`, `.xr-sheet-thumb` and any other found on the first run) go on a short allow-list with a comment that says they predate this feature. The message names file, selector and number.
@@ -88,8 +88,8 @@ Decisions recorded here:
     - Commit message: `test(xray-ui): add css source helpers and 120 u size guard`
     - _Requirements: 10.5, 9.7_
 
-- [ ] 2. Global look and typography (ledger S1)
-  - [ ] 2.1 Unbox labels and remove dashed outlines
+- [x] 2. Global look and typography (ledger S1)
+  - [x] 2.1 Unbox labels and remove dashed outlines
     - Files: `styles/xray.css`, `styles/panels.css`, `styles/controls.css`, `styles/tokens.css`, `__tests__/contrast.test.ts`, `__tests__/components/GlassCard.layout.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `xray.css`: delete `.xr-result[data-result="partially_approved"] { border-style: dashed }` (line 472) and replace the `border-style: dashed` of `.xr-result[data-effective="partially_approved"]` (line 490) with `solid`. Replace the dashed `.xr-mark--bbox` and `.xr-mark--line` borders with `solid`. The old `ResultPlate` (used by case-files) shows a solid outline from now on; say so in the commit body.
     - `panels.css`: remove `border: 2px dashed` from `.xr-glass-stamp` (the frame is `stamp-frame.webp`, D5). Add `.xr-doctor .xr-result.xr-result-footer { border: 0; background: transparent; box-shadow: none; outline: 0; }`.
@@ -101,7 +101,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): unbox panel labels and drop dashed outlines (R1)`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 5.9, 5.10, 13.8_
 
-  - [ ] 2.2 One type system
+  - [x] 2.2 One type system
     - Files: `styles/header.css`, `styles/sheet.css`, `styles/shell.css` (or `frame.css`, where `.xr-root` and `.xr-shell` are defined), `styles/controls.css`, `styles/panels.css`, `styles/xray.css`, `__tests__/styles/typography.test.ts` (new).
     - `.xr-wordmark` and `.xr-start-title` use `var(--xr-font-serif)` (weight stays 700). `.xr-root` and `.xr-shell` get `font-family: var(--xr-font-sans)`. Remove the two `ui-monospace` declarations in `controls.css`. `.xr-doc .xr-film-text` uses `var(--xr-font-mono)` with `letter-spacing: 0.02em`. `.xr-sheet-line` keeps mono (start-screen thumbnail, outside R2.3).
     - Lower to weight 500: `.xr-answer-head`, `.xr-field-value`, `.xr-rb-head`, `.xr-result-line`, `.xr-stamp-title`, `.xr-sheet-title`, `.xr-doctor-title`, `.xr-form-strip button`. The app rule `.app-button` changes in task 11.3. Header action text and tagline use `--xr-font-sans`.
@@ -114,8 +114,8 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): apply serif, sans and mono tokens and lower weights to 500 (R2)`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 3. Header (ledger S5, header part)
-  - [ ] 3.1 Header icons, action icon prop and contextNote
+- [x] 3. Header (ledger S5, header part)
+  - [x] 3.1 Header icons, action icon prop and contextNote
     - Files: `components/HeaderIcons.tsx` (new), `components/shell/HeaderAction.tsx`, `components/shell/HeaderBar.tsx`, `components/shell/Shell.tsx`, `components/shell/ShellFrame.tsx`, `src/index.ts`, `apps/expense-auditor/src/ui/Toolbar.tsx`, `apps/expense-auditor/src/ui/DecisionView.tsx`, `__tests__/components/HeaderBar.test.tsx`, and the app tests that read the trip text.
     - `HeaderIcons.tsx`: `IconDownload` and `IconLoad`, inline SVG, `aria-hidden="true"`, `focusable="false"`, no `url(`, domain-free names. Export from `index.ts`.
     - `HeaderAction`: optional `icon?: ReactNode`, rendered as `<span className="xr-header-action-icon" aria-hidden="true">{icon}</span>` before the children. Handlers unchanged.
@@ -126,7 +126,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add header action icons and hidden contextNote for the trip text`
     - _Requirements: 7.6, 7.7, 7.8, 7.9, 9.4, 13.8_
 
-  - [ ] 3.2 Framed header, glass pill, ghost actions
+  - [x] 3.2 Framed header, glass pill, ghost actions
     - Files: `styles/header.css`, `__tests__/contrast.test.ts`, `__tests__/styles/header.test.ts` (new), `e2e/measure-1600.spec.ts`.
     - `.xr-header`: `height: calc(40 * var(--xr-u))`, margin `6 u 14 u`, 1 px `--xr-line-header` border, radius `14 u`, fill `--xr-bg-header-glass`, padding `0 18 u`. Shell row stays 52 u. Tagline starts 16 u right of the wordmark.
     - `.xr-header-pill`: `background: var(--xr-bg-pill)`, `border: 1px solid var(--xr-line-pill)`, `color: var(--xr-text-pill)`, small decorative `::before` dot. `[data-on="true"]` no longer uses `--xr-bg-cyan-fill` (D7). Pill stays centred (`1fr auto 1fr`).
@@ -138,8 +138,8 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): framed glass header with muted pill and ghost actions (R7)`
     - _Requirements: 2.6, 2.7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.8, 7.9, 9.2, 9.5_
 
-- [ ] 4. Receipt on film (ledger S3)
-  - [ ] 4.1 Film backdrop, white paper, tilt, curl, clips
+- [x] 4. Receipt on film (ledger S3)
+  - [x] 4.1 Film backdrop, white paper, tilt, curl, clips
     - Files: `styles/panels.css`, `styles/tokens.css`, `__tests__/contrast.test.ts`, `__tests__/components/DocumentPanel.layout.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `tokens.css`: `--xr-bg-paper-doc` from `#efe6cc` to `#f7f6f1` (16.08:1 with `--xr-text-paper-doc #1a1a1a`).
     - `panels.css` as in the design: `.xr-doc` gets `isolation: isolate` and new padding; `.xr-doc::before` is the film (inset 2 u, radius 8 u, gradient `--xr-bg-film` to `--xr-bg-film-deep`, hairline and inner shadow); `.xr-doc-paper` loses the `paper.webp` url, gets two crease gradients, `--xr-bg-paper-doc`, `transform: rotate(-2deg)` and the curl `box-shadow`; `.xr-doc-paper::after` is the curl corner; `.xr-doc .xr-clip { top: calc(-24 * var(--xr-u)) }`. `.xr-doc-scroll` keeps an opaque paper underlay. `paper.webp` stays exported for the start-screen thumbnails.
@@ -149,7 +149,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): hang the white tilted paper on blue-grey film with curl and clips (R4)`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.11, 12.2, 13.8_
 
-  - [ ] 4.2 Field marks, hover labels and centred scan line
+  - [x] 4.2 Field marks, hover labels and centred scan line
     - Files: `styles/panels.css`, `__tests__/components/DocumentPanel.layout.test.tsx`, `__tests__/styles/marks.test.ts` (new), `e2e/measure-1600.spec.ts`.
     - `.xr-doc .xr-film-line` becomes `display: block; position: relative; min-height: calc(18 * var(--xr-u))`. `.xr-doc .xr-mark--line` (and its highlighted state) becomes a 1.5 px `--xr-cyan` bottom border with the `--xr-cyan-glow` box-shadow, no side or top border, no background; highlighted sets `border-bottom-width: 2px`. `.xr-doc .xr-mark-tag` is absolutely placed at the right above the line, `opacity: 0` at rest, `transition: opacity 150ms ease`, no plate colours, `font-family: var(--xr-font-sans)`, `white-space: nowrap`, `max-width: 100%`, never `display: none` or `visibility: hidden`. It shows on `:hover` of the line and on `[data-highlighted="true"]` (A6: no new tab stop, the label follows the linked hotspot). Reduced motion: exact-selector `transition: none` entry in `panels.css`.
     - `.xr-scan`: `height: 2px; left: 0; right: 0`, background `--xr-red`, two-layer red glow, no animation (R4.10).
@@ -165,13 +165,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): cyan underline marks with hover labels and a centred red scan line`
     - _Requirements: 1.1, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 9.5, 13.8_
 
-- [ ] 5. Checkpoint - global look, header, receipt
+- [-] 5. Checkpoint - global look, header, receipt
   - Follow the Checkpoint procedure with N = 5. The side-by-side image covers regions 1, 2, 7 (header) and 4 (receipt on film) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 5 done". Do not start any further task until the user says "weiter". The user compares `review/cp5-side-by-side.png` with the mockup. If the verdict says the film backdrop is too flat, the next task may add `film-sheet.webp` (at most 120,000 B, D4).
 
 - [ ] 6. Control panel (ledger S4)
-  - [ ] 6.1 Knob label model
+  - [~] 6.1 Knob label model
     - Files: `model/knobLabels.ts` (new), `components/panel/Knob.tsx`, `src/index.ts`, `__tests__/properties/knob-labels.test.ts` (new).
     - `knobLabelPositions(count, activeIndex)` and `knobTicks(count)` as in the design (`KNOB = { center: 50, labelRadius: 46 }`, ticks from radius 40.5 to 44 percent along `knobAngle`). `Knob.tsx` uses them instead of the inline `polar`, adds `data-index` to each label, and renders the tick lines as a decorative inline SVG (`aria-hidden="true"`, no stroke yet, so pixels do not change). Role, aria attributes, keyboard operation and rule-version behaviour do not change.
     - **Property 3: Knob labels lie on one circle, are distinct and ordered**
@@ -181,7 +181,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add knob label ring model and decorative ticks`
     - _Requirements: 5.3, 5.4, 9.1, 9.4_
 
-  - [ ] 6.2 Meter geometry model
+  - [~] 6.2 Meter geometry model
     - Files: `model/meterGeometry.ts` (new), `src/index.ts`, `__tests__/model/meterGeometry.test.ts` (new).
     - `METER`, `RED_ZONE` (0.75 to 1), `meterPoint`, `meterTicks(majorCount)`, `redZoneArc()` as in the design. Pure; uses the existing `needleAngle`. No component uses it yet except its test, so wire it in task 6.5 (state this in the commit body).
     - **Property 5: Meter scale geometry**
@@ -191,7 +191,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add meter scale and red zone geometry model`
     - _Requirements: 5.5_
 
-  - [ ] 6.3 Shell grid and one steel panel with notch
+  - [~] 6.3 Shell grid and one steel panel with notch
     - Files: `styles/shell.css`, `styles/controls.css`, `styles/panels.css`, `__tests__/contrast.test.ts`, `__tests__/components/ControlPanel.test.tsx` (proof only), `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `grid-template-columns: 28fr 8fr 38fr 26fr`, rows `62fr 38fr`, explicit placement: `.xr-doc { grid-area: 1 / 1 / 2 / 2 }`, `.xr-shell-stagecell { grid-area: 1 / 2 / 3 / 4 }`, `.xr-cpanel { grid-area: 2 / 1 / 3 / 3 }`, `.xr-doctor { grid-area: 1 / 4 / 3 / 5 }`. Remove the old `grid-template-areas` and the `grid-area: doc|stage|doctor|ctrl` lines in `panels.css` and `controls.css`, so `shell.css` owns placement.
     - `controls.css`: new `.xr-cpanel` block from the design: negative margin `0 0 -14 u -14 u`, padding `12 u 12 u 14 u 26 u`, gap 8 u, `border-radius: 0 28 u 0 0`, sheen gradient over `brushed-steel.webp`, bevel and top shadow, `z-index: 2`, and the `::before` notch fillet with `mask` and `-webkit-mask`. Mask unsupported falls back to a square corner. No transition.
@@ -203,7 +203,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): four-column shell grid and one steel control panel with notch (R5.1)`
     - _Requirements: 5.1, 5.10, 5.11, 9.3, 10.4, 10.5_
 
-  - [ ] 6.4 Toggle with the lamp above the lever
+  - [~] 6.4 Toggle with the lamp above the lever
     - Files: `components/panel/Toggle.tsx`, `components/panel/ControlPanel.tsx`, `styles/controls.css`, `__tests__/components/Toggle.test.tsx`, `__tests__/components/ControlPanel.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `Toggle.tsx`: the button content becomes `<Lamp/>` then the lever (column). The lever DOM, `data-on` and `data-lit` stay. `ControlPanel.tsx`: knob item is plaque then Knob; meter item is plaque then Meter; toggle item is Toggle then plaque. Tab order stays Knob, then Toggle. The four screws stay.
     - `controls.css`: `.xr-ptoggle { flex-direction: column; gap: calc(4 * var(--xr-u)) }`, `.xr-ptoggle-lever { width: calc(52 * var(--xr-u)) }`, `.xr-shell .xr-plamp { width: calc(26 * var(--xr-u)) }`. The lit `drop-shadow(0 0 calc(10 * var(--xr-u, 1px)) var(--xr-amber-glow))` and `brightness(0.8)` strings stay (asserted by `Toggle.test.tsx`).
@@ -213,7 +213,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): put the amber lamp above the toggle lever (R5.8)`
     - _Requirements: 5.8, 9.1_
 
-  - [ ] 6.5 Rectangular VU meter (SVG)
+  - [~] 6.5 Rectangular VU meter (SVG)
     - Files: `components/panel/Meter.tsx`, `styles/controls.css`, `styles/motion.css`, `assets/index.ts`, `assets/meter.webp` (delete), `__tests__/assets.test.ts`, `__tests__/properties/images.test.tsx` (if it lists `meterUrl`), `__tests__/properties/meter.test.tsx` (new), `e2e/measure-1600.spec.ts`.
     - Rewrite `Meter.tsx` as inline SVG (viewBox `0 0 200 105`) from `meterGeometry`: bezel rect, cream face gradient (`--xr-meter-face-a`/`-b`), scale ticks and numbers in `--xr-text-on-meter`, red zone arc in `--xr-meter-zone` (0.75 to 1.0), needle line from pivot (100, 98). Root stays `.xr-pmeter` with `role="meter"`, `aria-label`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`. The needle group stays `.xr-pmeter-needle` with `data-angle`, `--from/--over/--to` and a `key` on the value, so `Meter.test.tsx` passes unchanged. All decorative SVG parts are `aria-hidden`.
     - `controls.css`: `.xr-pmeter` 150 u x 79 u (the only new size above 120 u besides the knob; on the guard allow-list). `motion.css`: `.xr-pmeter-needle { transform-origin: 100px 104px; transform-box: view-box }`. `xr-needle-swing` and its 700 ms stay (asserted by `css-constants.test.ts`). Reduced motion shows the needle at its final angle by the existing `data-motion` rules.
@@ -226,7 +226,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): replace the round gauge with a rectangular SVG VU meter, remove meter.webp (29,192 B)`
     - _Requirements: 5.5, 5.6, 5.7, 9.1, 9.4, 12.1, 12.2, 13.8_
 
-  - [ ] 6.6 Large knob with engraved v1/v2/v3 ring and engraved panel labels
+  - [~] 6.6 Large knob with engraved v1/v2/v3 ring and engraved panel labels
     - Files: `styles/controls.css`, `components/panel/ControlPanel.tsx` (spacing only if needed), `e2e/measure-1600.spec.ts`.
     - `.xr-pknob { width: calc(188 * var(--xr-u)); aspect-ratio: 1 }`, `.xr-shell .xr-pknob-dial { inset: 11.5% }` (dial 144.8 u, A4). Tick lines get a stroke from `--xr-text-on-steel`. `.xr-pknob-label` and `.xr-cpanel-plaque` use `font: 500 max(11px, calc(13 * var(--xr-u))) / 1 var(--xr-font-sans)`, `letter-spacing: 0.1em` for the plaques. Each item is a flex column, `align-items: center`, gap 6 u. If the review of the ring shows labels too tight, `labelRadius` goes to 47 and `.xr-pknob` to 192 u (design note).
     - The task measures old and new dial size with Playwright before and after (old: `.xr-pknob-dial` `offsetWidth` 99 px at 1600x900, 79.2 u). The commit message states both pixel values (R5.2).
@@ -237,7 +237,7 @@ Decisions recorded here:
     - _Requirements: 5.2, 5.3, 5.9, 5.11, 5.12, 10.5_
 
 - [ ] 7. Phone panel (ledger S5, phone part)
-  - [ ] 7.1 Doctor title, home indicator and button icons (DOM)
+  - [~] 7.1 Doctor title, home indicator and button icons (DOM)
     - Files: `components/HeaderIcons.tsx`, `components/panels/DoctorPanel.tsx`, `components/panels/ResultFooter.tsx`, `__tests__/components/DoctorPanel.test.tsx`, `__tests__/components/ResultFooter.test.tsx`, and app tests that query "Dr. Bones".
     - `HeaderIcons.tsx`: add `IconReplay` and `IconOverride` (`aria-hidden`, `focusable="false"`, 18x18 viewBox 24). `DoctorPanel.tsx`: title text `Dr. Bones · Radiologist` (U+00B7), and `<span className="xr-doctor-home" aria-hidden="true" />` as last child. The notch span keeps `aria-hidden`. `ResultFooter.tsx`: an `svg.xr-btn-icon` before the text of each button. Texts "Replay decision" and "Human override" and the `onClick` calls do not change.
     - Tests in the same commit: `DoctorPanel.test.tsx` heading name becomes "Dr. Bones · Radiologist", home indicator and notch are `aria-hidden` (comment: visual-polish-2 R6.2 supersedes visual-polish R8). `ResultFooter.test.tsx`: an `svg[aria-hidden="true"]` precedes each button text; callbacks once per activation by mouse and keyboard. App tests: change only the queried name if they use "Dr. Bones" as a heading name.
@@ -245,7 +245,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): Dr. Bones · Radiologist title, home indicator and button icons`
     - _Requirements: 6.1, 6.2, 6.7, 6.8, 9.4, 13.8_
 
-  - [ ] 7.2 Teal bubbles, phone frame, thin bar, pill buttons
+  - [~] 7.2 Teal bubbles, phone frame, thin bar, pill buttons
     - Files: `styles/panels.css`, `styles/tokens.css`, `__tests__/contrast.test.ts`, `__tests__/components/ResultFooter.test.tsx`, `__tests__/properties/progress-bar.test.tsx` (new), `e2e/measure-1600.spec.ts`.
     - `tokens.css`: `--xr-bg-bubble #1b4f4a`, `--xr-text-bubble #f2fbfa` (8.81:1), `--xr-bg-phone-head #10242c` (14.29:1 with `#e8f4f8`).
     - `panels.css`: `.xr-doctor` frame 1 px `--xr-line-phone` with a softer glow; `.xr-doctor-notch` pill (28 % wide, 14 u high, `border-radius: 999px`, margin-top 8 u); `.xr-doctor-home` (centred, 34 % wide, 4 u high); avatar 44 u; `.xr-doctor .xr-bubble { border-radius: calc(16 * var(--xr-u)) }`; `.xr-progress { height: clamp(2px, calc(4 * var(--xr-u)), 6px); border: 0; border-radius: 999px; background: rgba(232, 244, 248, 0.14); box-shadow: none }`; fill with `--xr-bar-fill` and glow variables, red for partially approved and rejected; `.xr-footer-btn` pills with `min-height: max(44px, calc(40 * var(--xr-u)))`, `--xr-bg-pillbtn`, `--xr-text-pillbtn`, `--xr-line-pillbtn`, sans 500, focus ring as in task 3.2. `.xr-doctor-body` keeps `flex: 1 1 0; min-height: 0; overflow-y: auto`.
@@ -258,13 +258,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): phone panel with teal bubbles, thin bar and pill buttons (R6)`
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 9.3, 13.8_
 
-- [ ] 8. Checkpoint - control panel and phone
+- [~] 8. Checkpoint - control panel and phone
   - Follow the Checkpoint procedure with N = 8. The side-by-side image covers regions 5 (control panel) and 6 (phone panel) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 8 done". Do not start any further task until the user says "weiter". If the verdict says the meter face or the notch fillet is not close enough, the next task uses the fallbacks from the design (`meter-face.webp` at most 120,000 B, or an inline SVG notch path).
 
 - [ ] 9. Stage composition (ledger S2)
-  - [ ] 9.1 ECG starts at the left-most fracture
+  - [~] 9.1 ECG starts at the left-most fracture
     - Files: `model/ecg.ts`, `types.ts` (`EcgModel.startX`), `components/stage/EcgBand.tsx`, `styles/stage.css`, `styles/xray.css`, `__tests__/properties/ecg-start.test.ts` (new), `e2e/measure-1600.spec.ts`.
     - `ecgStartX(bones)` (minimum clamped x of fractured bones, `ECG_CENTER = 280` when none), `ecgPath(spikeXs, flatline, startX)` with the rules of the design (flat line `M{startX},30 L560,30`; beats only where `x - 14 >= startX`; spike path start `max(startX, x - 8)`). `EcgBand.tsx` sets `--xr-ecg-start` to `(startX / width) * 100%` and `viewBox = startX 0 (width - startX) height`, `preserveAspectRatio="none"`. `stage.css`: `.xr-ecg-band { left: var(--xr-ecg-start, 0%); right: 0; width: auto; height: calc(var(--xr-photo-w) * 60 / 560); aspect-ratio: auto; top: calc((50 - 3) / 62 * 100%) }` (the `top:` text stays literal for `css-constants.test.ts`; until task 9.3 defines `--xr-photo-w`, use the old width expression as the fallback inside `var()`). `xray.css`: `.xr-ecg-line` stroke 1.5 with a cyan `drop-shadow`; `.xr-ecg-spike` keeps `--xr-red` with a red `drop-shadow`.
     - **Property 1: ECG starts at the left-most fractured hotspot**
@@ -279,7 +279,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): start the ECG line at the left-most fractured hotspot (R3.6, R3.7)`
     - _Requirements: 3.6, 3.7, 3.8_
 
-  - [ ] 9.2 Soft glow hotspots
+  - [~] 9.2 Soft glow hotspots
     - Files: `styles/stage.css`, `__tests__/components/hotspot.test.tsx` (proof only), `e2e/measure-1600.spec.ts`.
     - `.xr-hs-ring`: `border: 0`, `border-radius: 50%`, radial-gradient from `--xr-hs-core` and `--xr-hs-mid`, `filter: blur(calc(1.5 * var(--xr-u, 1px)))`, no box-shadow, `pointer-events: none`. States set `--xr-hs-core` and `--xr-hs-mid` (cyan glow for passed and applied-no-change, `--xr-red-glow` with `inset: -30%` for fractured, dim for not-applicable). Merge the second `.xr-hs-ring--fractured` block at the end of `stage.css` into the first. `.xr-hs-check` keeps its role, size `max(10px, 11 u)`, opacity 0.8. `.xr-hotspot .xr-bone-btn:focus-visible` keeps the white outline plus dark outer shadow (R3.10).
     - Hotspots stay at least 24x24 px focusable. Class names `.xr-hs-ring--<state>` do not change, so `hotspot.test.tsx` stays unchanged.
@@ -288,7 +288,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): replace hotspot rings with soft red and cyan bone glows (R3.9 to R3.11)`
     - _Requirements: 3.9, 3.10, 3.11, 3.12, 13.6_
 
-  - [ ] 9.3 Larger skeleton anchored to the stage bottom
+  - [~] 9.3 Larger skeleton anchored to the stage bottom
     - Files: `styles/shell.css`, `styles/stage.css`, `__tests__/helpers/stageGeometry.ts` (new), `__tests__/properties/stage-layout.test.ts` (new), `__tests__/components/SkeletonPhoto.test.tsx`, `__tests__/css-constants.test.ts`, `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `.xr-shell-stagecell { overflow: hidden; container-type: size; --xr-photo-w: min(110cqw, 99.58cqh) }`. `stage.css`: `.xr-stage { place-items: end center }`, `.xr-photo { width: var(--xr-photo-w); aspect-ratio: 1208 / 1116; flex: none }`, preceded by a fallback line `width: 100%` for browsers without `cq` units. `anchors.ts`, `placeBones`, `toCropPercent`, `Stage.tsx` and `SkeletonPhoto.tsx` do not change, so anchors stay percentages of the crop box.
     - `stageGeometry.ts` mirrors the five layout formulas of the design (photo width and height, card top, rib top, card height budget, panel right edge, skeleton worst left edge).
@@ -301,7 +301,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): enlarge the skeleton and anchor it to the stage bottom (R3.5)`
     - _Requirements: 3.5, 10.4, 10.5, 5.11, 13.8_
 
-  - [ ] 9.4 Glass card at the top centre with compact rows
+  - [~] 9.4 Glass card at the top centre with compact rows
     - Files: `styles/shell.css`, `styles/panels.css`, `__tests__/components/GlassCard.layout.test.tsx`, `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `.xr-shell-stagecell .xr-glass { position: absolute; left: 24%; width: 52%; top: max(calc(2 * var(--xr-u)), calc(100% - var(--xr-photo-w) / 1.0824 * 1.06)); max-height: calc(160 * var(--xr-u)); z-index: 3 }`. Remove the old `left: 2%; bottom: 3%; width: 44%; max-height: 62%`. The flat view (`data-xray="false"`) sets `top: auto`.
     - `panels.css`: `.xr-glass .xr-field` becomes a two-column grid (30 % and the rest), `font-size: max(11px, calc(12 * var(--xr-u)))`, `line-height: 1.25`; `.xr-glass .xr-field dd` is a wrapping flex row with the confidence inline; `.xr-glass .xr-conf` 10 u; radius `calc(14 * var(--xr-u))`. Remove `.xr-glass .xr-field dt { flex: 0 0 32% }` and the `dd` `flex: 1 1 0` lines. Keep backdrop blur, `glass-cracks.webp` overlay and `overflow-y: auto` on `.xr-glass-body`. Row text, confidence text and badge text do not change.
@@ -312,7 +312,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): move the cracked glass card to the top centre above the ribs (R3.1 to R3.3)`
     - _Requirements: 3.1, 3.2, 3.3, 10.4, 13.1, 13.8_
 
-  - [ ] 9.5 Overrule stamp across the card diagonal
+  - [~] 9.5 Overrule stamp across the card diagonal
     - Files: `styles/panels.css`, `__tests__/components/GlassCard.layout.test.tsx`, `__tests__/properties/glass-document.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `.xr-glass-stamp`: `right: 9%; bottom: 14%; width: 62%; box-sizing: border-box; padding: calc(5 * var(--xr-u)) calc(10 * var(--xr-u)); border: 0; background: rgba(58, 15, 20, var(--xr-stamp-alpha)); transform: rotate(-9deg); text-align: center`. `.xr-glass[data-overruled="true"]` keeps `padding-bottom: calc(26 * var(--xr-u))`. The frame stays `stamp-frame.webp`. Text colour stays `--xr-text-stamp-live`.
     - Tests in the same commit: `GlassCard.layout.test.tsx` stamp block still asserts `position: absolute`, `right:`, `bottom:`, no `top:`; add a rotation between -20 and -5. `glass-document.test.tsx` rotation test (5 to 12 degrees) only changes its comment, since `-9deg` satisfies both (visual-polish-2 R3.4 supersedes visual-polish R7). The stamp pair in the contrast table is already present from task 1.3.
@@ -321,13 +321,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): stamp OVERRULED BY RULE diagonally across the glass card (R3.4)`
     - _Requirements: 1.3, 3.4, 13.1, 13.8_
 
-- [ ] 10. Checkpoint - stage composition
+- [~] 10. Checkpoint - stage composition
   - Follow the Checkpoint procedure with N = 10. The side-by-side image covers region 3 (card, skeleton, hotspots, ECG, stamp) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 10 done". Do not start any further task until the user says "weiter". The user checks the card position, the stamp, the skeleton size and the ECG start against the mockup. If the 91.5 % margin must grow, the design names the cap factor 1.1 as the lever (1.12 gives 93.2 %).
 
 - [ ] 11. Start screen, live form and app.css move (ledger S6)
-  - [ ] 11.1 Custom file button and steel live form
+  - [~] 11.1 Custom file button and steel live form
     - Files: `components/FormStrip.tsx` (add `FormStripFile`), `styles/form.css` (new), `styles/sheet.css`, `src/index.ts`, `apps/expense-auditor/src/ui/` (the file in which the live form is rendered), `__tests__/components/FormStrip.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `FormStripFile` with the DOM from the design: `.xr-file` wrapper, label span with an id, native `input[type="file"]` with `aria-labelledby` (visually hidden by the clip pattern, not `display: none`, stays in the tab order), and a `label.xr-file-button` (`aria-hidden`) with an icon and the file name or the placeholder. `.xr-file-input:focus-visible + .xr-file-button` draws the ring (3 px white outline plus dark outer shadow, at least 3:1). Props: `label`, `accept`, `placeholder`, `onFile`. The app swaps its `<input type="file">` for `FormStripFile` with label "Upload receipt photo" and placeholder "Choose a photo". The accessible name stays exactly "Upload receipt photo".
     - `form.css` (imported in `index.ts` next to `sheet.css`): move every `.xr-form-strip*` rule and `.xr-form-strip input|button` rule out of `sheet.css`. The strip is a steel surface with sheen and radius `18 u`, engraved legend and labels (`--xr-text-on-steel`, `--xr-engrave`), inputs and button with `appearance: none`, `font-family: var(--xr-font-sans)`, `min-height: max(44px, calc(36 * var(--xr-u)))`, pill button and file button, input fill `rgba(5, 9, 13, 0.55)` with inner shadow and `--xr-text`. `.xr-form-strip` stays `position: absolute; bottom: 14 u`, one wrapping row at 1280x720 within `max-width: 94 %`. Transitions (if any) get the `data-motion` pair or exact reduced-motion entry in `form.css`. Add the contrast pair for the input text on the darkest steel blend to Property 7.
@@ -337,7 +337,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): steel live form with a custom file button (R8.1 to R8.4)`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.6, 8.8, 9.2, 10.6_
 
-  - [ ] 11.2 Move app buttons, inputs, dialog, error and status styling into xray-ui
+  - [~] 11.2 Move app buttons, inputs, dialog, error and status styling into xray-ui
     - Files: `styles/form.css`, `styles/header.css`, `apps/expense-auditor/src/ui/OverrideDialog.tsx`, `ErrorPanel.tsx`, `DecisionView.tsx`, `StartScreen.tsx` (the files that use `.app-*` classes), `apps/expense-auditor/tests/guards/contrast.node.test.ts`.
     - `form.css` adds `.xr-btn`, `.xr-btn--primary`, `.xr-input`, `.xr-field-label`, `.xr-counter`, `.xr-field-error`, `.xr-dialog`, `.xr-error`, `.xr-status` with the visual parts of the old `.app-*` rules (colours, borders, radius, font tokens, focus ring). `header.css`: `.xr-header-status [role="status"]` takes over `.app-note` (muted, no box). Rule names follow the move table of the design.
     - App: class names change in the `.tsx` files (`app-button` to `xr-btn`, `app-button-primary` to `xr-btn xr-btn--primary`, `app-input` to `xr-input`, `app-error` to `xr-error`, `app-dialog` to `xr-dialog`, `app-status` to `xr-status`, `app-note` removed in favour of the header status rule, `app-field label` to `xr-field-label`, counter and field error likewise). Only class names change; no handler, request or flow changes (R8.7). Old `.app-*` rules stay in `app.css` until task 11.3 (dead, harmless).
@@ -347,7 +347,7 @@ Decisions recorded here:
     - Commit message: `refactor(expense-auditor): move button, input, dialog, error and status styling to xray-ui form.css (D2)`
     - _Requirements: 8.1, 8.4, 8.7, 9.2, 13.8_
 
-  - [ ] 11.3 Strip visual rules from app.css and add the app guard rule
+  - [~] 11.3 Strip visual rules from app.css and add the app guard rule
     - Files: `apps/expense-auditor/src/styles/app.css`, `apps/expense-auditor/src/App.tsx` (root class), `packages/xray-ui/src/styles/form.css`, `apps/expense-auditor/tests/guards/no-visual-in-app.node.test.ts`.
     - `app.css` keeps only layout of app-owned wrappers (`main` padding, `.app-sheets`, `.app-field` and `.app-actions` flex, `.app-sheets + .app-status` positions) and the `body` rule (its font becomes `var(--xr-font-sans)`). All colour, border, background, shadow and font declarations go away. The `:focus-visible` outline moves to `form.css` scoped to `.xr-shell, .xr-app`; the app root gets `className="xr-app"` (only the expense app sets it, so case-files is not affected).
     - Guard: add the rule `visual declaration in app.css` (pattern `(?:^|[;{\s])(?:border(?:-[a-z]+)*|box-shadow|text-shadow|font-family|font-weight|color|background(?:-[a-z]+)*)\s*:` on `.css`) with a small parser that strips the `body { ... }` block before matching. Add two sample entries to the existing bad and clean sample tests (a bad `app.css` with `color: red` outside `body`, a clean one with only `display: flex`).
@@ -356,13 +356,13 @@ Decisions recorded here:
     - Commit message: `refactor(expense-auditor): keep only layout in app.css and guard against visual rules (D2, A9)`
     - _Requirements: 8.1, 8.7, 9.7, 13.8_
 
-- [ ] 12. Checkpoint - start screen and live form
+- [~] 12. Checkpoint - start screen and live form
   - Follow the Checkpoint procedure with N = 12. The side-by-side image still compares the Signature screen with the mockup; `cp12-start-1600.png` is the start screen for the user's visual review of region 8.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 12 done". Do not start any further task until the user says "weiter".
 
 - [ ] 13. Sweeps, accessibility and cleanup (ledger S7)
-  - [ ] 13.1 Playwright sweeps at three viewports
+  - [~] 13.1 Playwright sweeps at three viewports
     - Files: `apps/expense-auditor/e2e/measure-1600.spec.ts`.
     - Boxed_Element sweep on the Signature screen at 1600x900: every element with a visible border, non-transparent background or image, or box-shadow that is not on the allow-list of the design (`.xr-glass`, `.xr-rulebox`, `.xr-doctor`, `.xr-bubble`, `.xr-footer-btn`, `.xr-header`, `.xr-header-pill`, `.xr-header-action`, `.xr-steel`, `.xr-cpanel`, `.xr-pmeter`, `.xr-doc-paper`, `.xr-doc-film` (the film pseudo-element belongs to `.xr-doc`), `.xr-hotspot .xr-bone-btn`, image elements) fails (R1.6). Findings are fixed in CSS in this task, not hidden by the allow-list.
     - Font sweep: no element outside the wordmark and headline has a computed `font-family` starting with "Cormorant SC"; none outside `.xr-doc` contains `monospace`, `Menlo` or `Consolas`; every other text element has `font-weight` 400 or 500 (R2.2 to R2.4).
@@ -372,7 +372,7 @@ Decisions recorded here:
     - Commit message: `test(expense-auditor): add boxed, font, focus and layout sweeps at three viewports`
     - _Requirements: 1.6, 2.2, 2.3, 2.4, 2.6, 9.1, 9.2, 9.4, 10.1, 10.2, 10.3, 10.4, 10.6, 11.4_
 
-  - [ ] 13.2 Dead-rule cleanup and guard proof
+  - [~] 13.2 Dead-rule cleanup and guard proof
     - Files: `packages/xray-ui/src/styles/*.css`, `packages/xray-ui/src/__tests__/assets.test.ts`, `__tests__/styles/` (if a check is added).
     - Grep each removed or replaced rule and delete leftovers: the old `.xr-pknob-label` plate and active outline, the old `.xr-hs-ring` border rules, the old round-gauge CSS for `.xr-pmeter`, `.xr-doc-paper` `paper.webp` url, old `.app-*` references in `packages/xray-ui`. The `xray.css` legacy section stays untouched because case-files and the old `XrayView` still use it.
     - Prove with the existing suites, without edits: `fonts.test.ts`, `domain-isolation.test.ts`, `guards/assets-guard.test.ts`, `source-hygiene.test.ts`, `guards/motion-guard.test.ts`, `a11y-roles.test.tsx`. Add one assertion to `assets.test.ts` that the Asset_Dir total equals the measured value and stays at most 1,500,000 B (expected 619,406 B), and that the failure message contains total and budget (R12.1, R12.6). Verify no `img` without positive integer `width` and `height` (existing Property 20 stays green; R12.5).
@@ -387,14 +387,14 @@ Decisions recorded here:
     - _Requirements: 2.1, 11.1, 12.1_
 
 - [ ] 15. Final: 1440x900 references and last review
-  - [ ] 15.1 Regenerate the two 1440x900 references and remove the skips
+  - [~] 15.1 Regenerate the two 1440x900 references and remove the skips
     - Files: `apps/expense-auditor/e2e/signature-case.spec.ts`, `e2e/start-screen.spec.ts`, `e2e/__screenshots__/start-screen.spec.ts/start-screen.png`, `e2e/__screenshots__/signature-case.spec.ts/signature-case.png`.
     - Remove the `test.skip` lines added in task 1.2. Regenerate on purpose with `pnpm --filter @bones/expense-auditor exec vite build` and `pnpm --filter @bones/expense-auditor exec playwright test --project=chromium start-screen.spec.ts signature-case.spec.ts --update-snapshots`. Look at both new images before committing. Only these two PNGs change; the 1600 PNGs and the PNGs of other specs do not.
     - Run `pnpm e2e` without the update flag: all specs pass, none skipped.
     - Commit message: `test(expense-auditor): regenerate 1440x900 references and remove skips (start-screen.png, signature-case.png)`
     - _Requirements: 11.5, 11.9_
 
-- [ ] 16. Final checkpoint
+- [~] 16. Final checkpoint
   - Follow the Checkpoint procedure with N = 16, with these additions before the commit of the review images:
     - The side-by-side image is also saved as `review/final-side-by-side.png` (R11.10).
     - Run `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e` (no skips, no update flag) and `git diff --exit-code <commit before this feature> -- packages/core`. No file under `packages/core` may differ.
@@ -415,7 +415,7 @@ Decisions recorded here:
 
 ### Review verdicts
 
-- Checkpoint 5: pending
+- Checkpoint 5: accepted with two changes (film fills the panel, paper 65-70 percent of film width, 24 px film margin, faint CSS X-ray texture; marks nearly invisible at rest, hug the text, full cyan on hover).
 - Checkpoint 8: pending
 - Checkpoint 10: pending
 - Checkpoint 12: pending

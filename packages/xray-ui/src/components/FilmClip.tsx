@@ -54,17 +54,23 @@ export function FilmClip({ trace, anatomy, source, activeRuleId, reducedMotion, 
               data-line={i}
               data-highlighted={here ? (highlighted ? "true" : "false") : undefined}
             >
-              {line}
-              {here?.map((m) => (
-                <span
-                  key={m.path}
-                  className="xr-mark-tag"
-                  data-path={m.path}
-                  data-highlighted={m.highlighted ? "true" : "false"}
-                >
-                  {markText(m)}
+              {here ? (
+                <span className="xr-mark-text">
+                  {line}
+                  {here.map((m) => (
+                    <span
+                      key={m.path}
+                      className="xr-mark-tag"
+                      data-path={m.path}
+                      data-highlighted={m.highlighted ? "true" : "false"}
+                    >
+                      {markText(m)}
+                    </span>
+                  ))}
                 </span>
-              ))}
+              ) : (
+                line
+              )}
               {here?.map((m) => scan(m.path))}
             </span>
           );
