@@ -82,8 +82,9 @@
 /* Control panel parts: X-ray toggle and amber lamp. */
 .xr-ptoggle {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: calc(8 * var(--xr-u, 1px));
+  gap: calc(4 * var(--xr-u, 1px));
   margin: 0;
   padding: 0;
   border: 0;
@@ -97,7 +98,7 @@
 }
 .xr-ptoggle-lever {
   display: block;
-  width: calc(64 * var(--xr-u, 1px));
+  width: calc(52 * var(--xr-u, 1px));
   aspect-ratio: 1 / 1;
 }
 .xr-ptoggle-img,
@@ -119,7 +120,7 @@
 }
 .xr-shell .xr-plamp {
   display: block;
-  width: calc(40 * var(--xr-u, 1px));
+  width: calc(26 * var(--xr-u, 1px));
   aspect-ratio: 1 / 1;
   filter: brightness(0.8);
   transition: filter 300ms ease;

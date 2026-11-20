@@ -43,12 +43,12 @@ export function ControlPanel({
         />
       ))}
       <div className="xr-cpanel-item xr-cpanel-item--knob">
-        <Knob versions={versions} value={value} onVersionChange={onVersionChange} />
         <span className="xr-cpanel-plaque">RULE VERSION</span>
+        <Knob versions={versions} value={value} onVersionChange={onVersionChange} />
       </div>
       <div className="xr-cpanel-item xr-cpanel-item--meter">
-        <Meter trace={trace} anatomy={anatomy} />
         <span className="xr-cpanel-plaque">AI READ CONFIDENCE</span>
+        <Meter trace={trace} anatomy={anatomy} />
       </div>
       <div className="xr-cpanel-item xr-cpanel-item--toggle">
         <Toggle xray={xray} onXrayChange={onXrayChange} />

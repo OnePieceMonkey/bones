@@ -35,6 +35,17 @@ describe("Toggle and Lamp", () => {
     expect(container.querySelector(".xr-ptoggle-lever")).toHaveAttribute("data-on", "false");
     expect(container.querySelector(".xr-plamp")).toHaveAttribute("data-lit", "false");
   });
+  it("puts the lamp before the lever in the switch and keeps role and state", () => {
+    render(<Toggle xray={true} onXrayChange={() => {}} />);
+    const sw = screen.getByRole("switch");
+    const kids = Array.from(sw.children);
+    expect(kids[0]).toHaveClass("xr-plamp");
+    expect(kids[1]).toHaveClass("xr-ptoggle-lever");
+    expect(sw).toHaveAttribute("aria-checked", "true");
+    expect(rule(".xr-ptoggle")).toContain("flex-direction: column");
+    expect(rule(".xr-ptoggle-lever")).toContain("calc(52 *");
+    expect(rule(".xr-shell .xr-plamp")).toContain("calc(26 *");
+  });
   it("styles the lever flip and lamp filters in CSS", () => {
     expect(rule('.xr-ptoggle-lever[data-on="true"] .xr-ptoggle-img')).toContain("scaleY(-1)");
     const on = rule('.xr-plamp[data-lit="true"]');

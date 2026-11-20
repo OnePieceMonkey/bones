@@ -42,6 +42,15 @@ describe("ControlPanel", () => {
     expect(plaques).toEqual(["RULE VERSION", "AI READ CONFIDENCE", "X-RAY"]);
   });
 
+  it("orders plaque and control per item: knob and meter label first, toggle label last", () => {
+    const { container } = setup();
+    const first = (cls: string) => container.querySelector(`.xr-cpanel-item--${cls}`)!.firstElementChild!;
+    const last = (cls: string) => container.querySelector(`.xr-cpanel-item--${cls}`)!.lastElementChild!;
+    expect(first("knob")).toHaveClass("xr-cpanel-plaque");
+    expect(first("meter")).toHaveClass("xr-cpanel-plaque");
+    expect(last("toggle")).toHaveClass("xr-cpanel-plaque");
+    expect(first("toggle")).toHaveAttribute("role", "switch");
+  });
   it("wires the knob and the toggle to the callbacks", () => {
     const { onVersionChange, onXrayChange } = setup();
     fireEvent.keyDown(screen.getByRole("slider", { name: "RULE VERSION" }), { key: "ArrowRight" });

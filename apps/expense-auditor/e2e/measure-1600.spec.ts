@@ -440,3 +440,39 @@ test("control panel is one rounded steel surface about 36 % of the lightbox wide
   expect(m.image).toContain("brushed-steel");
   expect(m.cols).toBe(4);
 });
+
+// visual-polish-2 task 6.4: amber lamp above the toggle lever (R5.8).
+test("the lamp sits above the lever and is amber when on", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const r = (sel: string) => document.querySelector(sel)!.getBoundingClientRect();
+    const lamp = r(".xr-ptoggle .xr-plamp");
+    const lever = r(".xr-ptoggle .xr-ptoggle-lever");
+    const sw = document.querySelector(".xr-ptoggle")!;
+    const label = r(".xr-cpanel-item--toggle .xr-cpanel-plaque");
+    return {
+      lampBottom: lamp.bottom,
+      leverTop: lever.top,
+      lampCx: lamp.left + lamp.width / 2,
+      leverCx: lever.left + lever.width / 2,
+      lampW: lamp.width,
+      leverW: lever.width,
+      leverBottom: lever.bottom,
+      labelTop: label.top,
+      lit: document.querySelector(".xr-ptoggle .xr-plamp")!.getAttribute("data-lit"),
+      filter: getComputedStyle(document.querySelector(".xr-ptoggle .xr-plamp")!).filter,
+      checked: sw.getAttribute("aria-checked"),
+      role: sw.getAttribute("role"),
+    };
+  });
+  expect(m.role).toBe("switch");
+  expect(m.checked).toBe("true");
+  expect(m.lit).toBe("true");
+  expect(m.lampBottom).toBeLessThanOrEqual(m.leverTop + 1);
+  expect(Math.abs(m.lampCx - m.leverCx)).toBeLessThanOrEqual(2);
+  expect(m.lampW).toBeGreaterThan(0);
+  expect(m.lampW).toBeLessThan(m.leverW);
+  expect(m.labelTop).toBeGreaterThanOrEqual(m.leverBottom);
+  expect(m.filter).toContain("drop-shadow");
+  expect(m.filter).toMatch(/rgba?\(\s*2[0-9]{2},\s*1[0-9]{2},\s*\d+/); // amber glow colour
+});

@@ -8,7 +8,7 @@ export interface ToggleProps {
   className?: string;
 }
 const SIZE = 256;
-/** X-ray switch: a chrome lever (flipped when on) and an amber lamp. */
+/** X-ray switch: an amber lamp above a chrome lever (flipped when on). */
 export function Toggle({ xray, onXrayChange, className }: ToggleProps) {
   return (
     <button
@@ -19,10 +19,10 @@ export function Toggle({ xray, onXrayChange, className }: ToggleProps) {
       className={cx("xr-ptoggle", className)}
       onClick={() => onXrayChange(!xray)}
     >
+      <Lamp lit={xray} />
       <span className="xr-ptoggle-lever" data-on={xray ? "true" : "false"} aria-hidden="true">
         <AssetImage className="xr-ptoggle-img" src={toggleUrl} width={SIZE} height={SIZE} />
       </span>
-      <Lamp lit={xray} />
     </button>
   );
 }
