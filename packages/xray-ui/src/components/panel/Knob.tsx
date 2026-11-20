@@ -2,6 +2,7 @@ import type { KeyboardEvent } from "react";
 import { knobUrl } from "../../assets";
 import { cx } from "../../cx";
 import { knobAngle, stepVersion } from "../../model/gauge";
+import { knobLabelPositions, knobTicks } from "../../model/knobLabels";
 import type { CommonProps } from "../../types";
 import { AssetImage } from "../shell/AssetImage";
 
@@ -11,17 +12,6 @@ export interface KnobProps extends CommonProps {
   onVersionChange: (version: string) => void;
 }
 
-const CENTER = 50;
-const LABEL_RADIUS = 46;
-
-/** Point on a circle around the knob centre, in percent; 0 degrees points up. */
-function polar(angleDeg: number, radius: number): { x: number; y: number } {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: CENTER + radius * Math.sin(rad), y: CENTER - radius * Math.cos(rad) };
-}
-
-const r1 = (v: number): number => Math.round(v * 10) / 10;
-
 /**
  * Rule version knob: a bakelite image turned to the selected detent, with the
  * version labels as real text on a circle. One tab stop (the slider); each
@@ -30,6 +20,7 @@ const r1 = (v: number): number => Math.round(v * 10) / 10;
 export function Knob({ versions, value, onVersionChange, className }: KnobProps) {
   const count = versions.length;
   const index = Math.max(0, versions.indexOf(value));
+  const labels = knobLabelPositions(count, index);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const next = stepVersion(versions, value, e.key);
@@ -58,17 +49,28 @@ export function Knob({ versions, value, onVersionChange, className }: KnobProps)
       >
         <AssetImage className="xr-pknob-img" src={knobUrl} width={512} height={512} />
       </div>
-      {versions.map((version, i) => {
-        const p = polar(knobAngle(i, count), LABEL_RADIUS);
+      <svg
+        className="xr-pknob-ticks"
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {knobTicks(count).map((t, i) => (
+          <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} />
+        ))}
+      </svg>
+      {labels.map((p, i) => {
+        const version = versions[i] as string;
         return (
           <button
             key={version}
+            data-index={i}
             type="button"
             className="xr-pknob-label"
-            data-active={i === index}
+            data-active={p.active}
             tabIndex={-1}
             aria-hidden="true"
-            style={{ left: `${r1(p.x)}%`, top: `${r1(p.y)}%` }}
+            style={{ left: `${p.x}%`, top: `${p.y}%` }}
             onClick={() => onVersionChange(version)}
           >
             {version}

@@ -96,6 +96,8 @@ export {
 export { SPLINTER_COUNT, CRACK_SEGMENTS, hashString, nextRandom, splinters, crackPath } from "./model/hash";
 export { gaugeValue, buildGaugeModel } from "./model/confidence";
 export { SWEEP, needleAngle, knobAngle, stepVersion } from "./model/gauge";
+export { KNOB, knobLabelPositions, knobTicks } from "./model/knobLabels";
+export type { KnobLabel, KnobTick } from "./model/knobLabels";
 export { TEMPLATES, MAX_EVIDENCE_LINES, buildChatMessages } from "./model/chat";
 export { defaultFormat, safeFormat, resultLabel, summariseValue } from "./model/format";
 export type { Formatter } from "./model/format";
