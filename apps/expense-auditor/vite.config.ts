@@ -2,7 +2,7 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { Readable } from "node:stream";
+import { toWebRequest } from "./dev/toWebRequest";
 
 const appRoot = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(appRoot, "../..");
@@ -20,19 +20,7 @@ function devExtractApi(mode: string): Plugin {
       server.middlewares.use("/api/extract", async (req, res) => {
         try {
           const mod = await server.ssrLoadModule("/api/extract.ts");
-          const init: RequestInit & { duplex?: "half" } = {
-            method: req.method ?? "GET",
-            headers: req.headers as HeadersInit,
-          };
-          if (req.method !== "GET" && req.method !== "HEAD") {
-            init.body = Readable.toWeb(req) as unknown as BodyInit;
-            init.duplex = "half";
-          }
-          const forwarded = new Headers(init.headers);
-          forwarded.set("x-forwarded-for", req.socket.remoteAddress ?? "127.0.0.1");
-          const response: Response = await mod.default.fetch(
-            new Request(new URL(req.url ?? "/", "http://localhost"), { ...init, headers: forwarded }),
-          );
+          const response: Response = await mod.default.fetch(toWebRequest(req));
           res.statusCode = response.status;
           response.headers.forEach((v, k) => res.setHeader(k, v));
           res.end(Buffer.from(await response.arrayBuffer()));
