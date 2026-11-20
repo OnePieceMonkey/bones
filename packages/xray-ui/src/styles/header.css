@@ -29,7 +29,7 @@
 }
 .xr-header-status > * { margin: 0; min-width: 0; }
 .xr-wordmark {
-  font-family: "Cormorant SC", Georgia, "Times New Roman", serif;
+  font-family: var(--xr-font-serif);
   font-weight: 700;
   font-size: max(18px, calc(30 * var(--xr-u, 1px)));
   letter-spacing: 0.08em;

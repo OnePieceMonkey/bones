@@ -48,7 +48,8 @@
 .xr-doc .xr-clip--left { left: calc(8 * var(--xr-u, 1px)); right: auto; }
 .xr-doc .xr-clip--right { right: calc(8 * var(--xr-u, 1px)); left: auto; }
 .xr-doc .xr-film-text {
-  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-family: var(--xr-font-mono);
+  letter-spacing: 0.02em;
   font-size: max(11px, calc(12 * var(--xr-u, 1px)));
   line-height: calc(18 * var(--xr-u, 1px));
   white-space: pre-wrap;
@@ -197,7 +198,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 500;
 }
 .xr-progress {
   flex: none;
@@ -280,6 +281,7 @@
 }
 .xr-doctor-title {
   margin: 0;
+  font-weight: 500;
   font-size: max(11px, calc(16 * var(--xr-u, 1px)));
   letter-spacing: 0.04em;
 }

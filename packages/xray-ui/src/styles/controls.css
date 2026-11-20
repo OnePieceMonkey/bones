@@ -34,7 +34,7 @@
   background: none;
   color: var(--xr-text-on-steel);
   text-shadow: var(--xr-engrave);
-  font: 500 max(11px, calc(12 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
+  font: 500 max(11px, calc(12 * var(--xr-u, 1px))) / 1.2 var(--xr-font-sans);
   cursor: pointer;
 }
 .xr-pknob-label[data-active="true"] {
@@ -170,7 +170,7 @@
   background: none;
   color: var(--xr-text-on-steel);
   text-shadow: var(--xr-engrave);
-  font: 500 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
+  font: 500 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 var(--xr-font-sans);
   letter-spacing: 0.04em;
   white-space: nowrap;
 }

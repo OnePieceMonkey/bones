@@ -48,7 +48,7 @@
   right: 8%;
   overflow: hidden;
   white-space: pre;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--xr-font-mono);
   font-size: max(7px, calc(9 * var(--xr-u, 1px)));
   line-height: 1;
   color: rgba(30, 24, 14, 0.7);
@@ -89,7 +89,7 @@
 }
 .xr-start-title {
   margin: 0;
-  font-family: "Cormorant SC", Georgia, "Times New Roman", serif;
+  font-family: var(--xr-font-serif);
   font-weight: 700;
   font-size: max(28px, calc(52 * var(--xr-u, 1px)));
   letter-spacing: 0.06em;
@@ -113,7 +113,7 @@
 }
 .xr-sheet-title {
   font-size: max(13px, calc(18 * var(--xr-u, 1px)));
-  font-weight: 700;
+  font-weight: 500;
 }
 .xr-sheet-desc {
   display: block;
@@ -183,7 +183,7 @@
   border-radius: 3px;
 }
 .xr-form-strip button {
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
 }
 .xr-form-strip button:disabled {

@@ -1,5 +1,6 @@
 :root,
 .xr-root {
+  font-family: var(--xr-font-sans);
   --xr-bg-deep: #05090d;        /* lightbox viewing area */
   --xr-bg-panel: #0b1620;       /* chat, answer card, strip background */
   --xr-bg-row: #132636;         /* answer card rows, opaque */

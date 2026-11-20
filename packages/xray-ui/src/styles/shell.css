@@ -10,6 +10,7 @@ html:has(.xr-shell) body {
   background: var(--xr-bg-deep, #05090d);
 }
 .xr-shell {
+  font-family: var(--xr-font-sans);
   --xr-u: max(1px, min(100vw / 1280, 100vh / 720));
   position: absolute;
   inset: 0;

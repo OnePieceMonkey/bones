@@ -226,7 +226,7 @@
   opacity: 1;
 }
 .xr-rulebox p { margin: 0 0 4px; }
-.xr-rb-head { font-weight: 700; }
+.xr-rb-head { font-weight: 500; }
 .xr-rb-state { color: var(--xr-text-rulebox); }
 .xr-rb-evidence { margin: 0; }
 .xr-rb-row { display: flex; gap: calc(8 * var(--xr-u, 1px)); }
