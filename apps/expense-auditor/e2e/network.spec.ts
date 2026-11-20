@@ -32,6 +32,8 @@ test("all requests stay on 127.0.0.1:4173, only the status GET to /api/, no font
     apiRequests.filter((r) => !(r.method === "GET" && r.path === "/api/extract")),
     "requests to /api/ other than the status GET",
   ).toEqual([]);
-  expect(apiRequests.filter((r) => r.method === "GET").length, "status GETs").toBeLessThanOrEqual(1);
+  expect(apiRequests.filter((r) => r.method === "GET").length, "status GETs").toBeLessThanOrEqual(2);
+  // Two, not one: preview has no /api, so the status GET returns the SPA html (ok, bad body)
+  // and fetchLiveStatus retries once by design.
   expect(urls.filter((u) => FONT_HOSTS.test(new URL(u).hostname)), "requests to a font host").toEqual([]);
 });
