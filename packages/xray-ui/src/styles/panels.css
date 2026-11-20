@@ -6,8 +6,9 @@
   min-height: 0;
   min-width: 0;
   display: grid;
-  --xr-doc-top: calc(30 * var(--xr-u, 1px));
-  padding: var(--xr-doc-top) 0 max(36px, calc(36 * var(--xr-u, 1px)));
+  --xr-doc-top: calc(22 * var(--xr-u, 1px));
+  /* Bottom film margin: 24 px plus room for the paper tilt, so the whole text fits above it (R4.3). */
+  padding: var(--xr-doc-top) 0 max(30px, calc(30 * var(--xr-u, 1px)));
   box-sizing: border-box;
 }
 /* Film backdrop: blue-grey sheet that fills the whole panel (R4.3). Faint X-ray texture from CSS gradients only:
@@ -41,7 +42,7 @@
   width: 67%;
   justify-self: center;
   display: grid;
-  padding: calc(26 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(20 * var(--xr-u, 1px)) calc(8 * var(--xr-u, 1px)) calc(8 * var(--xr-u, 1px));
   box-sizing: border-box;
   background:
     linear-gradient(115deg, transparent 38%, rgba(0, 0, 0, 0.05) 39%, transparent 41%),
@@ -96,8 +97,8 @@
 .xr-doc .xr-film-text {
   font-family: var(--xr-font-mono);
   letter-spacing: 0.02em;
-  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
-  line-height: calc(18 * var(--xr-u, 1px));
+  font-size: max(11px, calc(10.5 * var(--xr-u, 1px)));
+  line-height: calc(15 * var(--xr-u, 1px));
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   color: var(--xr-text-paper-doc);
@@ -105,7 +106,7 @@
 .xr-doc .xr-film-line {
   display: block;
   position: relative;
-  min-height: calc(18 * var(--xr-u, 1px));
+  min-height: calc(15 * var(--xr-u, 1px));
 }
 .xr-doc .xr-film-image-wrap { position: relative; }
 

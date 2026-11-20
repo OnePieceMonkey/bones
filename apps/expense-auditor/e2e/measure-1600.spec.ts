@@ -362,3 +362,60 @@ test("scan line is red, thin, centred on the total row and spans the paper (R4.9
   expect(m.w).toBeGreaterThanOrEqual(0.9 * m.paper);
   expect(m.anim).toBe("none");
 });
+
+// checkpoint 5 verdict: the whole receipt, including the TOTAL row with its red scan line, is visible at rest without
+// scrolling inside the paper (1600x900, 1440x900).
+for (const size of SIZES.slice(0, 2)) {
+  test(`scan line is fully visible on the paper and the paper does not scroll at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const box = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+      };
+      const scroll = document.querySelector(".xr-doc-scroll") as HTMLElement;
+      const scan = document.querySelector(".xr-doc .xr-scan")!;
+      return {
+        scan: box(scan),
+        visible: box(scroll),
+        vw: window.innerWidth,
+        vh: window.innerHeight,
+        scrollHeight: scroll.scrollHeight,
+        clientHeight: scroll.clientHeight,
+        scrollTop: scroll.scrollTop,
+        pageScroll: document.documentElement.scrollTop + document.body.scrollTop,
+        fontPx: parseFloat(getComputedStyle(document.querySelector(".xr-doc .xr-film-text")!).fontSize),
+      };
+    });
+    expect(m.scrollHeight, "paper content height").toBeLessThanOrEqual(m.clientHeight);
+    expect(m.scrollTop).toBe(0);
+    expect(m.pageScroll).toBe(0);
+    expect(m.scan.left, "scan inside paper").toBeGreaterThanOrEqual(m.visible.left - 1);
+    expect(m.scan.right).toBeLessThanOrEqual(m.visible.right + 1);
+    expect(m.scan.top).toBeGreaterThanOrEqual(m.visible.top);
+    expect(m.scan.bottom).toBeLessThanOrEqual(m.visible.bottom);
+    expect(m.scan.left).toBeGreaterThanOrEqual(0);
+    expect(m.scan.right).toBeLessThanOrEqual(m.vw);
+    expect(m.scan.top).toBeGreaterThanOrEqual(0);
+    expect(m.scan.bottom).toBeLessThanOrEqual(m.vh);
+    expect(m.fontPx).toBeGreaterThanOrEqual(11);
+  });
+}
+test("at 1280x720 the paper either fits or shows the scan line on first render", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/");
+  await page.getByRole("button", { name: /signature case/i }).click();
+  await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+  const m = await page.evaluate(() => {
+    const scroll = document.querySelector(".xr-doc-scroll") as HTMLElement;
+    const s = document.querySelector(".xr-doc .xr-scan")!.getBoundingClientRect();
+    const v = scroll.getBoundingClientRect();
+    return { top: s.top - v.top, bottom: v.bottom - s.bottom, pageScroll: document.documentElement.scrollTop };
+  });
+  expect(m.top).toBeGreaterThanOrEqual(0);
+  expect(m.bottom).toBeGreaterThanOrEqual(0);
+  expect(m.pageScroll).toBe(0);
+});
