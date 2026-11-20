@@ -52,6 +52,32 @@
   --xr-text-stamp-live: #ffd0d0;
   --xr-bg-stamp-live: #3a0f14;
 
+  /* visual-polish-2: new tokens, not read by any rule yet (no look change) */
+  --xr-font-serif: "Cormorant SC", Georgia, "Times New Roman", serif;
+  --xr-font-sans: ui-sans-serif, "Helvetica Neue", Arial, sans-serif;
+  --xr-font-mono: ui-monospace, Menlo, Consolas, monospace;
+  --xr-text-on-steel-active: #000000;
+  --xr-steel-sheen: rgba(255, 255, 255, 0.14);
+  --xr-engrave: 0 1px 0 rgba(255, 255, 255, 0.55), 0 -1px 0 rgba(0, 0, 0, 0.25);
+  --xr-engrave-active: 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 6px rgba(255, 255, 255, 0.45);
+  --xr-bg-film: #2b4a5c;
+  --xr-bg-film-deep: #1b3342;
+  --xr-line-phone: rgba(61, 232, 255, 0.35);
+  --xr-bg-pillbtn: #12303a;
+  --xr-text-pillbtn: #e8f4f8;
+  --xr-line-pillbtn: rgba(61, 232, 255, 0.4);
+  --xr-bg-header-glass: rgba(11, 22, 32, 0.72);
+  --xr-line-header: rgba(61, 232, 255, 0.28);
+  --xr-bg-pill: rgba(11, 22, 32, 0.30);
+  --xr-text-pill: #a8f2ff;
+  --xr-line-pill: rgba(61, 232, 255, 0.55);
+  --xr-stamp-alpha: 0.82;       /* plain number, read by the contrast test */
+  --xr-meter-face-a: #f3e7c6;
+  --xr-meter-face-b: #d8c18c;
+  --xr-text-on-meter: #2a2118;
+  --xr-meter-zone: #b3261e;
+  --xr-meter-bezel: #2b3338;
+
   --xr-space-1: 4px; --xr-space-2: 8px; --xr-space-3: 16px; --xr-space-4: 24px;
   --xr-radius: 6px;
 }

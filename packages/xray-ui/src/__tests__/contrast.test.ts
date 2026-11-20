@@ -71,6 +71,24 @@ async function extremePixels(file: string, opaqueOnly = false): Promise<{ light:
 
 const assets = join(here, "..", "assets");
 
+/** Average, lightest and darkest pixel of brushed-steel.webp. */
+async function scanSteel(): Promise<{ avg: Rgb; light: Rgb; dark: Rgb }> {
+  const file = join(assets, "brushed-steel.webp");
+  const { light, dark } = await extremePixels(file);
+  const { data, info } = await sharp(file).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const n = info.width * info.height;
+  const sum = [0, 0, 0];
+  for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) sum[c]! += data[i * info.channels + c]!;
+  return { avg: sum.map((s) => s / n) as unknown as Rgb, light, dark };
+}
+
+/** Value of an rgba(r, g, b, a) token as tint and alpha. */
+function rgbaOf(name: string): { tint: Rgb; alpha: number } {
+  const m = new RegExp(`${name}:\\s*rgba\\(\\s*(\\d+),\\s*(\\d+),\\s*(\\d+),\\s*([0-9.]+)\\s*\\)`).exec(css);
+  if (!m) throw new Error(`missing token ${name}`);
+  return { tint: [Number(m[1]), Number(m[2]), Number(m[3])], alpha: Number(m[4]) };
+}
+
 describe("token contrast", () => {
   it("keeps the 18 original pairs", () => {
     expect(TOKEN_PAIRS).toHaveLength(18);
@@ -116,9 +134,10 @@ const FOCUS_PAIRS: { name: string; fg: string; bg: string }[] = [
 // Count of text pairs: 18 original + 9 token pairs above + 2 glass + 1 paper image + 2 start subline = 32.
 describe("new surface contrast", () => {
   // The old exact count of 18 became "at least 29" because 11 new surfaces were added.
-  it("has at least 29 text pairs", async () => {
-    const total = TOKEN_PAIRS.length + NEW_PAIRS.length + 2 /* glass */ + 1 /* paper.webp */;
-    expect(total).toBeGreaterThanOrEqual(29);
+  it("has at least 35 text pairs", async () => {
+    // visual-polish-2 task 1.3 adds 6 text/graphic pairs (pill, stamp, pillbtn, header glass, meter text, meter zone): 29 + 6 = 35.
+    const total = TOKEN_PAIRS.length + NEW_PAIRS.length + 2 /* glass */ + 1 /* paper.webp */ + 6 /* NEW_PAIRS_V2 */;
+    expect(total).toBeGreaterThanOrEqual(35);
   });
 
   it.each(NEW_PAIRS.map((p) => [p.name, p] as const))("%s >= 4.5", (_n, p) => {
@@ -158,6 +177,43 @@ describe("new surface contrast", () => {
   it.each(FOCUS_PAIRS.map((p) => [p.name, p] as const))("%s >= 3", (_n, p) => {
     const ratio = contrastRatio(need(p.fg), need(p.bg));
     expect(ratio, failMessage(p.name, ratio, 3)).toBeGreaterThanOrEqual(3);
+  });
+
+  // Feature: visual-polish-2, Property 7: Every text and focus pair meets its ratio
+  // **Validates: Requirements 1.5, 4.1, 5.10, 6.3, 7.5, 9.3**
+  it("every visual-polish-2 text and focus pair meets its ratio", async () => {
+    const film = await extremePixels(join(assets, "film.webp"));
+    const steel = await scanSteel();
+    const sheen = rgbaOf("--xr-steel-sheen");
+    const overSheen = (px: Rgb) => blend(sheen.tint, sheen.alpha, px);
+
+    const pill = rgbaOf("--xr-bg-pill");
+    const glass = rgbaOf("--xr-bg-header-glass");
+    const stampTint = hexToRgb(need("--xr-bg-stamp-live"));
+    const stampAlpha = numberOf("--xr-stamp-alpha")!;
+    const deep = hexToRgb(need("--xr-bg-deep"));
+    const meterFace = "#e9dcb6";
+
+    const pairs: { name: string; fg: string; bg: string; min: number }[] = [
+      { name: "pill text on pill over lightest film", fg: need("--xr-text-pill"), bg: rgbToHex(blend(pill.tint, pill.alpha, film.light)), min: 4.5 },
+      { name: "stamp text on stamp over lightest film", fg: need("--xr-text-stamp-live"), bg: rgbToHex(blend(stampTint, stampAlpha, film.light)), min: 4.5 },
+      { name: "pillbtn", fg: need("--xr-text-pillbtn"), bg: need("--xr-bg-pillbtn"), min: 4.5 },
+      { name: "header text on glass over deep", fg: need("--xr-text-header"), bg: rgbToHex(blend(glass.tint, glass.alpha, deep)), min: 4.5 },
+      { name: "meter text on face", fg: need("--xr-text-on-meter"), bg: meterFace, min: 4.5 },
+      { name: "meter zone on face (graphic)", fg: need("--xr-meter-zone"), bg: meterFace, min: 3 },
+      // FOCUS_PAIRS_V2
+      { name: "focus-contrast on lightest steel after sheen", fg: need("--xr-focus-contrast"), bg: rgbToHex(overSheen(steel.light)), min: 3 },
+      { name: "focus on darkest steel after sheen", fg: need("--xr-focus"), bg: rgbToHex(overSheen(steel.dark)), min: 3 },
+    ];
+    for (const p of pairs) {
+      const ratio = contrastRatio(p.fg, p.bg);
+      expect(ratio, failMessage(p.name, ratio, p.min)).toBeGreaterThanOrEqual(p.min);
+    }
+    // Property: for any pair in the list the ratio holds (list is fixed, order must not matter).
+    fc.assert(
+      fc.property(fc.constantFrom(...pairs), (p) => contrastRatio(p.fg, p.bg) >= p.min),
+      { numRuns: 100 },
+    );
   });
 
   it("reports a missing token and a low ratio in the documented format", () => {
