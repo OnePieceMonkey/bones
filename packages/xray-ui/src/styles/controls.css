@@ -29,16 +29,17 @@
   position: absolute;
   transform: translate(-50%, -50%);
   margin: 0;
-  padding: 0 calc(3 * var(--xr-u, 1px));
+  padding: 0;
   border: 0;
-  background: var(--xr-bg-metal-light);
-  color: var(--xr-text-on-metal);
-  font: 700 max(11px, calc(12 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
-  border-radius: calc(3 * var(--xr-u, 1px));
+  background: none;
+  color: var(--xr-text-on-steel);
+  text-shadow: var(--xr-engrave);
+  font: 500 max(11px, calc(12 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
   cursor: pointer;
 }
 .xr-pknob-label[data-active="true"] {
-  outline: 1px solid var(--xr-text-on-metal);
+  color: var(--xr-text-on-steel-active);
+  text-shadow: var(--xr-engrave-active);
 }
 
 /* Control panel parts: AI read confidence meter. */
@@ -164,11 +165,12 @@
   min-width: 0;
 }
 .xr-cpanel-plaque {
-  padding: calc(2 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
-  background: var(--xr-bg-metal-light);
-  color: var(--xr-text-on-metal);
-  font: 700 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--xr-text-on-steel);
+  text-shadow: var(--xr-engrave);
+  font: 500 max(10px, calc(11 * var(--xr-u, 1px))) / 1.2 ui-monospace, monospace;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  border-radius: calc(2 * var(--xr-u, 1px));
 }

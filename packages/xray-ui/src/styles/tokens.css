@@ -33,7 +33,7 @@
   --xr-glass-alpha: 0.55;       /* plain number, read by the contrast test */
   --xr-glass-tint-rgba: rgba(11, 22, 32, 0.55);
   --xr-text-on-glass: #e8f4f8;
-  --xr-text-on-steel: #14202a;  /* on --xr-bg-metal-light plaques */
+  --xr-text-on-steel: #0b1218;  /* engraved on brushed steel (4.70:1 on the steel average) */
   --xr-text-header: #e8f4f8;
   --xr-bg-header: #0b1620;
   --xr-text-on-sheet: #e8f4f8;

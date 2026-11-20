@@ -165,7 +165,6 @@
   margin: 0;
   padding: calc(6 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px));
   font-size: max(11px, calc(12 * var(--xr-u, 1px)));
-  border: 2px dashed var(--xr-text-stamp-live);
   background: var(--xr-bg-stamp-live);
   color: var(--xr-text-stamp-live);
   transform: rotate(-8deg);
@@ -184,6 +183,8 @@
 .xr-glass-stamp .xr-stamp-bones { position: relative; z-index: 1; }
 
 /* Result footer: result line, progress bar, actions */
+/* visual-polish-2 R1.4: the footer result block draws no border or outline in any result state. */
+.xr-doctor .xr-result.xr-result-footer { border: 0; background: transparent; box-shadow: none; outline: 0; }
 .xr-result-footer {
   display: flex;
   flex-direction: column;
