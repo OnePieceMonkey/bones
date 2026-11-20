@@ -156,13 +156,13 @@ describe("new surface contrast", () => {
     }
   });
 
-  it("document text meets 4.5 on the token and on the darkest opaque paper pixel", async () => {
-    const { dark } = await extremePixels(join(assets, "paper.webp"), true);
+  it("document text meets 4.5 on the paper token and on the token under creases and curl", () => {
+    // visual-polish-2 R4.1 supersedes visual-polish R6: the paper is a token colour, no longer paper.webp.
+    // Creases and curl darken the paper by at most 12 percent (alpha 0.16 is only in the corner, outside the text).
     const fg = need("--xr-text-paper-doc");
-    const ratio = Math.min(
-      contrastRatio(fg, need("--xr-bg-paper-doc")),
-      contrastRatio(fg, rgbToHex(dark)),
-    );
+    const bg = hexToRgb(need("--xr-bg-paper-doc"));
+    const darkened = rgbToHex(bg.map((c) => c * 0.88) as unknown as Rgb);
+    const ratio = Math.min(contrastRatio(fg, need("--xr-bg-paper-doc")), contrastRatio(fg, darkened));
     expect(ratio, failMessage("paper document", ratio, 4.5)).toBeGreaterThanOrEqual(4.5);
   });
 

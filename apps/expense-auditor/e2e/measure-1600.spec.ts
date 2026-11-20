@@ -190,3 +190,78 @@ test("header layout holds when the wordmark font fails to load (R2.7)", async ({
     for (let k = 0; k < 4; k += 1) expect(Math.abs(withFont[i]![k]! - without[i]![k]!), `box ${i}/${k}`).toBeLessThanOrEqual(2);
   }
 });
+
+// visual-polish-2 task 4.1: white tilted paper on blue-grey film (R4.1 to R4.4, R4.11).
+test("paper is white, tilted, on a larger blue-grey film with two clips (R4.1 to R4.4)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const doc = document.querySelector(".xr-doc")!;
+    const paper = document.querySelector(".xr-doc-paper")!;
+    const u = Math.max(1, Math.min(window.innerWidth / 1280, window.innerHeight / 720));
+    const d = doc.getBoundingClientRect();
+    const film = { left: d.left + 2 * u, right: d.right - 2 * u, top: d.top + 2 * u, bottom: d.bottom - 2 * u };
+    const ps = getComputedStyle(paper);
+    const mat = new DOMMatrixReadOnly(ps.transform);
+    const angle = (Math.atan2(mat.b, mat.a) * 180) / Math.PI;
+    const filmBg = getComputedStyle(doc, "::before").backgroundImage;
+    const rgbs = [...filmBg.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)].map((x) => [Number(x[1]), Number(x[2]), Number(x[3])]);
+    const avg = [0, 1, 2].map((i) => rgbs.reduce((s, c) => s + c[i]!, 0) / rgbs.length);
+    // Untransformed paper box: offset size around the same centre.
+    const pr = paper.getBoundingClientRect();
+    const cx = pr.left + pr.width / 2;
+    const cy = pr.top + pr.height / 2;
+    const w = (paper as HTMLElement).offsetWidth;
+    const h = (paper as HTMLElement).offsetHeight;
+    const clips = [...document.querySelectorAll(".xr-doc .xr-clip")].map((c) => {
+      const r = c.getBoundingClientRect();
+      return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    });
+    return {
+      bg: ps.backgroundColor,
+      angle,
+      film,
+      paper: { left: cx - w / 2, right: cx + w / 2, top: cy - h / 2, bottom: cy + h / 2 },
+      avg,
+      clips,
+    };
+  });
+  const channels = (m.bg.match(/\d+/g) ?? []).slice(0, 3).map(Number);
+  for (const c of channels) expect(c, `paper colour ${m.bg}`).toBeGreaterThanOrEqual(235);
+  expect(Math.abs(m.angle)).toBeGreaterThanOrEqual(1);
+  expect(Math.abs(m.angle)).toBeLessThanOrEqual(4);
+  expect(m.avg[2]! - m.avg[0]!, "film blue minus red").toBeGreaterThanOrEqual(10);
+  expect(m.paper.left - m.film.left, "film margin left").toBeGreaterThanOrEqual(8);
+  expect(m.film.right - m.paper.right, "film margin right").toBeGreaterThanOrEqual(8);
+  expect(m.paper.top - m.film.top, "film margin top").toBeGreaterThanOrEqual(8);
+  expect(m.film.bottom - m.paper.bottom, "film margin bottom").toBeGreaterThanOrEqual(8);
+  expect(m.clips).toHaveLength(2);
+  for (const c of m.clips) {
+    expect(c.left, "clip inside film").toBeGreaterThanOrEqual(m.film.left);
+    expect(c.right, "clip inside film").toBeLessThanOrEqual(m.film.right);
+    expect(c.top, "clip touches film top edge").toBeLessThanOrEqual(m.film.top + 6); // 2 deg paper tilt moves the clip box a few px
+    expect(c.bottom, "clip touches film top edge").toBeGreaterThan(m.film.top);
+  }
+});
+for (const size of SIZES) {
+  test(`document panel stays inside the lightbox, off stage and controls at ${size.width}x${size.height} (R4.11)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const r = await page.evaluate(() => {
+      const box = (s: string) => {
+        const b = document.querySelector(s)!.getBoundingClientRect();
+        return { left: b.left, right: b.right, top: b.top, bottom: b.bottom };
+      };
+      return { doc: box(".xr-doc"), box: box(".xr-viewport"), stage: box(".xr-shell-stagecell"), ctrl: box(".xr-cpanel") };
+    });
+    const overlap = (a: typeof r.doc, b: typeof r.doc) =>
+      a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+    expect(r.doc.left).toBeGreaterThanOrEqual(r.box.left - 0.5);
+    expect(r.doc.right).toBeLessThanOrEqual(r.box.right + 0.5);
+    expect(r.doc.top).toBeGreaterThanOrEqual(r.box.top - 0.5);
+    expect(r.doc.bottom).toBeLessThanOrEqual(r.box.bottom + 0.5);
+    expect(overlap(r.doc, r.stage), "doc vs stage").toBe(false);
+    expect(overlap(r.doc, r.ctrl), "doc vs controls").toBe(false);
+  });
+}

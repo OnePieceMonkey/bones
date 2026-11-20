@@ -2,21 +2,52 @@
 .xr-doc {
   grid-area: doc;
   position: relative;
+  isolation: isolate;
   min-height: 0;
   min-width: 0;
   display: grid;
-  padding: calc(22 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(24 * var(--xr-u, 1px)) calc(16 * var(--xr-u, 1px)) calc(16 * var(--xr-u, 1px));
   box-sizing: border-box;
+}
+/* Film backdrop: blue-grey sheet 2 u inside the panel, larger than the paper on every side. */
+.xr-doc::before {
+  content: "";
+  position: absolute;
+  inset: calc(2 * var(--xr-u, 1px));
+  z-index: -1;
+  border-radius: calc(8 * var(--xr-u, 1px));
+  background: linear-gradient(160deg, var(--xr-bg-film) 0%, var(--xr-bg-film-deep) 62%, var(--xr-bg-film) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 calc(30 * var(--xr-u, 1px)) rgba(5, 9, 13, 0.55);
+  pointer-events: none;
 }
 .xr-doc-paper {
   position: relative;
   min-height: 0;
   display: grid;
-  padding: calc(26 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(26 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
   box-sizing: border-box;
-  background: url("../assets/paper.webp") center / 100% 100% no-repeat, var(--xr-bg-paper-doc);
+  background:
+    linear-gradient(115deg, transparent 38%, rgba(0, 0, 0, 0.05) 39%, transparent 41%),
+    linear-gradient(65deg, transparent 58%, rgba(0, 0, 0, 0.04) 59%, transparent 61%),
+    var(--xr-bg-paper-doc);
   color: var(--xr-text-paper-doc);
-  box-shadow: 0 calc(6 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.6);
+  transform: rotate(-2deg);
+  box-shadow:
+    0 calc(8 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(-6 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.6),
+    0 calc(2 * var(--xr-u, 1px)) calc(3 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.35);
+}
+/* Curl: lower right corner. */
+.xr-doc-paper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18%;
+  height: 9%;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.16) 70%, rgba(255, 255, 255, 0.55) 100%);
+  pointer-events: none;
 }
 .xr-doc-scroll {
   min-height: 0;
@@ -38,7 +69,7 @@
   color: inherit;
 }
 .xr-doc .xr-clip {
-  top: calc(-6 * var(--xr-u, 1px));
+  top: calc(-24 * var(--xr-u, 1px));
   width: calc(44 * var(--xr-u, 1px));
   height: calc(44 * var(--xr-u, 1px));
   border: 0;
