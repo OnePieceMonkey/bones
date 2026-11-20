@@ -206,6 +206,11 @@ describe("new surface contrast", () => {
       { name: "focus-contrast on lightest steel after sheen", fg: need("--xr-focus-contrast"), bg: rgbToHex(overSheen(steel.light)), min: 3 },
       { name: "focus on darkest steel after sheen", fg: need("--xr-focus"), bg: rgbToHex(overSheen(steel.dark)), min: 3 },
     ];
+    // Task 3.2: the header and pill pairs above are the ones header.css actually reads.
+    const headerCss = readFileSync(join(here, "..", "styles", "header.css"), "utf8");
+    for (const token of ["--xr-text-pill", "--xr-bg-pill", "--xr-bg-header-glass", "--xr-text-header"]) {
+      expect(headerCss, `header.css reads ${token}`).toContain(`var(${token})`);
+    }
     for (const p of pairs) {
       const ratio = contrastRatio(p.fg, p.bg);
       expect(ratio, failMessage(p.name, ratio, p.min)).toBeGreaterThanOrEqual(p.min);
