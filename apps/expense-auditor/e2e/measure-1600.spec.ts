@@ -476,3 +476,49 @@ test("the lamp sits above the lever and is amber when on", async ({ page }) => {
   expect(m.filter).toContain("drop-shadow");
   expect(m.filter).toMatch(/rgba?\(\s*2[0-9]{2},\s*1[0-9]{2},\s*\d+/); // amber glow colour
 });
+
+// visual-polish-2 task 6.5: rectangular SVG VU meter (R5.5, R5.6, R5.7).
+test("the meter is a rectangle with a red zone and its needle moves by transform only", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const root = document.querySelector(".xr-pmeter")!;
+    const rs = getComputedStyle(root);
+    const box = root.getBoundingClientRect();
+    const needle = document.querySelector(".xr-pmeter-needle")!;
+    const ns = getComputedStyle(needle);
+    const bezel = document.querySelector(".xr-pmeter-bezel")!.getBoundingClientRect();
+    return {
+      role: root.getAttribute("role"),
+      now: root.getAttribute("aria-valuenow"),
+      radius: parseFloat(rs.borderTopLeftRadius),
+      w: box.width,
+      h: box.height,
+      bezelRatio: bezel.width / bezel.height,
+      hasImg: root.querySelector("img") !== null,
+      zoneStroke: getComputedStyle(document.querySelector(".xr-pmeter-zone")!).stroke,
+      numbers: [...root.querySelectorAll(".xr-pmeter-num")].map((e) => e.textContent),
+      angle: needle.getAttribute("data-angle"),
+      transform: ns.transform,
+      animatedProps: ns.animationName,
+    };
+  });
+  expect(m.role).toBe("meter");
+  expect(m.now).not.toBeNull();
+  expect(m.radius).toBeGreaterThan(0);
+  expect(m.radius).toBeLessThan(m.h / 2); // below 50 % of the height: a rounded rectangle, not a disc
+  expect(m.w).toBeGreaterThan(m.h * 1.5);
+  expect(m.bezelRatio).toBeGreaterThan(1.5);
+  expect(m.hasImg).toBe(false);
+  expect(m.zoneStroke).toMatch(/rgb\(179, 38, 30\)/);
+  expect(m.numbers).toEqual(["0", "25", "50", "75", "100"]);
+  // Reduced motion: no animation, the needle shows its final angle through transform only.
+  expect(m.animatedProps).toBe("none");
+  expect(m.transform).not.toBe("none");
+  const src = await page.evaluate(() => {
+    const css = [...document.styleSheets].flatMap((s) => [...s.cssRules]).map((r) => r.cssText).join("\n");
+    const rule = css.match(/@keyframes xr-needle-swing\s*\{[\s\S]*?\}\s*\}/)?.[0] ?? "";
+    return rule;
+  });
+  const props = [...src.matchAll(/([a-z-]+)\s*:/g)].map((x) => x[1]).filter((p) => p !== "from" && p !== "to");
+  expect([...new Set(props)]).toEqual(["transform"]);
+});

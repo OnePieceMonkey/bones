@@ -64,8 +64,8 @@ describe("asset bundle", () => {
   const actual = listing(assetDir, (p) => p === "index.ts");
   const expected = expectedFromReadme();
 
-  it("README lists 23 images", () => {
-    expect(expected).toHaveLength(23);
+  it("README lists 22 images", () => {
+    expect(expected).toHaveLength(22);
   });
 
   it("contains every file listed in design/assets/README.md", () => {

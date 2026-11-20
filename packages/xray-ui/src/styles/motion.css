@@ -142,7 +142,7 @@
 }
 .xr-shell.xr-live .xr-pmeter-needle {
   transform-box: view-box;
-  transform-origin: 320px 270px;
+  transform-origin: 100px 98px;
   animation: xr-needle-swing 700ms ease-out both;
 }
 

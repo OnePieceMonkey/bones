@@ -12,7 +12,6 @@ All files are WebP, sized for the web. Black backgrounds are meant for `mix-blen
 | `brushed-steel.webp` | Brushed steel, tileable | Metal frame and control panel (`background-size` about 512px) |
 | `screw.webp` | Slotted screw head, cut-out | Frame corners and panel corners, random rotation per screw |
 | `knob.webp` | Black bakelite knob, white pointer at 12 o'clock, cut-out | Rule version dial. Rotate the image; v1/v2/v3 labels in code |
-| `meter.webp` | Analog meter, cream dial, no needle, cut-out | AI confidence meter. Needle and pivot drawn in SVG over the dial arc |
 | `toggle.webp` | Chrome toggle, lever DOWN, cut-out | X-ray switch. Off = as is, on = `scaleY(-1)` with a short snap |
 | `lamp.webp` | Amber indicator lamp, unlit, cut-out | Next to the toggle. Lit = CSS glow (`drop-shadow` + brightness) |
 | `receipt-paper.webp` | Blank crumpled paper strip, cut-out | Document panel. Real text rendered on top in a mono font |

@@ -9,7 +9,6 @@ import glassCracksUrl from "./glass-cracks.webp";
 import knobUrl from "./knob.webp";
 import lampUrl from "./lamp.webp";
 import lightConeUrl from "./light-cone.webp";
-import meterUrl from "./meter.webp";
 import paperUrl from "./paper.webp";
 import screwUrl from "./screw.webp";
 import skeletonUrl from "./skeleton.webp";
@@ -34,7 +33,6 @@ export {
   knobUrl,
   lampUrl,
   lightConeUrl,
-  meterUrl,
   paperUrl,
   screwUrl,
   skeletonUrl,
