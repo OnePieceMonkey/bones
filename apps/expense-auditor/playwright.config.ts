@@ -19,7 +19,24 @@ export default defineConfig({
     acceptDownloads: true,
     trace: "retain-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
+  projects: [
+    {
+      name: "chromium",
+      testIgnore: /(reference-1600|measure-1600)\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // visual-polish-2 D3: the review target is 1600x900.
+      name: "chromium-1600",
+      testMatch: /(reference-1600|measure-1600)\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1600, height: 900 },
+        reducedMotion: "reduce",
+        colorScheme: "dark",
+      },
+    },
+  ],
   webServer: {
     // Serves the freshly built production bundle, so the e2e never runs against a stale dist.
     command: "pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort",

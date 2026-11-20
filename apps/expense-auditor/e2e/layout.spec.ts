@@ -6,6 +6,7 @@ const SIZES = [
   { width: 1920, height: 720 },
   { width: 1920, height: 1080 },
   { width: 1440, height: 900 },
+  { width: 1600, height: 900 },
 ];
 const REGIONS = [".xr-doc", ".xr-glass", ".xr-photo", ".xr-doctor", ".xr-cpanel"] as const;
 
@@ -107,6 +108,7 @@ test("layout holds within 100 ms after a viewport change", async ({ page }) => {
 const SCROLL_SIZES = [
   { width: 1440, height: 900 },
   { width: 1280, height: 720 },
+  { width: 1600, height: 900 },
 ];
 
 function scrollDims(page: Page) {
