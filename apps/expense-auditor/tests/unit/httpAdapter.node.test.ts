@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+import type { CoreError } from "@bones/core";
 import { HttpExtractionAdapter } from "../../src/extraction/HttpExtractionAdapter";
+import { describeError } from "../../src/ui/ErrorPanel";
 
 const validExtraction = {
   proposedFields: {
@@ -39,6 +41,22 @@ describe("HttpExtractionAdapter (mocked fetch)", () => {
   it("returns the extraction for a valid 200", async () => {
     const result = await make((async () => json(validExtraction)) as typeof fetch).extract(bytes);
     expect(result).toEqual(validExtraction);
+  });
+
+  it("gives forbidden_origin its own message and keeps the kill-switch text for disabled", async () => {
+    const origin = { error: { reason: "disabled", code: "forbidden_origin", message: "x" } };
+    const off = { error: { reason: "disabled", code: "disabled", message: "x" } };
+    const a = await make((async () => json(origin, 403)) as typeof fetch).extract(bytes);
+    const b = await make((async () => json(off, 403)) as typeof fetch).extract(bytes);
+    expect(a).toMatchObject({
+      reason: "disabled",
+      message: "This request was blocked because it came from another site.",
+    });
+    expect(b).toMatchObject({ reason: "disabled", message: "Live reading is switched off." });
+    expect(describeError(a as CoreError).summary).toBe(
+      "This request was blocked because it came from another site.",
+    );
+    expect(describeError(b as CoreError).summary).toBe("Live reading is switched off on this server.");
   });
 
   it("maps a 403 disabled body to extraction_failed disabled", async () => {

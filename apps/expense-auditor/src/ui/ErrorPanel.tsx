@@ -1,5 +1,6 @@
 import type { CoreError } from "@bones/core";
 import { anatomy } from "../anatomy";
+import { FORBIDDEN_ORIGIN_MESSAGE } from "../extraction/messages";
 import type { StartError } from "../state/reducer";
 
 export interface ErrorDescription {
@@ -32,6 +33,9 @@ export function describeError(e: CoreError): ErrorDescription {
     case "extraction_failed":
       switch (e.reason) {
         case "disabled":
+          // The server sends reason "disabled" for both the kill switch and a foreign origin;
+          // the adapter tells them apart by code and puts the honest text in the message.
+          if (e.message === FORBIDDEN_ORIGIN_MESSAGE) return { summary: e.message, details: [] };
           return { summary: "Live reading is switched off on this server.", details: [] };
         case "network":
           return {

@@ -2,6 +2,8 @@ import { guardInput } from "@bones/core";
 import type { CoreError, ExtractionPort, ExtractionResult, RawInput } from "@bones/core";
 import { ERROR_CODES, errorBodySchema, extractionResultWireSchema } from "../../shared/wire";
 
+import { FORBIDDEN_ORIGIN_MESSAGE } from "./messages";
+
 export interface HttpAdapterOptions {
   mediaType: "image/jpeg" | "image/png";
   endpoint?: string;
@@ -15,7 +17,7 @@ type Reason = Extract<CoreError, { kind: "extraction_failed" }>["reason"];
 
 const CODE_MESSAGES: Record<(typeof ERROR_CODES)[number], string> = {
   disabled: "Live reading is switched off.",
-  forbidden_origin: "This site is not allowed to use live reading.",
+  forbidden_origin: FORBIDDEN_ORIGIN_MESSAGE,
   method_not_allowed: "The reading service rejected the request method.",
   bad_request: "The reading service could not use this photo.",
   too_large: "The photo is too large for live reading.",
