@@ -723,14 +723,14 @@ Build the prerequisites first, in the order the user asked for: move the rule fi
     - Rules: no real API call, no `.env.local`, no deploy, no push
     - Commit: `git add apps/expense-auditor .kiro/specs/expense-auditor/design.md && git commit -m "feat(expense-auditor): add OpenRouter provider"`
 
-- [ ] 29. Live-mode fixes
-  - [ ] 29.1 Dev middleware keeps the port in the request base URL
+- [x] 29. Live-mode fixes
+  - [x] 29.1 Dev middleware keeps the port in the request base URL
     - In `vite.config.ts` `devExtractApi` build the Web `Request` with base `http://${req.headers.host ?? "localhost"}`; test that a same-origin POST with an `Origin` header that includes the port is accepted
     - Commit: `git add apps/expense-auditor && git commit -m "fix(expense-auditor): keep the port in the dev middleware request URL"`
-  - [ ] 29.2 Honest message for forbidden_origin
+  - [x] 29.2 Honest message for forbidden_origin
     - `forbidden_origin` shows "This request was blocked because it came from another site." instead of the kill-switch text; component or unit test
     - Commit: `git add apps/expense-auditor && git commit -m "fix(expense-auditor): own message for forbidden_origin"`
-  - [ ] 29.3 Live status waits longer and retries once
+  - [x] 29.3 Live status waits longer and retries once
     - `fetchLiveStatus` timeout 8 s (was 3 s) and one retry after a failure; extend `tests/unit/liveStatus.node.test.ts` (fake timers: first attempt fails, second succeeds gives true; both fail gives false; a slow first answer under 8 s still works)
     - Commit: `git add apps/expense-auditor && git commit -m "fix(expense-auditor): live status timeout 8 s with one retry"`
 

@@ -2530,6 +2530,59 @@
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1794993077499
       }
+    ],
+    "29.1 Dev middleware keeps the port in the request base URL": [
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160387675
+      },
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160402635
+      },
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160407644
+      },
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160517535
+      }
+    ],
+    "29.2 Honest message for forbidden_origin": [
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160517623
+      },
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160583000
+      }
+    ],
+    "29.3 Live status waits longer and retries once": [
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160583441
+      },
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160737069
+      }
+    ],
+    "29. Live-mode fixes": [
+      {
+        "executionId": "e672c44c-3702-43fe-8acb-75bfb1ad0282",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795160737124
+      }
     ]
   }
 }
