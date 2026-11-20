@@ -88,38 +88,50 @@
   color: var(--xr-text-paper-doc);
 }
 .xr-doc .xr-film-line {
+  display: block;
   position: relative;
   min-height: calc(18 * var(--xr-u, 1px));
 }
 .xr-doc .xr-film-image-wrap { position: relative; }
 
-/* Marks on paper: dark cyan edge, highlight fades in by opacity of a pseudo-element. */
+/* Marks on paper: a cyan underline with a glow. The label is in the DOM at all times and fades in
+   on hover of the mark or when the linked rule is hovered or focused (no extra tab stop). */
 .xr-doc .xr-mark--line,
 .xr-doc .xr-mark--line[data-highlighted="true"] {
   position: relative;
   background: none;
-  border-left: 3px solid #0a6a78;
+  border: 0;
+  border-bottom: 1.5px solid var(--xr-cyan);
+  box-shadow: 0 1px calc(4 * var(--xr-u, 1px)) var(--xr-cyan-glow);
+  padding-left: 0;
 }
-.xr-doc .xr-mark--line::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(61, 232, 255, 0.35);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 150ms ease;
-}
-.xr-doc .xr-mark--line[data-highlighted="true"]::before { opacity: 1; }
+.xr-doc .xr-mark--line[data-highlighted="true"] { border-bottom-width: 2px; }
 .xr-doc .xr-mark-tag {
-  color: var(--xr-text-on-plate);
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--xr-text-paper-doc);
+  font-family: var(--xr-font-sans);
+  font-size: max(10px, calc(10 * var(--xr-u, 1px)));
+  line-height: 1.2;
   display: inline-block;
   max-width: 100%;
   white-space: nowrap;
   overflow: visible;
-  vertical-align: top;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
 }
+.xr-doc .xr-mark--bbox > .xr-mark-tag { left: 0; right: auto; }
+.xr-doc .xr-mark:hover .xr-mark-tag,
+.xr-doc .xr-mark-tag[data-highlighted="true"] { opacity: 1; }
 
-/* Scan line: red line across the full width of an overruled field. */
+/* Scan line: red line across the full width of an overruled field, centred on its row. */
 .xr-scan {
   position: absolute;
   left: 0;
@@ -128,12 +140,12 @@
   height: 2px;
   margin-top: -1px;
   background: var(--xr-red);
-  box-shadow: 0 0 calc(6 * var(--xr-u, 1px)) var(--xr-red-glow);
+  box-shadow: 0 0 calc(3 * var(--xr-u, 1px)) var(--xr-red-glow), 0 0 calc(8 * var(--xr-u, 1px)) var(--xr-red-glow);
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xr-doc .xr-mark--line::before { transition: none; }
+  .xr-doc .xr-mark-tag { transition: none; }
 }
 
 /* Glass card: frosted AI answer, cracks and stamp when a field is overruled. */

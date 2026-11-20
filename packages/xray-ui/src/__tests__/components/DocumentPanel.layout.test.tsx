@@ -18,6 +18,7 @@ describe("Document panel mark labels", () => {
     expect(text).not.toMatch(/white-space:\s*pre;/);
   });
 
+  // visual-polish-2 R4.7 supersedes visual-polish R6: the label hides by opacity, which is not clipping.
   it("keeps each label whole and unclipped", () => {
     const tag = block(".xr-doc .xr-mark-tag");
     expect(tag).toMatch(/white-space:\s*nowrap/);

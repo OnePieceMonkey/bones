@@ -44,7 +44,7 @@ async function openSample(page: Page, name: RegExp): Promise<void> {
 }
 test("panel labels and the doctor name draw no box (R1.1)", async ({ page }) => {
   await openSample(page, /signature case/i);
-  for (const selector of [".xr-cpanel-plaque", ".xr-doctor-title"]) {
+  for (const selector of [".xr-cpanel-plaque", ".xr-doctor-title", ".xr-mark-tag"]) {
     const boxes = await page.$$eval(selector, (els) =>
       els.map((el) => {
         const s = getComputedStyle(el);
@@ -265,3 +265,56 @@ for (const size of SIZES) {
     expect(overlap(r.doc, r.ctrl), "doc vs controls").toBe(false);
   });
 }
+
+// visual-polish-2 task 4.2: cyan underline marks, hover labels, centred scan line (R1.1, R4.5 to R4.10).
+test("mark labels are hidden at rest, shown on hover and hotspot focus; underline is cyan (R4.5 to R4.8)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const style = (sel: string) =>
+    page.$eval(sel, (el) => {
+      const s = getComputedStyle(el);
+      return { opacity: Number(s.opacity), visibility: s.visibility, display: s.display, bottom: s.borderBottomWidth, bottomColor: s.borderBottomColor, shadow: s.boxShadow, top: s.borderTopWidth, left: s.borderLeftWidth, right: s.borderRightWidth, bg: s.backgroundColor };
+    });
+  const tag = page.locator(".xr-doc .xr-mark-tag").first();
+  await expect(tag).toBeAttached();
+  const rest = await style(".xr-doc .xr-mark-tag");
+  expect(rest.opacity).toBe(0);
+  expect(rest.visibility).toBe("visible");
+  expect(rest.display).not.toBe("none");
+  const line = await style(".xr-doc .xr-mark--line");
+  expect(parseFloat(line.bottom)).toBeGreaterThanOrEqual(1);
+  expect(parseFloat(line.bottom)).toBeLessThanOrEqual(2.5);
+  expect([line.top, line.left, line.right]).toEqual(["0px", "0px", "0px"]);
+  expect(line.bottomColor).toBe("rgb(61, 232, 255)");
+  expect(line.shadow).not.toBe("none");
+  expect(line.bg).toBe("rgba(0, 0, 0, 0)");
+  // Hover on the mark line shows its label.
+  await page.locator(".xr-doc .xr-mark--line").first().hover();
+  await expect.poll(async () => (await style(".xr-doc .xr-mark-tag")).opacity).toBe(1);
+  await page.mouse.move(2, 2);
+  await expect.poll(async () => (await style(".xr-doc .xr-mark-tag")).opacity).toBe(0);
+  // Focus on a linked hotspot shows the label; no new tab stops in the document.
+  const before = await page.locator(".xr-doc [tabindex], .xr-doc button, .xr-doc a").count();
+  await page.getByRole("button", { name: /^Line-item match, rule line-item-cap/ }).focus();
+  await expect.poll(async () => page.$$eval('.xr-doc .xr-mark-tag[data-highlighted="true"]', (e) => e.length)).toBeGreaterThan(0);
+  const shown = await page.$eval('.xr-doc .xr-mark-tag[data-highlighted="true"]', (el) => ({ o: Number(getComputedStyle(el).opacity), b: getComputedStyle(el).borderTopWidth, bg: getComputedStyle(el).backgroundColor, sh: getComputedStyle(el).boxShadow }));
+  expect(shown).toEqual({ o: 1, b: "0px", bg: "rgba(0, 0, 0, 0)", sh: "none" });
+  expect(await page.locator(".xr-doc [tabindex], .xr-doc button, .xr-doc a").count()).toBe(before);
+});
+test("scan line is red, thin, centred on the total row and spans the paper (R4.9)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const scan = document.querySelector(".xr-doc .xr-scan")!;
+    const s = getComputedStyle(scan);
+    // Layout sizes: the paper tilt would inflate bounding rectangles.
+    const el = scan as HTMLElement;
+    const row = el.parentElement as HTMLElement;
+    const paper = (document.querySelector(".xr-doc-paper") as HTMLElement).offsetWidth;
+    return { bg: s.backgroundColor, h: el.offsetHeight, cy: el.offsetTop + el.offsetHeight / 2, rowCy: row.offsetHeight / 2, w: el.offsetWidth, paper, anim: s.animationName };
+  });
+  expect(m.bg).toBe("rgb(255, 122, 122)");
+  expect(m.h).toBeGreaterThanOrEqual(1);
+  expect(m.h).toBeLessThanOrEqual(3);
+  expect(Math.abs(m.cy - m.rowCy)).toBeLessThanOrEqual(6);
+  expect(m.w).toBeGreaterThanOrEqual(0.9 * m.paper);
+  expect(m.anim).toBe("none");
+});
