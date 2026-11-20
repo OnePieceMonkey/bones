@@ -98,6 +98,8 @@ export { gaugeValue, buildGaugeModel } from "./model/confidence";
 export { SWEEP, needleAngle, knobAngle, stepVersion } from "./model/gauge";
 export { KNOB, knobLabelPositions, knobTicks } from "./model/knobLabels";
 export type { KnobLabel, KnobTick } from "./model/knobLabels";
+export { METER, RED_ZONE, meterPoint, meterTicks, redZoneArc } from "./model/meterGeometry";
+export type { MeterTick } from "./model/meterGeometry";
 export { TEMPLATES, MAX_EVIDENCE_LINES, buildChatMessages } from "./model/chat";
 export { defaultFormat, safeFormat, resultLabel, summariseValue } from "./model/format";
 export type { Formatter } from "./model/format";
