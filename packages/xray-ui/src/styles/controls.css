@@ -145,9 +145,8 @@
   }
 }
 
-/* Control panel: steel plate in grid area ctrl, overlapping the frame's lower left corner. */
+/* Control panel: one steel surface in the shell grid (placement in shell.css), overlapping the frame's lower left corner. */
 .xr-cpanel {
-  grid-area: ctrl;
   position: relative;
   z-index: 2;
   align-self: end;
@@ -158,11 +157,29 @@
   gap: calc(8 * var(--xr-u, 1px));
   min-width: 0;
   margin: 0 0 calc(-14 * var(--xr-u, 1px)) calc(-14 * var(--xr-u, 1px));
-  padding: calc(22 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px));
-  background: url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat, #3a444b;
+  padding: calc(12 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(26 * var(--xr-u, 1px));
+  border-radius: 0 calc(28 * var(--xr-u, 1px)) 0 0;
+  background:
+    linear-gradient(180deg, var(--xr-steel-sheen), rgba(255, 255, 255, 0) 60%),
+    url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat,
+    #3a444b;
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.35),
-    inset -1px -1px 0 rgba(0, 0, 0, 0.6);
+    inset -1px -1px 0 rgba(0, 0, 0, 0.6),
+    0 calc(-6 * var(--xr-u, 1px)) calc(18 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.5);
+}
+/* Notch: concave fillet where the panel top meets the frame. Without mask support it stays a square corner. */
+.xr-cpanel::before {
+  content: "";
+  position: absolute;
+  left: calc(14 * var(--xr-u, 1px));
+  top: calc(-22 * var(--xr-u, 1px));
+  width: calc(22 * var(--xr-u, 1px));
+  height: calc(22 * var(--xr-u, 1px));
+  pointer-events: none;
+  background: url("../assets/brushed-steel.webp") 0 0 / 512px 512px repeat, #3a444b;
+  -webkit-mask: radial-gradient(circle at 100% 0, transparent calc(21.5 * var(--xr-u, 1px)), #000 calc(22 * var(--xr-u, 1px)));
+  mask: radial-gradient(circle at 100% 0, transparent calc(21.5 * var(--xr-u, 1px)), #000 calc(22 * var(--xr-u, 1px)));
 }
 .xr-cpanel-item {
   display: flex;

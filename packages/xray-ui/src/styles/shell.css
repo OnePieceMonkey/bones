@@ -41,13 +41,14 @@ html:has(.xr-shell) body {
   background: none;
   box-shadow: none;
 }
+/* Placement of the four regions lives here only (visual-polish-2 R5.1). */
+.xr-shell .xr-doc { grid-area: 1 / 1 / 2 / 2; }
+.xr-shell .xr-cpanel { grid-area: 2 / 1 / 3 / 3; }
+.xr-shell .xr-doctor { grid-area: 1 / 4 / 3 / 5; }
 .xr-shell .xr-viewport {
   display: grid;
-  grid-template-columns: 28fr 46fr 26fr;
+  grid-template-columns: 28fr 8fr 38fr 26fr;
   grid-template-rows: 62fr 38fr;
-  grid-template-areas:
-    "doc stage doctor"
-    "ctrl stage doctor";
   min-height: 0;
   min-width: 0;
   padding: 0;
@@ -70,7 +71,7 @@ html:has(.xr-shell) body {
 
 /* Stage cell: skeleton photo with the glass answer card laid over its lower left. */
 .xr-shell-stagecell {
-  grid-area: stage;
+  grid-area: 1 / 2 / 3 / 4;
   position: relative;
   min-height: 0;
   min-width: 0;
@@ -79,7 +80,8 @@ html:has(.xr-shell) body {
 .xr-shell-stagecell .xr-glass {
   grid-area: auto;
   position: absolute;
-  left: 2%;
+  /* Task 6.3: starts right of the wider control panel (8fr of 46fr = 17.4 %). Task 9 moves the card to the top centre. */
+  left: 19%;
   bottom: 3%;
   width: 44%;
   max-height: 62%;

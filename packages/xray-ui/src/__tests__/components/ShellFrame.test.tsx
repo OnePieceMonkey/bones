@@ -66,10 +66,13 @@ describe("ShellFrame", () => {
     expect(css).toMatch(/--xr-u:[^;]*100vw \/ 1280[^;]*100vh \/ 720/);
     expect(css).toMatch(/min-width:\s*1280px/);
     expect(css).toMatch(/min-height:\s*720px/);
-    expect(css).toMatch(/grid-template-columns:\s*28fr 46fr 26fr/);
+    // visual-polish-2 R5.1 supersedes visual-polish R1: four columns and explicit grid-area placement replace the three-column named areas.
+    expect(css).toMatch(/grid-template-columns:\s*28fr 8fr 38fr 26fr/);
     expect(css).toMatch(/grid-template-rows:\s*62fr 38fr/);
-    expect(css).toContain('"doc stage doctor"');
-    expect(css).toContain('"ctrl stage doctor"');
+    expect(css).toContain(".xr-doc { grid-area: 1 / 1 / 2 / 2; }");
+    expect(css).toContain(".xr-cpanel { grid-area: 2 / 1 / 3 / 3; }");
+    expect(css).toContain(".xr-doctor { grid-area: 1 / 4 / 3 / 5; }");
+    expect(css).toContain("grid-area: 1 / 2 / 3 / 4;");
     expect(css).toMatch(/\[data-motion="reduce"\][\s\S]*animation:\s*none/);
     expect(css).toMatch(/prefers-reduced-motion: reduce\)\s*\{\s*\.xr-shell\[data-motion="auto"\]/);
   });

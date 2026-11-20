@@ -135,7 +135,7 @@ describe("new surface contrast", () => {
   // The old exact count of 18 became "at least 29" because 11 new surfaces were added.
   it("has at least 35 text pairs", async () => {
     // visual-polish-2 task 1.3 adds 6 text/graphic pairs (pill, stamp, pillbtn, header glass, meter text, meter zone): 29 + 6 = 35.
-    const total = TOKEN_PAIRS.length + NEW_PAIRS.length + 2 /* glass */ + 1 /* paper.webp */ + 6 /* NEW_PAIRS_V2 */ + 1 /* steel plaque on steel average */;
+    const total = TOKEN_PAIRS.length + NEW_PAIRS.length + 2 /* glass */ + 1 /* paper.webp */ + 6 /* NEW_PAIRS_V2 */ + 2 /* steel plaque on steel average, bare and after sheen */;
     expect(total).toBeGreaterThanOrEqual(35);
   });
 
@@ -201,7 +201,9 @@ describe("new surface contrast", () => {
       { name: "meter text on face", fg: need("--xr-text-on-meter"), bg: meterFace, min: 4.5 },
       { name: "meter zone on face (graphic)", fg: need("--xr-meter-zone"), bg: meterFace, min: 3 },
       // visual-polish-2 R5.10 supersedes visual-polish R9: the plaque pair is measured on the bare steel average, not on a plate token.
+      // Task 6.3: the panel now carries the sheen gradient, so the pair is measured on the sheen-blended average (its strongest point, the top edge).
       { name: "steel label on steel average", fg: need("--xr-text-on-steel"), bg: rgbToHex(steel.avg), min: 4.5 },
+      { name: "steel label on steel average after sheen", fg: need("--xr-text-on-steel"), bg: rgbToHex(overSheen(steel.avg)), min: 4.5 },
       // FOCUS_PAIRS_V2
       { name: "focus-contrast on lightest steel after sheen", fg: need("--xr-focus-contrast"), bg: rgbToHex(overSheen(steel.light)), min: 3 },
       { name: "focus on darkest steel after sheen", fg: need("--xr-focus"), bg: rgbToHex(overSheen(steel.dark)), min: 3 },

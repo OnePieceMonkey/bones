@@ -419,3 +419,24 @@ test("at 1280x720 the paper either fits or shows the scan line on first render",
   expect(m.bottom).toBeGreaterThanOrEqual(0);
   expect(m.pageScroll).toBe(0);
 });
+// visual-polish-2 task 6.3: one steel panel with a notch, in the four-column shell grid (R5.1).
+test("control panel is one rounded steel surface about 36 % of the lightbox wide (R5.1)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const panel = document.querySelector(".xr-cpanel")!;
+    const box = document.querySelector(".xr-viewport")!.getBoundingClientRect();
+    const r = panel.getBoundingClientRect();
+    const s = getComputedStyle(panel);
+    return {
+      radiusTopRight: parseFloat(s.borderTopRightRadius),
+      right: r.right,
+      expected: box.left + 0.36 * box.width,
+      image: s.backgroundImage,
+      cols: getComputedStyle(document.querySelector(".xr-viewport")!).gridTemplateColumns.split(" ").length,
+    };
+  });
+  expect(m.radiusTopRight).toBeGreaterThan(0);
+  expect(Math.abs(m.right - m.expected)).toBeLessThanOrEqual(2);
+  expect(m.image).toContain("brushed-steel");
+  expect(m.cols).toBe(4);
+});

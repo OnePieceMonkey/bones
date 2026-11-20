@@ -65,8 +65,16 @@ function checkLayout(m: Measured): void {
       const b = m.regions[REGIONS[j]!];
       // Known exception: the design lays the glass card over the lower left of the photo (shell.css, .xr-shell-stagecell .xr-glass).
       if (REGIONS[i] === ".xr-glass" && REGIONS[j] === ".xr-photo") continue;
+      // visual-polish-2 A5: the steel panel may cover the transparent margin of the photo box; the pixel gap is checked below.
+      if (REGIONS[i] === ".xr-photo" && REGIONS[j] === ".xr-cpanel") continue;
       if (a && b) expect(overlaps(a, b), `${REGIONS[i]} overlaps ${REGIONS[j]}`).toBe(false);
     }
+  }
+  // visual-polish-2 R5.11: the panel stays 10 px clear of the left-most opaque skeleton pixel (22.43 % of the photo width).
+  const panel = m.regions[".xr-cpanel"];
+  const photo = m.regions[".xr-photo"];
+  if (panel && photo) {
+    expect(panel.right + 10, "cpanel clears the skeleton pixels").toBeLessThanOrEqual(photo.left + 0.2243 * (photo.right - photo.left));
   }
   expect(m.header, "header exists").not.toBeNull();
   expect(m.pill, "pill exists").not.toBeNull();

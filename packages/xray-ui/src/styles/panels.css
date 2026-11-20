@@ -1,6 +1,5 @@
 /* Document panel: paper strip on the film, two clips, scrolling text, scan lines. */
 .xr-doc {
-  grid-area: doc;
   position: relative;
   isolation: isolate;
   min-height: 0;
@@ -311,7 +310,6 @@
 
 /* Doctor panel: phone-shaped chat with notch, header, scrolling log and footer. */
 .xr-doctor {
-  grid-area: doctor;
   position: relative;
   min-height: 0;
   min-width: 0;
