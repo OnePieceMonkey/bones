@@ -2,6 +2,7 @@ import type { Ref } from "react";
 import { cx } from "../../cx";
 import { resultLabel, safeFormat } from "../../model/format";
 import { progressShare, resultLine } from "../../model/progress";
+import { IconOverride, IconReplay } from "../HeaderIcons";
 import type { Anatomy, CommonProps, EffectiveResult, Trace } from "../../types";
 
 export interface ResultFooterProps extends CommonProps {
@@ -57,9 +58,11 @@ export function ResultFooter({
       </div>
       <div className="xr-result-actions">
         <button type="button" className="xr-footer-btn" onClick={() => onReplay?.()}>
+          <IconReplay />
           Replay decision
         </button>
         <button type="button" className="xr-footer-btn" ref={overrideRef} onClick={() => onOverride?.()}>
+          <IconOverride />
           Human override
         </button>
       </div>

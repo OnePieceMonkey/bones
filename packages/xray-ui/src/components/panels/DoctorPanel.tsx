@@ -48,7 +48,7 @@ export function DoctorPanel({
       <span className="xr-doctor-notch" aria-hidden="true" />
       <header className="xr-doctor-head">
         <AssetImage className="xr-doctor-avatar" src={drBonesUrl} width={512} height={512} />
-        <h3 className="xr-doctor-title">Dr. Bones</h3>
+        <h3 className="xr-doctor-title">Dr. Bones · Radiologist</h3>
       </header>
       <div className="xr-doctor-body xr-chat-log" role="log" aria-live="polite">
         <ChatLog
@@ -68,6 +68,7 @@ export function DoctorPanel({
         {...(onOverride === undefined ? {} : { onOverride })}
         {...(overrideRef === undefined ? {} : { overrideRef })}
       />
+      <span className="xr-doctor-home" aria-hidden="true" />
     </section>
   );
 }

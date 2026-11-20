@@ -51,6 +51,34 @@ describe("ResultFooter", () => {
     expect(ref.current).toBe(screen.getByRole("button", { name: "Human override" }));
   });
 
+  it("puts a decorative icon before each button text and fires once per mouse or keyboard activation", async () => {
+    const onReplay = vi.fn();
+    const onOverride = vi.fn();
+    render(
+      <ResultFooter
+        trace={signatureTrace()}
+        anatomy={anatomy()}
+        claimedCents={10000}
+        onReplay={onReplay}
+        onOverride={onOverride}
+      />,
+    );
+    for (const name of ["Replay decision", "Human override"]) {
+      const btn = screen.getByRole("button", { name });
+      const icon = btn.querySelector("svg.xr-btn-icon[aria-hidden='true']");
+      expect(icon).not.toBeNull();
+      expect(btn.firstElementChild).toBe(icon);
+      expect(btn.textContent).toBe(name);
+    }
+    const replay = screen.getByRole("button", { name: "Replay decision" });
+    replay.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onReplay).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(" ");
+    expect(onReplay).toHaveBeenCalledTimes(2);
+    expect(onOverride).not.toHaveBeenCalled();
+  });
+
   it("shows the effective result and reviewer name", () => {
     const trace = { ...signatureTrace(), result: "partially_approved" as const };
     render(

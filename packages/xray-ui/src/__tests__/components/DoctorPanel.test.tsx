@@ -13,12 +13,16 @@ describe("DoctorPanel", () => {
     const { container } = render(
       <DoctorPanel trace={signatureTrace()} anatomy={anatomy()} claimedCents={10000} reducedMotion />,
     );
-    expect(screen.getByRole("heading", { name: "Dr. Bones" })).toBeInTheDocument();
+    // visual-polish-2 R6.2 supersedes visual-polish R8: title is "Dr. Bones · Radiologist".
+    expect(screen.getByRole("heading", { name: "Dr. Bones · Radiologist" })).toBeInTheDocument();
     const img = container.querySelector("img.xr-doctor-avatar")!;
     expect(img).toHaveAttribute("alt", "");
     expect(img).toHaveAttribute("aria-hidden", "true");
     expect(img).toHaveAttribute("width", "512");
-    expect(container.querySelector(".xr-doctor-notch")).not.toBeNull();
+    expect(container.querySelector(".xr-doctor-notch")).toHaveAttribute("aria-hidden", "true");
+    const home = container.querySelector(".xr-doctor-home");
+    expect(home).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector(".xr-doctor")!.lastElementChild).toBe(home);
   });
 
   it("renders a polite log with the full chat text at once in reduced motion", () => {
