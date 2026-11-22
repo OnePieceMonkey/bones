@@ -113,6 +113,7 @@ describe("token contrast", () => {
 const NEW_PAIRS: { name: string; fg: string; bg: string }[] = [
   { name: "header", fg: "--xr-text-header", bg: "--xr-bg-header" },
   { name: "film sheet", fg: "--xr-text-on-sheet", bg: "--xr-bg-sheet" },
+  // visual-polish-2 R6.3: teal bubble (#f2fbfa on #1b4f4a) and phone head (#e8f4f8 on #10242c) are checked here at 4.5:1.
   { name: "bubble", fg: "--xr-text-bubble", bg: "--xr-bg-bubble" },
   { name: "phone head", fg: "--xr-text-phone-head", bg: "--xr-bg-phone-head" },
   { name: "result footer", fg: "--xr-text-footer", bg: "--xr-bg-footer" },

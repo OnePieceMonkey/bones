@@ -40,10 +40,10 @@
   --xr-text-on-sheet: #e8f4f8;
   --xr-text-start-sub: #b8d6e2;  /* subline on the lightest film pixel, read by the contrast test */
   --xr-bg-sheet: #10222e;
-  --xr-text-bubble: #e8f4f8;
-  --xr-bg-bubble: #132636;
+  --xr-text-bubble: #f2fbfa;  /* 8.81:1 on the teal bubble */
+  --xr-bg-bubble: #1b4f4a;
   --xr-text-phone-head: #e8f4f8;
-  --xr-bg-phone-head: #1b2a35;
+  --xr-bg-phone-head: #10242c;  /* 14.29:1 with #e8f4f8 */
   --xr-text-footer: #e8f4f8;
   --xr-bg-footer: #0b1620;
   --xr-text-rulebox: #e8f4f8;

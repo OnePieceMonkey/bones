@@ -608,3 +608,78 @@ for (const size of SIZES) {
     expect(m.scrollW).toBeLessThanOrEqual(size.width);
   });
 }
+
+// visual-polish-2 task 7.2: phone panel with teal bubbles, thin bar and pill buttons (R6.1 to R6.9).
+test("phone panel: pill notch, big avatar, round bubbles, thin bar, pill buttons with icons (R6)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const rect = (sel: string) => document.querySelector(sel)!.getBoundingClientRect();
+    const bar = document.querySelector(".xr-progress")!;
+    const bs = getComputedStyle(bar);
+    const bubbles = [...document.querySelectorAll(".xr-doctor .xr-bubble")].map((b) => {
+      const s = getComputedStyle(b);
+      return { radius: parseFloat(s.borderTopLeftRadius), overflow: s.overflow, height: s.height, clipped: b.scrollHeight > b.clientHeight + 1 };
+    });
+    const buttons = [...document.querySelectorAll(".xr-footer-btn")].map((b) => {
+      const r = b.getBoundingClientRect();
+      return { h: r.height, radius: parseFloat(getComputedStyle(b).borderTopLeftRadius), icon: b.querySelector("svg[aria-hidden='true']") !== null };
+    });
+    return {
+      notch: rect(".xr-doctor-notch").width,
+      avatar: rect(".xr-doctor-avatar").width,
+      bubbles,
+      barH: bar.getBoundingClientRect().height,
+      barBorder: [bs.borderTopWidth, bs.borderRightWidth, bs.borderBottomWidth, bs.borderLeftWidth],
+      barStyle: bs.borderTopStyle + bs.outlineStyle,
+      line: document.querySelector(".xr-result-line")!.textContent,
+      buttons,
+      bodyOverflowY: getComputedStyle(document.querySelector(".xr-doctor-body")!).overflowY,
+    };
+  });
+  expect(m.notch).toBeGreaterThanOrEqual(60);
+  expect(m.notch).toBeLessThanOrEqual(140);
+  expect(m.avatar).toBeGreaterThanOrEqual(40);
+  expect(m.bubbles.length).toBeGreaterThan(0);
+  for (const b of m.bubbles) {
+    expect(b.radius).toBeGreaterThanOrEqual(12);
+    expect(b.overflow).toBe("visible");
+    expect(b.clipped).toBe(false);
+  }
+  expect(m.barH).toBeGreaterThanOrEqual(2);
+  expect(m.barH).toBeLessThanOrEqual(6);
+  expect(m.barBorder).toEqual(["0px", "0px", "0px", "0px"]);
+  expect(m.barStyle).not.toMatch(/dashed|dotted/);
+  expect(m.line?.trim()).toBe("PARTIALLY APPROVED $41.50");
+  expect(m.buttons).toHaveLength(2);
+  for (const b of m.buttons) {
+    expect(b.h).toBeGreaterThanOrEqual(44);
+    expect(b.radius).toBeGreaterThanOrEqual(b.h / 2);
+    expect(b.icon).toBe(true);
+  }
+  expect(m.bodyOverflowY).toBe("auto");
+});
+
+for (const size of SIZES) {
+  test(`chat body scrolls inside its box and the page does not at ${size.width}x${size.height} (R6.9)`, async ({ page }) => {
+    await openSample(page, /signature case/i);
+    await page.setViewportSize(size);
+    const d = await page.evaluate(() => {
+      const body = document.querySelector(".xr-doctor-body")!;
+      const doc = document.documentElement;
+      const panel = document.querySelector(".xr-doctor")!.getBoundingClientRect();
+      const footer = document.querySelector(".xr-result-footer")!.getBoundingClientRect();
+      return {
+        bodyClient: body.clientHeight,
+        footerInside: footer.bottom <= panel.bottom + 1,
+        buttonsFit: [...document.querySelectorAll(".xr-footer-btn")].every((b) => b.scrollWidth <= b.clientWidth),
+        pageX: doc.scrollWidth - doc.clientWidth,
+        pageY: doc.scrollHeight - doc.clientHeight,
+      };
+    });
+    expect(d.bodyClient).toBeGreaterThan(0);
+    expect(d.footerInside).toBe(true);
+    expect(d.buttonsFit, "button text fits on one line").toBe(true);
+    expect(d.pageX).toBeLessThanOrEqual(0);
+    expect(d.pageY).toBeLessThanOrEqual(0);
+  });
+}

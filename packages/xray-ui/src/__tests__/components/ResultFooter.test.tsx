@@ -97,6 +97,7 @@ describe("ResultFooter", () => {
 });
 
 describe("ResultFooter progress track", () => {
+  // visual-polish-2 R6.5 supersedes visual-polish R8: the track is thin and borderless, so `border: 0` is the border declaration.
   it("styles a visible track and a scaleX fill", async () => {
     const { readFileSync } = await import("node:fs");
     const { resolve } = await import("node:path");
