@@ -1,7 +1,7 @@
 /* Control panel parts: rule version knob. */
 .xr-pknob {
   position: relative;
-  width: calc(192 * var(--xr-u, 1px));
+  width: calc(164 * var(--xr-u, 1px));
   aspect-ratio: 1 / 1;
   box-sizing: border-box;
 }
@@ -13,7 +13,7 @@
 }
 .xr-shell .xr-pknob-dial {
   position: absolute;
-  inset: 12%;
+  inset: 5.8%;
   transform-origin: 50% 50%;
   transition: transform 350ms cubic-bezier(0.3, 1.4, 0.5, 1);
 }
@@ -57,8 +57,8 @@
 /* Control panel parts: AI read confidence meter. */
 .xr-pmeter {
   position: relative;
-  width: calc(150 * var(--xr-u, 1px));
-  aspect-ratio: 200 / 105;
+  width: calc(180 * var(--xr-u, 1px));
+  aspect-ratio: 200 / 150;
   border-radius: calc(9 * var(--xr-u, 1px));
   filter: drop-shadow(0 calc(2 * var(--xr-u, 1px)) calc(3 * var(--xr-u, 1px)) rgba(0, 0, 0, 0.55));
 }
@@ -84,7 +84,7 @@
 }
 .xr-pmeter-num {
   fill: var(--xr-text-on-meter);
-  font: 600 9px / 1 var(--xr-font-sans);
+  font: 600 13px / 1 var(--xr-font-sans);
 }
 .xr-pmeter-needle-line {
   stroke: var(--xr-red);
@@ -169,13 +169,17 @@
   z-index: 2;
   align-self: end;
   box-sizing: border-box;
-  display: flex;
-  align-items: flex-end;
+  /* Row 1: plaques on one baseline. Row 2: controls centred on one horizontal axis. */
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto;
   justify-content: space-around;
-  gap: calc(8 * var(--xr-u, 1px));
+  align-items: center;
+  column-gap: calc(8 * var(--xr-u, 1px));
+  row-gap: calc(6 * var(--xr-u, 1px));
   min-width: 0;
   margin: 0 0 calc(-14 * var(--xr-u, 1px)) calc(-14 * var(--xr-u, 1px));
-  padding: calc(12 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px)) calc(26 * var(--xr-u, 1px));
+  padding: calc(12 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px)) calc(16 * var(--xr-u, 1px)) calc(26 * var(--xr-u, 1px));
   border-radius: 0 calc(28 * var(--xr-u, 1px)) 0 0;
   background:
     linear-gradient(180deg, var(--xr-steel-sheen), rgba(255, 255, 255, 0) 60%),
@@ -200,12 +204,20 @@
   mask: radial-gradient(circle at 100% 0, transparent calc(21.5 * var(--xr-u, 1px)), #000 calc(22 * var(--xr-u, 1px)));
 }
 .xr-cpanel-item {
+  display: contents;
+}
+.xr-cpanel-item--knob > .xr-cpanel-plaque { grid-area: 1 / 1; }
+.xr-cpanel-item--knob > .xr-pknob { grid-area: 2 / 1; }
+.xr-cpanel-item--meter > .xr-cpanel-plaque { grid-area: 1 / 2; }
+.xr-cpanel-item--meter > .xr-pmeter { grid-area: 2 / 2; }
+.xr-cpanel-item--toggle {
+  grid-area: 2 / 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: calc(6 * var(--xr-u, 1px));
-  min-width: 0;
 }
+.xr-cpanel-item--toggle > .xr-cpanel-plaque { align-self: center; }
 .xr-cpanel-plaque {
   padding: 0;
   border: 0;
@@ -215,4 +227,6 @@
   font: 500 max(11px, calc(13 * var(--xr-u, 1px))) / 1 var(--xr-font-sans);
   letter-spacing: 0.1em;
   white-space: nowrap;
+  align-self: end;
+  justify-self: center;
 }

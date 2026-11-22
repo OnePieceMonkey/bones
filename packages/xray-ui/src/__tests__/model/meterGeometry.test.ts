@@ -31,7 +31,9 @@ describe("meter geometry", () => {
     expect(RED_ZONE.from).toBe(0.75);
     expect(RED_ZONE.to).toBe(1);
     expect(redZoneArc().startAngle).toBe(30);
-    expect(redZoneArc().d).toMatch(/^M [\d.]+ [\d.]+ A 76 76 0 0 1 [\d.]+ [\d.]+$/);
+    expect(redZoneArc().d).toMatch(
+      new RegExp(String.raw`^M [\d.]+ [\d.]+ A ${METER.scaleRadius} ${METER.scaleRadius} 0 0 1 [\d.]+ [\d.]+$`),
+    );
   });
 
   it("meterPoint(0, r) is straight up from the pivot", () => {

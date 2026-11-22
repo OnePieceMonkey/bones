@@ -14,11 +14,11 @@ export interface MeterProps extends CommonProps {
 
 const LABEL = "AI READ CONFIDENCE";
 const VIEW_W = 200;
-const VIEW_H = 105;
+const VIEW_H = 150;
 /** Five major ticks: 0, 25, 50, 75, 100. */
 const MAJOR_COUNT = 5;
 const MINOR_PER_STEP = 4;
-const NUMBER_RADIUS = METER.scaleRadius - METER.tickMajor - 9;
+const NUMBER_RADIUS = METER.scaleRadius - METER.tickMajor - 10;
 /** Fixed id keeps the markup identical across mounts (render determinism). */
 const faceId = "xr-meter-face";
 const EMPTY_ANATOMY: Anatomy = { bones: [], fieldLabels: {} };

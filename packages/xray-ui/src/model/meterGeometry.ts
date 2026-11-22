@@ -10,13 +10,13 @@ export interface MeterTick {
   y: number;
 }
 
-/** Meter geometry in the SVG viewBox `0 0 200 105`. */
+/** Meter geometry in the SVG viewBox `0 0 200 150`. */
 export const METER = {
-  pivot: { x: 100, y: 98 },
-  needle: 70,
-  scaleRadius: 76,
-  tickMajor: 6,
-  tickMinor: 4,
+  pivot: { x: 100, y: 128 },
+  needle: 94,
+  scaleRadius: 104,
+  tickMajor: 7,
+  tickMinor: 5,
 } as const;
 
 export const RED_ZONE = { from: 0.75, to: 1 } as const;

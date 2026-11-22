@@ -506,8 +506,8 @@ test("the meter is a rectangle with a red zone and its needle moves by transform
   expect(m.now).not.toBeNull();
   expect(m.radius).toBeGreaterThan(0);
   expect(m.radius).toBeLessThan(m.h / 2); // below 50 % of the height: a rounded rectangle, not a disc
-  expect(m.w).toBeGreaterThan(m.h * 1.5);
-  expect(m.bezelRatio).toBeGreaterThan(1.5);
+  expect(m.w).toBeGreaterThan(m.h * 1.2);
+  expect(m.bezelRatio).toBeGreaterThan(1.2);
   expect(m.hasImg).toBe(false);
   expect(m.zoneStroke).toMatch(/rgb\(179, 38, 30\)/);
   expect(m.numbers).toEqual(["0", "25", "50", "75", "100"]);
@@ -681,5 +681,48 @@ for (const size of SIZES) {
     expect(d.buttonsFit, "button text fits on one line").toBe(true);
     expect(d.pageX).toBeLessThanOrEqual(0);
     expect(d.pageY).toBeLessThanOrEqual(0);
+  });
+}
+
+// Checkpoint 8 verdict (R5.2, R5.5, R5.9): meter as tall as the dial and centred on it, 16 px steel below, one label baseline, numbers >= 11 px.
+for (const size of SIZES) {
+  test(`meter matches the dial height, is centred on the knob and keeps steel below at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const r = (sel: string) => document.querySelector(sel)!.getBoundingClientRect();
+      // The dial is rotated, so its client rect is a bounding box; use the unrotated size and the knob root for the centre.
+      const dialEl = document.querySelector<HTMLElement>(".xr-pknob-dial")!;
+      const knob = r(".xr-pknob");
+      const dial = { height: dialEl.offsetHeight, top: knob.top + (knob.height - dialEl.offsetHeight) / 2 };
+      const meter = r(".xr-pmeter");
+      const panel = r(".xr-cpanel");
+      const plaqueBottom = (cls: string) => r(`.xr-cpanel-item--${cls} .xr-cpanel-plaque`).bottom;
+      const svg = r(".xr-pmeter-svg");
+      const nums = [...document.querySelectorAll<SVGTextElement>(".xr-pmeter-num")].map(
+        (n) => parseFloat(getComputedStyle(n).fontSize) * (svg.width / 200),
+      );
+      return {
+        dialH: dial.height,
+        meterH: meter.height,
+        dialCy: dial.top + dial.height / 2,
+        meterCy: meter.top + meter.height / 2,
+        steelBelow: panel.bottom - meter.bottom,
+        baselineDelta: Math.abs(plaqueBottom("knob") - plaqueBottom("meter")),
+        minNum: Math.min(...nums),
+        scrollH: document.documentElement.scrollHeight,
+        inside: meter.left >= panel.left && meter.right <= panel.right && meter.top >= panel.top,
+      };
+    });
+    expect(Math.abs(m.meterH - m.dialH) / m.dialH).toBeLessThanOrEqual(0.15);
+    expect(Math.abs(m.meterCy - m.dialCy)).toBeLessThanOrEqual(4);
+    expect(m.steelBelow).toBeGreaterThanOrEqual(16);
+    expect(m.baselineDelta).toBeLessThanOrEqual(2);
+    expect(m.minNum).toBeGreaterThanOrEqual(11);
+    expect(m.inside).toBe(true);
+    expect(m.scrollH).toBeLessThanOrEqual(size.height);
   });
 }
