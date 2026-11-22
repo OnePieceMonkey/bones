@@ -8,6 +8,7 @@ import "./styles/stage.css";
 import "./styles/panels.css";
 import "./styles/controls.css";
 import "./styles/sheet.css";
+import "./styles/form.css";
 import "./styles/intro.css";
 import "./styles/motion.css";
 
@@ -56,8 +57,8 @@ export { Skeleton } from "./components/Skeleton";
 export { BoneButton, BoneGlyph } from "./components/Bone";
 export { Tooltip } from "./components/Tooltip";
 export { EcgLine } from "./components/EcgLine";
-export { FormStrip, FormStripField } from "./components/FormStrip";
-export type { FormStripProps, FormStripFieldProps } from "./components/FormStrip";
+export { FormStrip, FormStripField, FormStripFile } from "./components/FormStrip";
+export type { FormStripProps, FormStripFieldProps, FormStripFileProps } from "./components/FormStrip";
 export { StartHeadline } from "./components/StartHeadline";
 export type { StartHeadlineProps } from "./components/StartHeadline";
 export { FilmClip } from "./components/FilmClip";

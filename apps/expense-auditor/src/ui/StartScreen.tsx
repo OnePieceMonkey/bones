@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { FilmSheet, FormStrip, FormStripField, ShellFrame, StartHeadline } from "@bones/xray-ui";
+import { FilmSheet, FormStrip, FormStripField, FormStripFile, ShellFrame, StartHeadline } from "@bones/xray-ui";
 import { DEFAULT_TRIP } from "../extraction/samples";
 import type { PreparedImage } from "../extraction/imageResize";
 import type { PhotoRequest } from "../state/sessionStore";
@@ -90,13 +90,12 @@ export function StartScreen({
         {liveAvailable ? (
           <form onSubmit={(e) => void onSubmit(e)} className="app-live-form">
             <FormStrip legend="Live receipt photo" disabled={busy || preparing}>
-              <FormStripField label="Upload receipt photo">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  onChange={(e) => onFile(e.currentTarget.files?.[0] ?? null)}
-                />
-              </FormStripField>
+              <FormStripFile
+                label="Upload receipt photo"
+                accept="image/jpeg,image/png"
+                placeholder="Choose a photo"
+                onFile={onFile}
+              />
               <FormStripField label="Trip start">
                 <input type="date" required value={tripStart} onChange={(e) => setTripStart(e.target.value)} />
               </FormStripField>

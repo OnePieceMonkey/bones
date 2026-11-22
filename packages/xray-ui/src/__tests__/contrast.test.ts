@@ -207,6 +207,8 @@ describe("new surface contrast", () => {
       // Task 6.3: the panel now carries the sheen gradient, so the pair is measured on the sheen-blended average (its strongest point, the top edge).
       { name: "steel label on steel average", fg: need("--xr-text-on-steel"), bg: rgbToHex(steel.avg), min: 4.5 },
       { name: "steel label on steel average after sheen", fg: need("--xr-text-on-steel"), bg: rgbToHex(overSheen(steel.avg)), min: 4.5 },
+      // Task 11.1: live form input text on the input fill (rgba(5, 9, 13, 0.55) in form.css) over the lightest steel pixel (worst case for light text).
+      { name: "form input text on input fill over lightest steel", fg: need("--xr-text"), bg: rgbToHex(blend([5, 9, 13] as unknown as Rgb, 0.55, steel.light)), min: 4.5 },
       // FOCUS_PAIRS_V2
       { name: "focus-contrast on lightest steel after sheen", fg: need("--xr-focus-contrast"), bg: rgbToHex(overSheen(steel.light)), min: 3 },
       { name: "focus on darkest steel after sheen", fg: need("--xr-focus"), bg: rgbToHex(overSheen(steel.dark)), min: 3 },

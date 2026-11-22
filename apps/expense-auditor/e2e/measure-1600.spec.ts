@@ -1134,3 +1134,85 @@ for (const size of SIZES) {
     expect(m.contrast, "stamp text on its own fill").toBeGreaterThanOrEqual(4.5);
   });
 }
+
+// visual-polish-2 task 11.1: steel live form and custom file button (R8.1 to R8.4, R8.6).
+// The live form renders only when GET /api/extract answers {"live":true}; the answer is mocked, so no real server or provider is called.
+async function openLiveStart(page: Page, size = { width: 1600, height: 900 }): Promise<void> {
+  await page.route("**/api/extract", (route) =>
+    route.request().method() === "GET"
+      ? route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ live: true }) })
+      : route.fulfill({ status: 500, body: "mocked: no POST in this test" }),
+  );
+  await page.setViewportSize(size);
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.getByLabel("Upload receipt photo")).toBeAttached();
+}
+
+test("live form controls: appearance none, sans font, 44 px, hidden native file input (R8.2, R8.4)", async ({ page }) => {
+  await openLiveStart(page);
+  const sans = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--xr-font-sans").trim());
+  const sels = [".xr-form-strip input[type=date] >> nth=0", ".xr-form-strip button[type=submit]", ".xr-file-button"];
+  for (const sel of sels) {
+    const m = await page.locator(sel).evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { appearance: s.appearance, family: s.fontFamily, minHeight: parseFloat(s.minHeight), h: el.getBoundingClientRect().height };
+    });
+    expect(m.appearance, sel).toBe("none");
+    expect(m.family, sel).toBe(sans);
+    expect(m.minHeight, sel).toBeGreaterThanOrEqual(44);
+    expect(m.h, sel).toBeGreaterThanOrEqual(44);
+  }
+  const input = page.getByLabel("Upload receipt photo");
+  const hidden = await input.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { display: s.display, visibility: s.visibility, w: el.getBoundingClientRect().width };
+  });
+  expect(hidden.display).not.toBe("none");
+  expect(hidden.visibility).toBe("visible");
+  expect(hidden.w).toBeLessThanOrEqual(1);
+  await expect(page.locator(".xr-file-name")).toHaveText("Choose a photo");
+});
+
+test("live form: file input is focusable by keyboard and the button shows a 3 px ring (R8.2)", async ({ page }) => {
+  await openLiveStart(page);
+  const input = page.getByLabel("Upload receipt photo");
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press("Tab");
+    if (await input.evaluate((el) => el === document.activeElement)) break;
+  }
+  await expect(input).toBeFocused();
+  const ring = await page.locator(".xr-file-button").evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { width: parseFloat(s.outlineWidth), style: s.outlineStyle, color: s.outlineColor, shadow: s.boxShadow };
+  });
+  expect(ring.style).toBe("solid");
+  expect(ring.width).toBeGreaterThanOrEqual(3);
+  expect(ring.color).toBe("rgb(255, 255, 255)");
+  expect(ring.shadow).toContain("rgb(5, 9, 13)");
+});
+
+test("live form: chosen file name appears on the button", async ({ page }) => {
+  await openLiveStart(page);
+  await page.getByLabel("Upload receipt photo").setInputFiles({ name: "lunch.png", mimeType: "image/png", buffer: Buffer.from("x") });
+  await expect(page.locator(".xr-file-name")).toHaveText("lunch.png");
+});
+
+for (const size of SIZES) {
+  test(`live start screen fits, strip does not overlap the sheets at ${size.width}x${size.height} (R8.6)`, async ({ page }) => {
+    await openLiveStart(page, size);
+    const d = await scrollDims(page);
+    expect(d.scrollHeight, "height").toBeLessThanOrEqual(d.innerHeight);
+    expect(d.scrollWidth, "width").toBeLessThanOrEqual(d.innerWidth);
+    const boxes = await page.evaluate(() => {
+      const strip = document.querySelector(".xr-form-strip")!.getBoundingClientRect();
+      const sheets = Array.from(document.querySelectorAll(".app-sheets .xr-sheet")).map((e) => e.getBoundingClientRect());
+      return { strip: { top: strip.top, bottom: strip.bottom, left: strip.left, right: strip.right }, sheetBottom: Math.max(...sheets.map((r) => r.bottom)) };
+    });
+    expect(boxes.strip.top, "strip below sheets").toBeGreaterThanOrEqual(boxes.sheetBottom);
+    expect(boxes.strip.bottom).toBeLessThanOrEqual(size.height);
+    expect(boxes.strip.left).toBeGreaterThanOrEqual(0);
+    expect(boxes.strip.right).toBeLessThanOrEqual(size.width);
+    if (size.width === 1600) await page.screenshot({ path: "/tmp/live-start-1600.png" });
+  });
+}
