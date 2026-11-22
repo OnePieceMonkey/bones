@@ -179,21 +179,21 @@
   grid-area: glass;
   position: relative;
   box-sizing: border-box;
-  padding: calc(14 * var(--xr-u, 1px));
+  padding: calc(10 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
   background: var(--xr-glass-tint-rgba);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid var(--xr-cyan-glow);
-  border-radius: var(--xr-radius);
+  border-radius: calc(14 * var(--xr-u, 1px));
   color: var(--xr-text-on-glass);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
-/* Room for the stamp in the bottom-right corner, so it never covers a field value. */
+/* visual-polish-2 R3.3, R3.4: the stamp is part of the picture and may cover a row end; the last row stays mostly clear of it. */
 .xr-glass[data-overruled="true"] {
-  padding-bottom: calc(78 * var(--xr-u, 1px));
+  padding-bottom: calc(14 * var(--xr-u, 1px));
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .xr-glass { background: var(--xr-bg-panel); }
@@ -206,12 +206,23 @@
   overflow-y: auto;
 }
 .xr-glass .xr-field {
-  gap: calc(12 * var(--xr-u, 1px));
-  font-size: max(11px, calc(13 * var(--xr-u, 1px)));
+  display: grid;
+  grid-template-columns: 27% minmax(0, 1fr);
+  gap: calc(8 * var(--xr-u, 1px));
+  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  line-height: 1.25;
+  padding: calc(2 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
 }
-.xr-glass .xr-field dt { flex: 0 0 32%; min-width: 0; }
-.xr-glass .xr-field dd { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; }
-.xr-glass .xr-conf { display: block; margin-left: 0; }
+.xr-glass .xr-answer-head { margin-bottom: calc(2 * var(--xr-u, 1px)); }
+.xr-glass .xr-field dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 calc(8 * var(--xr-u, 1px));
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.xr-glass .xr-conf { display: inline; margin-left: 0; font-size: max(10px, calc(10 * var(--xr-u, 1px))); }
 .xr-glass .xr-cracks {
   position: absolute;
   inset: 0;
@@ -230,11 +241,11 @@
 .xr-glass-stamp {
   position: absolute;
   z-index: 3;
-  right: calc(10 * var(--xr-u, 1px));
+  right: calc(8 * var(--xr-u, 1px));
   bottom: calc(10 * var(--xr-u, 1px));
   margin: 0;
-  padding: calc(6 * var(--xr-u, 1px)) calc(12 * var(--xr-u, 1px));
-  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  padding: calc(3 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px));
+  font-size: max(10px, calc(11 * var(--xr-u, 1px)));
   background: var(--xr-bg-stamp-live);
   color: var(--xr-text-stamp-live);
   transform: rotate(-8deg);

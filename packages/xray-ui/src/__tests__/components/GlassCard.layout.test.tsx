@@ -43,9 +43,25 @@ describe("GlassCard layout", () => {
     expect(block(panels, ".xr-glass-body")).toMatch(/overflow-y:\s*auto/);
   });
 
-  it("does not give the card a fixed height", () => {
+  // visual-polish-2 R3.1 supersedes visual-polish R3.4 and R7: the card sits at the top centre of the stage.
+  it("does not give the card a fixed height and places it at the top centre", () => {
     const shell = block(css("shell.css"), ".xr-shell-stagecell .xr-glass");
+    expect(shell).toMatch(/position:\s*absolute/);
+    expect(shell).toMatch(/left:/);
+    expect(shell).toMatch(/width:/);
+    expect(shell).toMatch(/max-height:/);
     expect(shell).not.toMatch(/[^-]height:/);
+    expect(shell).not.toMatch(/bottom:/);
+    expect(shell).not.toMatch(/left:\s*2%/);
     expect(shell).not.toMatch(/overflow:\s*auto/);
+    expect(block(css("shell.css"), '.xr-shell[data-xray="false"] .xr-shell-stagecell .xr-glass')).toMatch(/top:\s*auto/);
+  });
+
+  it("lays each field out as a two-column grid with the confidence inline", () => {
+    const panels = css("panels.css");
+    expect(block(panels, ".xr-glass .xr-field")).toMatch(/display:\s*grid/);
+    expect(block(panels, ".xr-glass .xr-field")).toMatch(/grid-template-columns:\s*27%/);
+    expect(block(panels, ".xr-glass .xr-field dd")).toMatch(/flex-wrap:\s*wrap/);
+    expect(block(panels, ".xr-glass .xr-field dt")).not.toMatch(/flex:/);
   });
 });

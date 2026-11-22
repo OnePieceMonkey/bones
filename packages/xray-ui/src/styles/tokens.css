@@ -31,8 +31,8 @@
   --xr-focus-contrast: #05090d;
   --xr-amber-glow: rgba(255, 176, 32, 0.8);
   --xr-glass-tint: #0b1620;     /* hex, read by the contrast test */
-  --xr-glass-alpha: 0.55;       /* plain number, read by the contrast test */
-  --xr-glass-tint-rgba: rgba(11, 22, 32, 0.55);
+  --xr-glass-alpha: 0.78;       /* plain number, read by the contrast test */
+  --xr-glass-tint-rgba: rgba(11, 22, 32, 0.78);
   --xr-text-on-glass: #e8f4f8;
   --xr-text-on-steel: #0b1218;  /* engraved on brushed steel (4.70:1 on the steel average) */
   --xr-text-header: #e8f4f8;

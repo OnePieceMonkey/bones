@@ -973,3 +973,66 @@ for (const size of SIZES) {
     expect(m.sh).toBeLessThanOrEqual(m.vh);
   });
 }
+
+// visual-polish-2 task 9.4: glass card at the top centre with compact rows (R3.1 to R3.3, R10.4).
+for (const size of SIZES) {
+  test(`glass card sits at the top centre above the ribs at ${size.width}x${size.height} (R3.1, R3.2, R3.3)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const r = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+      const stage = r(".xr-shell-stagecell");
+      const photo = r(".xr-photo");
+      const glass = r(".xr-glass");
+      const others = [".xr-doc", ".xr-doctor", ".xr-cpanel", ".xr-header"].map((s) => ({ s, b: r(s) }));
+      const body = document.querySelector(".xr-glass-body")!;
+      const rows = Array.from(document.querySelectorAll(".xr-glass .xr-field")).map((f) => {
+        const dt = f.querySelector("dt")!.getBoundingClientRect();
+        const dd = f.querySelector("dd")!.getBoundingClientRect();
+        const rr = f.getBoundingClientRect();
+        return { top: rr.top, bottom: rr.bottom, h: rr.height, gap: dd.left - dt.right };
+      });
+      const bodyRect = body.getBoundingClientRect();
+      const cracks = document.querySelector(".xr-glass .xr-cracks")!.getBoundingClientRect();
+      return {
+        stage: { l: stage.left, w: stage.width },
+        photo: { l: photo.left, t: photo.top, w: photo.width, h: photo.height },
+        glass: { l: glass.left, r: glass.right, t: glass.top, b: glass.bottom, w: glass.width, h: glass.height },
+        others: others.map((o) => ({ s: o.s, l: o.b.left, r: o.b.right, t: o.b.top, b: o.b.bottom })),
+        rows,
+        body: { top: bodyRect.top, bottom: bodyRect.bottom, scrolls: body.scrollHeight > body.clientHeight + 1 },
+        cracks: { l: cracks.left, r: cracks.right, t: cracks.top, b: cracks.bottom },
+      };
+    });
+    const photoCentre = m.photo.l + m.photo.w / 2;
+    expect(Math.abs((m.glass.l + m.glass.r) / 2 - photoCentre), "card centre vs photo centre").toBeLessThanOrEqual(0.05 * m.stage.w);
+    expect(m.glass.b, "card above the rib top").toBeLessThanOrEqual(m.photo.t + 0.22 * m.photo.h + 0.5);
+    expect(m.glass.b, "card above 45 % of the photo").toBeLessThanOrEqual(m.photo.t + 0.45 * m.photo.h);
+    expect(m.glass.w / m.stage.w).toBeGreaterThanOrEqual(0.35);
+    expect(m.glass.w / m.stage.w).toBeLessThanOrEqual(0.55);
+    for (const o of m.others) {
+      const hit = m.glass.l < o.r - 0.5 && o.l < m.glass.r - 0.5 && m.glass.t < o.b - 0.5 && o.t < m.glass.b - 0.5;
+      expect(hit, `card overlaps ${o.s}`).toBe(false);
+    }
+    // All four fields are present, one row each, and either fully visible or reachable by scrolling inside the card.
+    expect(m.rows.length).toBe(4);
+    for (const row of m.rows) {
+      expect(row.h, "compact row, at most two text lines").toBeLessThan(48);
+      expect(row.gap, "label/value gap").toBeGreaterThanOrEqual(4);
+      if (!m.body.scrolls) expect(row.bottom, "row inside the card body").toBeLessThanOrEqual(m.body.bottom + 0.5);
+    }
+    // Cracks cover the full card area.
+    expect(m.cracks.l).toBeLessThanOrEqual(m.glass.l + 2);
+    expect(m.cracks.r).toBeGreaterThanOrEqual(m.glass.r - 2);
+    expect(m.cracks.t).toBeLessThanOrEqual(m.glass.t + 2);
+    expect(m.cracks.b).toBeGreaterThanOrEqual(m.glass.b - 2);
+    // Semantics.
+    await expect(page.getByRole("article", { name: "AI answer" })).toBeVisible();
+    await expect(page.getByRole("note").filter({ hasText: "OVERRULED BY RULE" })).toBeVisible();
+    const d = await scrollDims(page);
+    expect(d.scrollHeight).toBeLessThanOrEqual(d.innerHeight);
+    expect(d.scrollWidth).toBeLessThanOrEqual(d.innerWidth);
+  });
+}

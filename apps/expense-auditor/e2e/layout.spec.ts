@@ -76,7 +76,7 @@ function checkLayout(m: Measured): void {
     for (let j = i + 1; j < REGIONS.length; j += 1) {
       const a = m.regions[REGIONS[i]!];
       const b = m.regions[REGIONS[j]!];
-      // Known exception: the design lays the glass card over the lower left of the photo (shell.css, .xr-shell-stagecell .xr-glass).
+      // Known exception: the design lays the glass card over the upper part of the photo (skull), visual-polish-2 R3.2 and A1 (shell.css, .xr-shell-stagecell .xr-glass).
       if (REGIONS[i] === ".xr-glass" && REGIONS[j] === ".xr-photo") continue;
       // visual-polish-2 A5: the steel panel may cover the transparent margin of the photo box; the pixel gap is checked below.
       if (REGIONS[i] === ".xr-photo" && REGIONS[j] === ".xr-cpanel") continue;

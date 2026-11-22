@@ -69,7 +69,7 @@ html:has(.xr-shell) body {
   }
 }
 
-/* Stage cell: skeleton photo with the glass answer card laid over its lower left. */
+/* Stage cell: skeleton photo with the glass answer card laid over its top centre. */
 .xr-shell-stagecell {
   grid-area: 1 / 2 / 3 / 4;
   position: relative;
@@ -84,11 +84,11 @@ html:has(.xr-shell) body {
 .xr-shell-stagecell .xr-glass {
   grid-area: auto;
   position: absolute;
-  /* Task 6.3: starts right of the wider control panel (8fr of 46fr = 17.4 %). Task 9 moves the card to the top centre. */
-  left: 19%;
-  bottom: 3%;
-  width: 44%;
-  max-height: 62%;
+  /* visual-polish-2 R3.1, R3.2: top centre, 52 % of the stage; overlaps the skull, ends above the ribs. */
+  left: 24%;
+  width: 52%;
+  top: max(calc(2 * var(--xr-u, 1px)), calc(100% - var(--xr-photo-w) / 1.0824 * 1.06));
+  max-height: calc(160 * var(--xr-u, 1px));
   z-index: 3;
 }
 /* Flat view: the stage is not mounted; the answer card is shown in place. */
@@ -99,7 +99,7 @@ html:has(.xr-shell) body {
 .xr-shell[data-xray="false"] .xr-shell-stagecell .xr-glass {
   position: relative;
   left: auto;
-  bottom: auto;
+  top: auto;
   width: 80%;
   max-height: 80%;
 }

@@ -11,6 +11,8 @@ const ALLOW_LIST = new Set([
   ".xr-sheet-thumb",
   ".xr-rulebox",
   ".xr-burst",
+  // visual-polish-2 task 9.4: the glass card height budget is 160 u (design, R3.2).
+  ".xr-shell-stagecell .xr-glass",
 ]);
 
 export interface Violation {

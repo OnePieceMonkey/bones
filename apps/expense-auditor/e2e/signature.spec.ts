@@ -37,6 +37,7 @@ async function checkLayout(page: Page, label: string): Promise<void> {
     const body = glass?.querySelector(".xr-glass-body") ?? null;
     return {
       stamp: stampEl ? box(stampEl) : null,
+      glassBox: glass ? box(glass) : null,
       values: Array.from(document.querySelectorAll(".xr-glass .xr-field-value")).map(box),
       cracksZ: cracks ? Number.parseInt(getComputedStyle(cracks).zIndex, 10) : null,
       bodyZ: body ? Number.parseInt(getComputedStyle(body).zIndex, 10) : null,
@@ -48,7 +49,15 @@ async function checkLayout(page: Page, label: string): Promise<void> {
   });
   expect(m.stamp, `${label}: stamp box`).not.toBeNull();
   expect(m.values.length, `${label}: AI card has value boxes`).toBeGreaterThan(0);
-  for (const v of m.values) expect(overlaps(m.stamp!, v), `${label}: stamp overlaps a value`).toBe(false);
+  // visual-polish-2 R3.3, R3.4: the stamp is drawn across the compact card, so it may cover part of a value; it must not hide one entirely.
+  for (const v of m.values) {
+    const covered = m.stamp!.left <= v.left && m.stamp!.right >= v.right && m.stamp!.top <= v.top && m.stamp!.bottom >= v.bottom;
+    expect(covered, `${label}: stamp hides a value completely`).toBe(false);
+  }
+  expect(m.glassBox, `${label}: glass box`).not.toBeNull();
+  expect(m.stamp!.left, `${label}: stamp inside card`).toBeGreaterThanOrEqual(m.glassBox!.left - 1);
+  expect(m.stamp!.right, `${label}: stamp inside card`).toBeLessThanOrEqual(m.glassBox!.right + 1);
+  expect(m.stamp!.bottom, `${label}: stamp inside card`).toBeLessThanOrEqual(m.glassBox!.bottom + 1);
   expect(Number.isNaN(m.cracksZ), `${label}: cracks z-index is numeric`).toBe(false);
   expect(m.cracksZ, `${label}: cracks z-index`).not.toBeNull();
   expect(m.cracksZ!, `${label}: cracks below rows`).toBeLessThan(m.bodyZ!);
@@ -90,7 +99,13 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
     const lum = (r: number, g: number, bl: number) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(bl);
     const out: { what: string; maxLum: number }[] = [];
     // Backdrop luminance only; the text colour is read below.
-    const targets = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf"));
+    // visual-polish-2 R3.3: at small sizes the compact card scrolls inside; rows scrolled out of view are not painted on the card, so only visible rows are sampled.
+    const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
+    const inside = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+    };
+    const targets = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf")).filter(inside);
     for (const el of targets) {
       const r = el.getBoundingClientRect();
       const x0 = Math.max(0, Math.floor(r.left * scale));
@@ -114,9 +129,13 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
       const s = c / 255;
       return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     };
+    const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
     return Array.from(
       document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf"),
-    ).map((el) => {
+    ).filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+    }).map((el) => {
       const [r, g, b] = parse(getComputedStyle(el).color);
       return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
     });
