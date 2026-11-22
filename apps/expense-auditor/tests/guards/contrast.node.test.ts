@@ -4,8 +4,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { contrastRatio, relativeLuminance } from "../helpers/contrast";
 
-// app.css only names xray-ui tokens. This guard resolves them from tokens.css,
-// checks that each one exists and checks the colour pairs app.css puts together.
+// app.css is reduced to layout plus the `body` rule (visual-polish-2 D2, task 11.3). The visual rules
+// moved to packages/xray-ui. This guard resolves the tokens app.css still names, checks that each one
+// exists and checks the colour pairs that remain on screen (body, and the xray-ui form rules the app uses).
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKENS = readFileSync(resolve(HERE, "../../../../packages/xray-ui/src/styles/tokens.css"), "utf8");
@@ -30,7 +31,6 @@ const TEXT_PAIRS: ReadonlyArray<readonly [string, string, string]> = [
   ["--xr-text", "--xr-bg-panel", "body/dialog text on panel"],
   ["--xr-text", "--xr-bg-deep", "body text on deep"],
   ["--xr-text-dim", "--xr-bg-panel", "dim text on panel"],
-  ["--xr-text-dim", "--xr-bg-deep", ".app-trip-text on deep (removed in 11.3)"],
   ["--xr-text", "--xr-bg-row", ".xr-input text on row (visual-polish-2 D2)"],
   ["--xr-text-dim", "--xr-bg-row", ".xr-counter / input border on row"],
   ["--xr-text-on-plate", "--xr-bg-plate", ".xr-btn plate text"],

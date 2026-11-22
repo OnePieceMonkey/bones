@@ -216,3 +216,9 @@
   outline: 3px solid var(--xr-focus);
   outline-offset: 2px;
 }
+
+/* Default focus ring for the shell and the app root (moved from app.css, visual-polish-2 D2). */
+:where(.xr-shell, .xr-app) :focus-visible {
+  outline: 3px solid var(--xr-focus);
+  outline-offset: 2px;
+}

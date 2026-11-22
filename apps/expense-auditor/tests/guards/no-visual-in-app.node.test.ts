@@ -29,6 +29,13 @@ const RULES: readonly Rule[] = [
     pattern: /<(?:Shell|ShellFrame)\b[^>]*\bstyle\s*=/s,
     exts: [".tsx"],
   },
+  {
+    // visual-polish-2 D2/A9: app.css keeps layout only. The `body` block is exempt (see stripBodyBlock).
+    construct: "visual declaration in app.css",
+    pattern:
+      /(?:^|[;{\s])(?:border(?:-[a-z]+)*|box-shadow|text-shadow|font-family|font-weight|color|background(?:-[a-z]+)*)\s*:/m,
+    exts: [".css"],
+  },
   { construct: "audio (AudioContext)", pattern: /\bAudioContext\b/ },
   { construct: "audio (new Audio)", pattern: /\bnew\s+Audio\s*\(/ },
   {
@@ -42,12 +49,18 @@ export interface Violation {
   readonly construct: string;
 }
 
+/** Removes every top-level `body { ... }` block so the body rule may carry the page colours and font. */
+export function stripBodyBlock(css: string): string {
+  return css.replace(/(^|[}\s])body\s*\{[^}]*\}/g, "$1");
+}
+
 export function scanSource(file: string, text: string): Violation[] {
   const ext = extname(file);
   const out: Violation[] = [];
   for (const rule of RULES) {
     if (rule.exts && !rule.exts.includes(ext)) continue;
-    if (rule.pattern.test(text)) out.push({ file, construct: rule.construct });
+    const subject = rule.construct === "visual declaration in app.css" ? stripBodyBlock(text) : text;
+    if (rule.pattern.test(subject)) out.push({ file, construct: rule.construct });
   }
   return out;
 }
@@ -81,6 +94,8 @@ describe("app source guard", () => {
       ["a.css", ".a { transition: opacity 1s; }", "transition"],
       ["a.css", ".a { animation: spin 1s; }", "animation"],
       ["a.tsx", '<Shell heading="x" style={{ top: 1 }} />', "style= on Shell element"],
+      ["app.css", ".a { color: red; }", "visual declaration in app.css"],
+      ["app.css", "body { margin: 0; }\n.a { border: 1px solid; }", "visual declaration in app.css"],
       ["a.ts", "const c = new AudioContext();", "audio (AudioContext)"],
       ["a.ts", 'const a = new Audio("x");', "audio (new Audio)"],
       ["a.ts", 'headers.Authorization = "x";', "auth"],
@@ -93,5 +108,7 @@ describe("app source guard", () => {
   it("scanner accepts clean samples", () => {
     expect(scanSource("a.ts", "URL.createObjectURL(blob);")).toEqual([]);
     expect(scanSource("a.tsx", '<Shell heading="x" />')).toEqual([]);
+    expect(scanSource("app.css", ".a { display: flex; gap: 4px; }")).toEqual([]);
+    expect(scanSource("app.css", "body { color: red; background: #000; font-family: x; }")).toEqual([]);
   });
 });

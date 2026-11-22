@@ -1,7 +1,7 @@
-/* Expense Auditor styles. Colours come only from the xray-ui tokens (--xr-*).
-   Text/background pairs used: text, text-dim on bg-panel and bg-deep;
-   text-on-plate on bg-plate; text-on-metal on bg-metal-light;
-   text-on-cyan on bg-cyan-fill; text-stamp on bg-stamp. */
+/* Expense Auditor styles. Layout of app-owned wrappers only (position, flex, gap,
+   padding, margin, size). Every visual rule (colour, border, background, shadow,
+   font) lives in packages/xray-ui (visual-polish-2 D2). The guard
+   no-visual-in-app.node.test.ts forbids visual declarations here, except in `body`. */
 
 *,
 *::before,
@@ -13,13 +13,8 @@ body {
   margin: 0;
   background: var(--xr-bg-deep);
   color: var(--xr-text);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--xr-font-sans);
   line-height: 1.5;
-}
-
-:focus-visible {
-  outline: 3px solid var(--xr-focus);
-  outline-offset: 2px;
 }
 
 main {
@@ -37,7 +32,6 @@ main {
   gap: var(--xr-space-3);
   margin: 0;
   padding: calc(70 * var(--xr-u, 1px)) 0 0;
-  border: 0;
 }
 
 .app-sheets + .app-status {
@@ -52,52 +46,7 @@ main {
   bottom: calc(60 * var(--xr-u, 1px) + 60px);
 }
 
-/* Decision view */
-.app-note {
-  display: inline-block;
-  margin: 0;
-  padding: var(--xr-space-1) var(--xr-space-2);
-  background: var(--xr-bg-plate);
-  color: var(--xr-text-on-plate);
-  border: 1px solid var(--xr-cyan);
-  border-radius: var(--xr-radius);
-}
-
-.app-trip-text {
-  margin: 0;
-  color: var(--xr-text-dim);
-}
-
-/* Toolbar */
-/* Buttons */
-.app-button {
-  min-height: 2.75rem;
-  padding: var(--xr-space-2) var(--xr-space-3);
-  background: var(--xr-bg-plate);
-  color: var(--xr-text-on-plate);
-  border: 2px solid var(--xr-cyan);
-  border-radius: var(--xr-radius);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.app-button:hover:not(:disabled) {
-  box-shadow: 0 0 8px var(--xr-cyan-glow);
-}
-
-.app-button:disabled {
-  border-color: var(--xr-text-muted);
-  color: var(--xr-text-muted);
-  cursor: not-allowed;
-}
-
-.app-button-primary {
-  background: var(--xr-bg-cyan-fill);
-  color: var(--xr-text-on-cyan);
-}
-
-/* Forms */
+/* Override form */
 .app-field {
   display: flex;
   flex-direction: column;
@@ -105,95 +54,8 @@ main {
   margin: 0 0 var(--xr-space-3);
 }
 
-.app-field label {
-  color: var(--xr-text);
-  font-weight: 600;
-}
-
-.app-input {
-  width: 100%;
-  padding: var(--xr-space-2);
-  background: var(--xr-bg-row);
-  color: var(--xr-text);
-  border: 2px solid var(--xr-text-dim);
-  border-radius: var(--xr-radius);
-  font: inherit;
-}
-
-.app-input[aria-invalid="true"] {
-  border-color: var(--xr-red);
-}
-
-.app-counter {
-  margin: 0;
-  color: var(--xr-text-dim);
-  font-size: 0.875rem;
-  text-align: right;
-}
-
-.app-field-error {
-  margin: 0;
-  color: var(--xr-text-stamp);
-  background: var(--xr-bg-stamp);
-  padding: var(--xr-space-1) var(--xr-space-2);
-  border-radius: var(--xr-radius);
-}
-
 .app-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--xr-space-2);
-}
-
-/* Dialog */
-.app-dialog {
-  width: min(32rem, 92vw);
-  padding: var(--xr-space-4);
-  background: var(--xr-bg-panel);
-  color: var(--xr-text);
-  border: 4px solid var(--xr-bg-metal-dark);
-  border-radius: var(--xr-radius);
-}
-
-.app-dialog::backdrop {
-  background: var(--xr-bg-deep);
-  opacity: 0.8;
-}
-
-.app-dialog h2 {
-  margin: 0 0 var(--xr-space-3);
-  color: var(--xr-cyan);
-}
-
-/* Error panel */
-.app-error {
-  padding: var(--xr-space-3);
-  background: var(--xr-bg-stamp);
-  color: var(--xr-text-stamp);
-  border: 2px solid var(--xr-red);
-  border-radius: var(--xr-radius);
-}
-
-.app-error h2 {
-  margin: 0 0 var(--xr-space-2);
-  font-size: 1.125rem;
-}
-
-.app-error p {
-  margin: 0 0 var(--xr-space-2);
-}
-
-.app-error ul {
-  margin: 0;
-  padding-left: var(--xr-space-4);
-}
-
-.app-error code {
-  color: var(--xr-text-stamp);
-}
-
-/* Busy status */
-.app-status {
-  margin: var(--xr-space-2) 0 0;
-  color: var(--xr-text);
 }

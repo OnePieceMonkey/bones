@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
   override render(): ReactNode {
     if (this.state.failed) {
       return (
-        <main>
+        <main className="xr-app">
           <p role="alert" className="xr-error">
             Something went wrong. Reload the page.
           </p>
@@ -55,7 +55,7 @@ function Screens({ store }: { store: SessionStore }) {
     mainRef.current?.querySelector("h1")?.focus();
   }, [state.screen]);
   return (
-    <main ref={mainRef}>
+    <main ref={mainRef} className="xr-app">
       {state.screen === "start" ? (
         <StartScreen
           busy={state.busy}
@@ -76,7 +76,7 @@ export function App({ store = null, bundleError = null }: AppProps) {
   return (
     <ErrorBoundary>
       {store === null ? (
-        <main>
+        <main className="xr-app">
           <h1>Expense Auditor</h1>
           <ErrorPanel error={bundleError} title="The rules could not be loaded" />
         </main>
