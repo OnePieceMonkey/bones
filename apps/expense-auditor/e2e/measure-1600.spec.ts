@@ -857,3 +857,63 @@ test("ECG band starts at the photo centre when nothing is fractured (R3.7)", asy
   expect(m.fractured).toBe(0);
   expect(Math.abs(m.bandLeft - m.centre)).toBeLessThanOrEqual(8);
 });
+
+// visual-polish-2 task 9.2: soft glow hotspots (R3.9, R3.10, R3.11, R3.12).
+test("hotspots are soft glows: no border, round, radial gradient, red and cyan tokens (R3.9, R3.11)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const read = (sel: string) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const s = getComputedStyle(el);
+      return { border: s.borderTopWidth, radius: s.borderTopLeftRadius, bg: s.backgroundImage, filter: s.filter, shadow: s.boxShadow, events: s.pointerEvents, core: s.getPropertyValue("--xr-hs-core").trim() };
+    };
+    const root = getComputedStyle(document.documentElement);
+    return {
+      rings: Array.from(document.querySelectorAll(".xr-hs-ring")).map((el) => {
+        const s = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
+        return { border: s.borderTopWidth, radius: s.borderTopLeftRadius, bg: s.backgroundImage, w: r.width, h: r.height };
+      }),
+      fractured: read(".xr-hs-ring--fractured"),
+      passed: read(".xr-hs-ring--applied-no-change"),
+      red: root.getPropertyValue("--xr-red-glow").trim(),
+      cyan: root.getPropertyValue("--xr-cyan-glow").trim(),
+    };
+  });
+  expect(m.rings.length).toBeGreaterThan(0);
+  for (const r of m.rings) {
+    expect(r.border).toBe("0px");
+    expect(r.radius).toBe("50%");
+    expect(r.bg).toContain("radial-gradient");
+  }
+  for (const k of [m.fractured, m.passed]) {
+    expect(k).not.toBeNull();
+    expect(k!.filter).toContain("blur");
+    expect(k!.shadow).toBe("none");
+    expect(k!.events).toBe("none");
+  }
+  expect(m.fractured!.core).toBe(m.red);
+  expect(m.passed!.core).toBe(m.cyan);
+  expect(m.fractured!.bg).toContain("rgba(255, 90, 90");
+  expect(m.passed!.bg).toContain("rgba(61, 232, 255");
+});
+test("focused hotspot keeps a 3 px outline, a 24 px target and the rule box line (R3.10, R3.12)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const btn = page.locator('.xr-hotspot[data-state="fractured"] button.xr-bone-btn').first();
+  await page.keyboard.press("Tab");
+  await btn.focus();
+  const m = await btn.evaluate((el) => {
+    const s = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return { focused: document.activeElement === el, outline: parseFloat(s.outlineWidth), style: s.outlineStyle, w: r.width, h: r.height };
+  });
+  const f = m;
+  expect(f.focused).toBe(true);
+  expect(m.w).toBeGreaterThanOrEqual(24);
+  expect(m.h).toBeGreaterThanOrEqual(24);
+  expect(f.style).toBe("solid");
+  expect(f.outline).toBeGreaterThanOrEqual(3);
+  await expect(page.locator(".xr-rulebox").first()).toBeVisible();
+  await expect(page.locator(".xr-rb-line").first()).toBeAttached();
+});

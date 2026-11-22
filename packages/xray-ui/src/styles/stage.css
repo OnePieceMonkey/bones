@@ -108,31 +108,29 @@
   white-space: nowrap;
 }
 .xr-hs-ring {
+  --xr-hs-core: var(--xr-cyan-glow);
+  --xr-hs-mid: rgba(61, 232, 255, 0.18);
   position: absolute;
-  inset: 20%;
+  inset: -14%;
+  border: 0;
   border-radius: 50%;
-  border: calc(2 * var(--xr-u, 1px)) solid var(--xr-cyan);
-  box-shadow: 0 0 calc(10 * var(--xr-u, 1px)) var(--xr-cyan-glow), inset 0 0 calc(6 * var(--xr-u, 1px)) var(--xr-cyan-glow);
+  background: radial-gradient(circle, var(--xr-hs-core) 0%, var(--xr-hs-mid) 38%, transparent 70%);
+  filter: blur(calc(1.5 * var(--xr-u, 1px)));
+  box-shadow: none;
   pointer-events: none;
 }
-.xr-hs-ring--applied-no-change { border-color: var(--xr-cyan); }
-.xr-hs-ring--fractured {
-  border-color: var(--xr-red);
-  box-shadow: 0 0 calc(14 * var(--xr-u, 1px)) var(--xr-red-glow), inset 0 0 calc(8 * var(--xr-u, 1px)) var(--xr-red-glow);
-}
-.xr-hs-ring--not-applicable {
-  border-color: var(--xr-text-muted);
-  box-shadow: none;
-  opacity: 0.5;
-}
+.xr-hs-ring--applied-no-change { --xr-hs-core: var(--xr-cyan-glow); --xr-hs-mid: rgba(61, 232, 255, 0.18); }
+.xr-hs-ring--fractured { --xr-hs-core: var(--xr-red-glow); --xr-hs-mid: rgba(255, 90, 90, 0.22); inset: -30%; }
+.xr-hs-ring--not-applicable { --xr-hs-core: rgba(143, 169, 181, 0.3); --xr-hs-mid: transparent; opacity: 0.5; }
 .xr-hs-check {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
+  font-size: max(10px, calc(11 * var(--xr-u, 1px)));
   line-height: 1;
   color: var(--xr-cyan);
+  opacity: 0.8;
   pointer-events: none;
 }
 .xr-hotspot .xr-tooltip { z-index: 10; }
@@ -182,11 +180,6 @@
   mix-blend-mode: screen;
   transform: translate(-50%, -50%) translate(calc(var(--dx, 0) * var(--xr-u, 1px)), calc(var(--dy, 0) * var(--xr-u, 1px))) rotate(var(--rot, 0deg));
 }
-/* Red pulsing ring drawn with gradients, so the glow stays if images fail. */
-.xr-hs-ring--fractured {
-  background: radial-gradient(circle, rgba(255, 90, 90, 0.35) 0%, rgba(255, 90, 90, 0) 70%);
-}
-
 /* Rule box and its line. The layer covers the lightbox and never takes pointer events. */
 .xr-rb-layer {
   position: absolute;
