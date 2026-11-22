@@ -49,7 +49,7 @@ main {
 }
 
 .app-live-form ~ .app-status {
-  bottom: calc(96 * var(--xr-u, 1px));
+  bottom: calc(60 * var(--xr-u, 1px) + 60px);
 }
 
 /* Decision view */

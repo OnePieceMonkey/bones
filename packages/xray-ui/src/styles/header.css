@@ -30,7 +30,7 @@
   color: var(--xr-text-muted);
   white-space: nowrap;
 }
-.xr-header-status [role="status"] { background: none; border: 0; box-shadow: none; padding: 0; }
+.xr-header-status [role="status"] { background: none; border: 0; box-shadow: none; padding: 0; color: var(--xr-text-muted); }
 .xr-header-status > * { margin: 0; min-width: 0; }
 .xr-wordmark {
   font-family: var(--xr-font-serif);

@@ -127,7 +127,7 @@ export function StartScreen({
           ))}
         </div>
         {busy ? (
-          <p role="status" className="app-status">
+          <p role="status" className="xr-status app-status">
             Reading receipt
           </p>
         ) : null}

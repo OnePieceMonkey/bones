@@ -1216,3 +1216,52 @@ for (const size of SIZES) {
     if (size.width === 1600) await page.screenshot({ path: "/tmp/live-start-1600.png" });
   });
 }
+
+// visual-polish-2 task 11.2: the busy status must not overlap the live form (`.app-live-form ~ .app-status` bottom offset).
+// The extract POST is held open by a mocked route (no real API); the status is read while it is pending.
+const PNG_1X1 = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+for (const size of SIZES) {
+  test(`busy status does not overlap the live form at ${size.width}x${size.height}`, async ({ page }) => {
+    let release: () => void = () => undefined;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/api/extract", async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ live: true }) });
+        return;
+      }
+      await held;
+      await route.fulfill({ status: 500, body: "mocked: released" });
+    });
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByLabel("Upload receipt photo").setInputFiles({ name: "lunch.png", mimeType: "image/png", buffer: PNG_1X1 });
+    await page.getByRole("button", { name: "Read receipt" }).click();
+    const status = page.getByRole("status").filter({ hasText: "Reading receipt" });
+    await expect(status).toBeVisible();
+    const m = await page.evaluate(() => {
+      const st = Array.from(document.querySelectorAll("[role=status]")).find((e) => e.textContent?.includes("Reading receipt"))!.getBoundingClientRect();
+      const strip = document.querySelector(".xr-form-strip")!.getBoundingClientRect();
+      const sheets = Array.from(document.querySelectorAll(".app-sheets .xr-sheet")).map((e) => e.getBoundingClientRect());
+      return {
+        st: { t: st.top, b: st.bottom, l: st.left, r: st.right },
+        strip: { t: strip.top, b: strip.bottom, l: strip.left, r: strip.right },
+        sheetBottom: Math.max(...sheets.map((r) => r.bottom)),
+        innerHeight: window.innerHeight,
+      };
+    });
+    const overlap = m.st.l < m.strip.r && m.st.r > m.strip.l && m.st.t < m.strip.b && m.st.b > m.strip.t;
+    expect(overlap, `status ${JSON.stringify(m.st)} vs strip ${JSON.stringify(m.strip)}`).toBe(false);
+    expect(m.st.b, "status above the strip").toBeLessThanOrEqual(m.strip.t);
+    expect(m.st.t, "status below the sheets").toBeGreaterThanOrEqual(m.sheetBottom);
+    const d = await scrollDims(page);
+    expect(d.scrollHeight, "height").toBeLessThanOrEqual(d.innerHeight);
+    if (size.width === 1600) await page.screenshot({ path: "/tmp/busy-live-1600.png" });
+    release();
+  });
+}

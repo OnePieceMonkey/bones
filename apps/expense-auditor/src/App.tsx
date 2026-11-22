@@ -25,7 +25,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
     if (this.state.failed) {
       return (
         <main>
-          <p role="alert" className="app-error">
+          <p role="alert" className="xr-error">
             Something went wrong. Reload the page.
           </p>
         </main>

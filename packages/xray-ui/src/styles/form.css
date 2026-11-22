@@ -115,3 +115,104 @@
   outline-offset: 2px;
   box-shadow: 0 0 0 5px var(--xr-focus-contrast);
 }
+
+/* App controls moved out of the app stylesheet (visual-polish-2 D2). Domain-free; colours come from tokens. */
+.xr-btn {
+  min-height: 2.75rem;
+  padding: var(--xr-space-2) var(--xr-space-3);
+  background: var(--xr-bg-plate);
+  color: var(--xr-text-on-plate);
+  border: 2px solid var(--xr-cyan);
+  border-radius: var(--xr-radius);
+  font: inherit;
+  font-family: var(--xr-font-sans);
+  font-weight: 500;
+  cursor: pointer;
+}
+.xr-btn:hover:not(:disabled) {
+  box-shadow: 0 0 8px var(--xr-cyan-glow);
+}
+.xr-btn:disabled {
+  border-color: var(--xr-text-muted);
+  color: var(--xr-text-muted);
+  cursor: not-allowed;
+}
+.xr-btn--primary {
+  background: var(--xr-bg-cyan-fill);
+  color: var(--xr-text-on-cyan);
+}
+.xr-field-label {
+  color: var(--xr-text);
+  font-weight: 600;
+}
+.xr-input {
+  width: 100%;
+  padding: var(--xr-space-2);
+  background: var(--xr-bg-row);
+  color: var(--xr-text);
+  border: 2px solid var(--xr-text-dim);
+  border-radius: var(--xr-radius);
+  font: inherit;
+}
+.xr-input[aria-invalid="true"] {
+  border-color: var(--xr-red);
+}
+.xr-counter {
+  margin: 0;
+  color: var(--xr-text-dim);
+  font-size: 0.875rem;
+  text-align: right;
+}
+.xr-field-error {
+  margin: 0;
+  color: var(--xr-text-stamp);
+  background: var(--xr-bg-stamp);
+  padding: var(--xr-space-1) var(--xr-space-2);
+  border-radius: var(--xr-radius);
+}
+.xr-dialog {
+  width: min(32rem, 92vw);
+  padding: var(--xr-space-4);
+  background: var(--xr-bg-panel);
+  color: var(--xr-text);
+  border: 4px solid var(--xr-bg-metal-dark);
+  border-radius: var(--xr-radius);
+}
+.xr-dialog::backdrop {
+  background: var(--xr-bg-deep);
+  opacity: 0.8;
+}
+.xr-dialog h2 {
+  margin: 0 0 var(--xr-space-3);
+  color: var(--xr-cyan);
+}
+.xr-error {
+  padding: var(--xr-space-3);
+  background: var(--xr-bg-stamp);
+  color: var(--xr-text-stamp);
+  border: 2px solid var(--xr-red);
+  border-radius: var(--xr-radius);
+}
+.xr-error h2 {
+  margin: 0 0 var(--xr-space-2);
+  font-size: 1.125rem;
+}
+.xr-error p {
+  margin: 0 0 var(--xr-space-2);
+}
+.xr-error ul {
+  margin: 0;
+  padding-left: var(--xr-space-4);
+}
+.xr-error code {
+  color: var(--xr-text-stamp);
+}
+.xr-status {
+  margin: var(--xr-space-2) 0 0;
+  color: var(--xr-text);
+}
+.xr-btn:focus-visible,
+.xr-input:focus-visible {
+  outline: 3px solid var(--xr-focus);
+  outline-offset: 2px;
+}

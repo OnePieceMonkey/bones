@@ -73,7 +73,7 @@ export function OverrideDialog({ open, onClose, onSubmit, returnFocusTo }: Overr
   return (
     <dialog
       ref={dialogRef}
-      className="app-dialog"
+      className="xr-dialog"
       aria-labelledby="override-title"
       onCancel={(e) => {
         e.preventDefault();
@@ -83,11 +83,11 @@ export function OverrideDialog({ open, onClose, onSubmit, returnFocusTo }: Overr
       <h2 id="override-title">Overrule decision</h2>
       <form onSubmit={handleSubmit} noValidate>
         <div className="app-field">
-          <label htmlFor="override-reviewer">Reviewer name</label>
+          <label className="xr-field-label" htmlFor="override-reviewer">Reviewer name</label>
           <input
             id="override-reviewer"
             ref={nameRef}
-            className="app-input"
+            className="xr-input"
             type="text"
             autoComplete="off"
             value={reviewerName}
@@ -96,17 +96,17 @@ export function OverrideDialog({ open, onClose, onSubmit, returnFocusTo }: Overr
             aria-describedby={nameError !== null ? "override-error-reviewerName" : undefined}
           />
           {nameError !== null ? (
-            <p role="alert" id="override-error-reviewerName" className="app-field-error">
+            <p role="alert" id="override-error-reviewerName" className="xr-field-error">
               {nameError}
             </p>
           ) : null}
         </div>
         <div className="app-field">
-          <label htmlFor="override-reason">Reason</label>
+          <label className="xr-field-label" htmlFor="override-reason">Reason</label>
           <textarea
             id="override-reason"
             ref={reasonRef}
-            className="app-input"
+            className="xr-input"
             rows={4}
             maxLength={MAX_REASON}
             value={reason}
@@ -114,18 +114,18 @@ export function OverrideDialog({ open, onClose, onSubmit, returnFocusTo }: Overr
             aria-invalid={reasonError !== null ? "true" : undefined}
             aria-describedby={reasonError !== null ? "override-error-reason" : undefined}
           />
-          <p className="app-counter">{`${reason.length} / ${MAX_REASON}`}</p>
+          <p className="xr-counter">{`${reason.length} / ${MAX_REASON}`}</p>
           {reasonError !== null ? (
-            <p role="alert" id="override-error-reason" className="app-field-error">
+            <p role="alert" id="override-error-reason" className="xr-field-error">
               {reasonError}
             </p>
           ) : null}
         </div>
         <div className="app-field">
-          <label htmlFor="override-result">New result</label>
+          <label className="xr-field-label" htmlFor="override-result">New result</label>
           <select
             id="override-result"
-            className="app-input"
+            className="xr-input"
             value={replacementResult}
             onChange={(e) => {
               if (isDecisionResult(e.target.value)) setReplacementResult(e.target.value);
@@ -139,10 +139,10 @@ export function OverrideDialog({ open, onClose, onSubmit, returnFocusTo }: Overr
           </select>
         </div>
         <div className="app-actions">
-          <button type="button" className="app-button" onClick={onClose}>
+          <button type="button" className="xr-btn" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="app-button app-button-primary">
+          <button type="submit" className="xr-btn xr-btn--primary">
             Save override
           </button>
         </div>

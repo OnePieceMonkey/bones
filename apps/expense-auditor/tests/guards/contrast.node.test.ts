@@ -30,14 +30,15 @@ const TEXT_PAIRS: ReadonlyArray<readonly [string, string, string]> = [
   ["--xr-text", "--xr-bg-panel", "body/dialog text on panel"],
   ["--xr-text", "--xr-bg-deep", "body text on deep"],
   ["--xr-text-dim", "--xr-bg-panel", "dim text on panel"],
-  ["--xr-text-dim", "--xr-bg-deep", ".app-trip-text on deep"],
-  ["--xr-text", "--xr-bg-row", ".app-input text on row"],
-  ["--xr-text-dim", "--xr-bg-row", ".app-counter / input border on row"],
-  ["--xr-text-on-plate", "--xr-bg-plate", ".app-note, .app-button plate text"],
-  ["--xr-text-muted", "--xr-bg-plate", ".app-button:disabled"],
-  ["--xr-text-on-cyan", "--xr-bg-cyan-fill", ".app-button-primary"],
-  ["--xr-text-stamp", "--xr-bg-stamp", ".app-error, .app-field-error"],
-  ["--xr-cyan", "--xr-bg-panel", ".app-dialog h2"],
+  ["--xr-text-dim", "--xr-bg-deep", ".app-trip-text on deep (removed in 11.3)"],
+  ["--xr-text", "--xr-bg-row", ".xr-input text on row (visual-polish-2 D2)"],
+  ["--xr-text-dim", "--xr-bg-row", ".xr-counter / input border on row"],
+  ["--xr-text-on-plate", "--xr-bg-plate", ".xr-btn plate text"],
+  ["--xr-text-muted", "--xr-bg-header", ".xr-header-status [role=status] (was .app-note)"],
+  ["--xr-text-muted", "--xr-bg-plate", ".xr-btn:disabled"],
+  ["--xr-text-on-cyan", "--xr-bg-cyan-fill", ".xr-btn--primary"],
+  ["--xr-text-stamp", "--xr-bg-stamp", ".xr-error, .xr-field-error"],
+  ["--xr-cyan", "--xr-bg-panel", ".xr-dialog h2"],
 ];
 
 const FOCUS_PAIRS: ReadonlyArray<readonly [string, string]> = [

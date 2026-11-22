@@ -103,7 +103,7 @@ export function ErrorPanel({ error, title }: ErrorPanelProps) {
     items = core.fieldErrors.map((f) => ({ label: labelFor(f.path), path: f.path, issue: f.issue }));
   }
   return (
-    <div role="alert" className="app-error">
+    <div role="alert" className="xr-error">
       <h2>{title ?? "This receipt cannot be decided"}</h2>
       <p>{summary}</p>
       {items.length > 0 ? (
