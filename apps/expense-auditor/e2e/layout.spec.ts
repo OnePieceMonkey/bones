@@ -32,10 +32,23 @@ function measure(page: Page) {
       const r = el.getBoundingClientRect();
       return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
     };
+    const regionBoxes = Object.fromEntries(regions.map((s) => [s, box(s)])) as Record<string, Box | null>;
+    // visual-polish-2 R3.5: the photo box is wider than the stage cell and clipped by it, so overlap checks use the visible part.
+    const photoFull = box(".xr-photo");
+    const cell = box(".xr-shell-stagecell");
+    if (photoFull && cell) {
+      regionBoxes[".xr-photo"] = {
+        left: Math.max(photoFull.left, cell.left),
+        top: Math.max(photoFull.top, cell.top),
+        right: Math.min(photoFull.right, cell.right),
+        bottom: Math.min(photoFull.bottom, cell.bottom),
+      };
+    }
     return {
       vw: window.innerWidth,
       vh: window.innerHeight,
-      regions: Object.fromEntries(regions.map((s) => [s, box(s)])) as Record<string, Box | null>,
+      photoFull,
+      regions: regionBoxes,
       header: box(".xr-header"),
       pill: box(".xr-header-pill"),
       steel: box(".xr-steel"),
@@ -72,7 +85,7 @@ function checkLayout(m: Measured): void {
   }
   // visual-polish-2 R5.11: the panel stays 10 px clear of the left-most opaque skeleton pixel (22.43 % of the photo width).
   const panel = m.regions[".xr-cpanel"];
-  const photo = m.regions[".xr-photo"];
+  const photo = m.photoFull;
   if (panel && photo) {
     expect(panel.right + 10, "cpanel clears the skeleton pixels").toBeLessThanOrEqual(photo.left + 0.2243 * (photo.right - photo.left));
   }

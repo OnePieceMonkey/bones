@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { stageGeometry } from "../../../packages/xray-ui/src/__tests__/helpers/stageGeometry";
 
 // visual-polish-2: measurements at 1600x900. Later tasks append their assertions here.
 
@@ -917,3 +918,58 @@ test("focused hotspot keeps a 3 px outline, a 24 px target and the rule box line
   await expect(page.locator(".xr-rulebox").first()).toBeVisible();
   await expect(page.locator(".xr-rb-line").first()).toBeAttached();
 });
+
+// visual-polish-2 task 9.3: larger skeleton anchored to the stage bottom (R3.5, R10.4).
+test("skeleton fills at least 90 % of the stage height, is centred and sits on the stage bottom (R3.5)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const photo = document.querySelector(".xr-photo")!.getBoundingClientRect();
+    const stage = document.querySelector(".xr-shell-stagecell")!.getBoundingClientRect();
+    return { photo: { l: photo.left, r: photo.right, t: photo.top, b: photo.bottom, w: photo.width, h: photo.height }, stage: { l: stage.left, r: stage.right, t: stage.top, b: stage.bottom, w: stage.width, h: stage.height } };
+  });
+  expect(m.photo.h / m.stage.h).toBeGreaterThanOrEqual(0.9);
+  expect(Math.abs((m.photo.l + m.photo.r) / 2 - (m.stage.l + m.stage.r) / 2)).toBeLessThanOrEqual(0.02 * m.stage.w);
+  expect(Math.abs(m.photo.b - m.stage.b)).toBeLessThanOrEqual(1);
+});
+for (const size of [{ width: 1600, height: 900 }, { width: 1280, height: 720 }]) {
+  test(`the stage geometry model matches the real rectangles within 2 px at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const r = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+      const stage = r(".xr-shell-stagecell");
+      const photo = r(".xr-photo");
+      const panel = r(".xr-cpanel");
+      return { stageW: stage.width, stageH: stage.height, stageL: stage.left, photoW: photo.width, photoH: photo.height, photoTop: photo.top - stage.top, panelRight: panel.right };
+    });
+    const g = stageGeometry(size.width, size.height);
+    expect(Math.abs(m.stageW - g.stage.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(m.stageH - g.stage.height)).toBeLessThanOrEqual(2);
+    expect(Math.abs(m.photoW - g.photoW)).toBeLessThanOrEqual(2);
+    expect(Math.abs(m.photoH - g.photoH)).toBeLessThanOrEqual(2);
+    expect(Math.abs(m.photoTop - g.photoTop)).toBeLessThanOrEqual(2);
+    expect(Math.abs(m.panelRight - g.panelRight)).toBeLessThanOrEqual(2);
+  });
+}
+for (const size of SIZES) {
+  test(`receipt and control panel stay fully visible with the larger skeleton at ${size.width}x${size.height} (R10.4)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const r = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+      return { doc: r(".xr-doc"), ctrl: r(".xr-cpanel"), vw: window.innerWidth, vh: window.innerHeight, sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight };
+    });
+    for (const b of [m.doc, m.ctrl]) {
+      expect(b.left).toBeGreaterThanOrEqual(-0.5);
+      expect(b.top).toBeGreaterThanOrEqual(-0.5);
+      expect(b.right).toBeLessThanOrEqual(m.vw + 0.5);
+      expect(b.bottom).toBeLessThanOrEqual(m.vh + 0.5);
+    }
+    expect(m.sw).toBeLessThanOrEqual(m.vw);
+    expect(m.sh).toBeLessThanOrEqual(m.vh);
+  });
+}

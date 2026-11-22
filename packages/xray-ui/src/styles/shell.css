@@ -76,6 +76,10 @@ html:has(.xr-shell) body {
   min-height: 0;
   min-width: 0;
   display: grid;
+  /* visual-polish-2 R3.5: the stage clips the oversized photo; --xr-photo-w is the photo box width. */
+  overflow: hidden;
+  container-type: size;
+  --xr-photo-w: min(110cqw, 99.58cqh);
 }
 .xr-shell-stagecell .xr-glass {
   grid-area: auto;

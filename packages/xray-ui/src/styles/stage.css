@@ -52,13 +52,19 @@
   min-width: 0;
   min-height: 0;
   display: grid;
-  place-items: center;
+  /* A fixed track keeps the wider photo centred; it overflows both sides and the stage cell clips it. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  place-items: end center;
 }
 .xr-photo {
   position: relative;
   overflow: hidden;
-  width: min(100cqw, 100cqh * 1.0824);
+  /* Fallback for browsers without cq units. */
+  width: 100%;
+  width: var(--xr-photo-w);
   aspect-ratio: 1208 / 1116;
+  flex: none;
 }
 .xr-photo-img {
   position: absolute;
@@ -232,7 +238,8 @@
   left: var(--xr-ecg-start, 0%);
   right: 0;
   width: auto;
-  height: calc(var(--xr-photo-w, min(100cqw, 100cqh * 1.0824)) * 60 / 560);
+  height: 11.6%; /* fallback without cq units: 60/560 of the photo width */
+  height: calc(var(--xr-photo-w) * 60 / 560);
   top: calc((50 - 3) / 62 * 100%);
   aspect-ratio: auto;
   transform: translateY(-50%);

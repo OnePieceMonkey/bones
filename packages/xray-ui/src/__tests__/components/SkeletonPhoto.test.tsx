@@ -38,7 +38,10 @@ describe("SkeletonPhoto", () => {
     expect(body).toMatch(/mix-blend-mode:\s*screen/);
     const box = rule(".xr-photo");
     expect(box).toMatch(/aspect-ratio:\s*1208\s*\/\s*1116/);
-    expect(box).toMatch(/min\(100cqw,\s*100cqh \* 1\.0824\)/);
+    // visual-polish-2 R3.5 supersedes visual-polish R5: the width comes from --xr-photo-w (defined on the stage cell).
+    expect(box).toMatch(/width:\s*var\(--xr-photo-w\)/);
+    expect(box).toMatch(/flex:\s*none/);
+    expect(rule(".xr-stage")).toMatch(/place-items:\s*end center/);
     expect(rule(".xr-stage")).toMatch(/container-type:\s*size/);
   });
   it("keeps the photo box when the image fails to load", () => {
