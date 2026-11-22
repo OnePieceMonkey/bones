@@ -765,3 +765,59 @@ for (const size of SIZES) {
     expect(on.labelTop).toBeGreaterThanOrEqual(on.leverBottom);
   });
 }
+
+// Checkpoint 8 verdict (R5.3): v1, v2, v3 on a tight arc <= 20 px from the dial with ticks; RULE VERSION above the arc.
+// knob.webp art radius is 204/512 of the image (alpha bounding box 52..460).
+const KNOB_ART = 204 / 512;
+for (const size of SIZES) {
+  test(`knob labels sit within 20 px of the dial edge with ticks, RULE VERSION above v2 at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate((art) => {
+      const knob = document.querySelector(".xr-pknob")!.getBoundingClientRect();
+      const dialEl = document.querySelector<HTMLElement>(".xr-pknob-dial")!;
+      const cx = knob.left + knob.width / 2;
+      const cy = knob.top + knob.height / 2;
+      const edge = dialEl.offsetWidth * art;
+      const labels = [...document.querySelectorAll(".xr-pknob-label")].map((l) => {
+        const r = l.getBoundingClientRect();
+        const lx = r.left + r.width / 2;
+        const ly = r.top + r.height / 2;
+        return { text: l.textContent, lx, ly, gap: Math.hypot(lx - cx, ly - cy) - edge, top: r.top, bottom: r.bottom };
+      });
+      const plaque = document.querySelector(".xr-cpanel-item--knob .xr-cpanel-plaque")!.getBoundingClientRect();
+      const panel = document.querySelector(".xr-cpanel")!.getBoundingClientRect();
+      return {
+        labels,
+        cx,
+        cy,
+        ticks: document.querySelectorAll(".xr-pknob-ticks line").length,
+        plaqueBottom: plaque.bottom,
+        plaqueTop: plaque.top,
+        panelTop: panel.top,
+        role: document.querySelector(".xr-pknob")!.getAttribute("role"),
+        scrollH: document.documentElement.scrollHeight,
+      };
+    }, KNOB_ART);
+    const [v1, v2, v3] = m.labels;
+    expect(m.labels.map((l) => l.text)).toEqual(["v1", "v2", "v3"]);
+    for (const l of m.labels) {
+      expect(l.gap).toBeGreaterThan(0);
+      expect(l.gap).toBeLessThanOrEqual(20);
+    }
+    expect(v1!.lx).toBeLessThan(m.cx);
+    expect(v1!.ly).toBeGreaterThan(m.cy);
+    expect(v3!.lx).toBeGreaterThan(m.cx);
+    expect(v3!.ly).toBeGreaterThan(m.cy);
+    expect(Math.abs(v2!.lx - m.cx)).toBeLessThanOrEqual(2);
+    expect(v2!.ly).toBeLessThan(m.cy);
+    expect(m.ticks).toBe(3);
+    expect(m.role).toBe("slider");
+    expect(m.plaqueBottom).toBeLessThan(v2!.top); // RULE VERSION is above v2 with a gap
+    expect(m.plaqueTop).toBeGreaterThanOrEqual(m.panelTop);
+    expect(m.scrollH).toBeLessThanOrEqual(size.height);
+  });
+}

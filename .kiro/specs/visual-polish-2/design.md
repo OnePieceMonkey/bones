@@ -417,6 +417,8 @@ Panel content width check (all values in u): knob root 188, meter 150, toggle bl
 
 Contrast of engraved labels (R5.10): `--xr-text-on-steel` changes from `#14202a` (4.12:1 on the average steel pixel, fails) to `#0b1218` (4.70:1 on rgb(128,127,122) without sheen). `--xr-steel-sheen: rgba(255,255,255,0.14)` raises the average to about rgb(146,145,141), which lifts the ratio above 5.5:1. The contrast test blends the sheen over the image average and requires 4.5:1. `--xr-text-on-steel-active: #000000` gives the "higher contrast" for the active version label. The light `text-shadow` highlight is not counted in the ratio.
 
+**Checkpoint 8 revision (R5.2, R5.3, R5.5, R5.8, R5.9).** The panel is a two-row grid: row 1 holds the "RULE VERSION" and "AI READ CONFIDENCE" plaques on one baseline, row 2 holds knob, meter and toggle centred on one axis, with at least 16 px of steel below the meter. Knob root 164 u, dial 145 u (inset 5.8 %), visible bakelite radius 35.2 % of the root; `KNOB` in `model/knobLabels.ts` puts the v1/v2/v3 label centres on radius 43.5 % (about 13.6 u, 17 px at 1600x900, from the dial edge) at -120, 0 and +120 degrees, with engraved ticks from 36.6 % to 39 %. The meter viewBox is `0 0 200 150` (180 u x 135 u, within 15 % of the dial height), pivot (100, 128), scale radius 104, numbers 13 viewBox units (at least 11.7 px at 1280x720). The toggle drops `toggle.webp` (removed from assets and README) for a CSS conic-gradient chrome base plus an SVG tapered lever with a ball tip; the lever group rotates 0 degrees (up, on) or 180 degrees (down, off) about the base centre with a 120 ms transform transition.
+
 Meter geometry and look are in Data Models. Toggle and Lamp:
 
 ```css

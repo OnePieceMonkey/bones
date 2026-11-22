@@ -15,11 +15,23 @@ export interface KnobTick {
   y2: number;
 }
 
-export const KNOB = { center: 50, labelRadius: 47 } as const;
-
-const TICK_INNER = 40.5;
-const TICK_OUTER = 43;
-
+/**
+ * Knob geometry in percent of the knob box (`rootU` css units wide). `dialRadius`
+ * is the visible bakelite edge (knob.webp art radius 39.8 % of the dial image,
+ * which is 88.4 % of the box). Labels sit on a tight arc just outside it.
+ */
+export const KNOB = {
+  center: 50,
+  rootU: 164,
+  dialRadius: 35.2,
+  labelRadius: 43.5,
+  tickInner: 36.6,
+  tickOuter: 39,
+} as const;
+const TICK_INNER = KNOB.tickInner;
+const TICK_OUTER = KNOB.tickOuter;
+/** Distance from the dial edge to the label centre, in css units (u). */
+export const KNOB_LABEL_GAP_U = ((KNOB.labelRadius - KNOB.dialRadius) / 100) * KNOB.rootU;
 const r1 = (v: number): number => Math.round(v * 10) / 10;
 
 /** Point on a circle around the knob centre, in percent; 0 degrees points up. */
@@ -42,7 +54,7 @@ export function knobLabelPositions(count: number, activeIndex: number): KnobLabe
   return labels;
 }
 
-/** Short tick lines (radius 40.5 to 44 percent) at each detent angle. */
+/** Short engraved tick lines from the dial edge towards each label, at each detent angle. */
 export function knobTicks(count: number): KnobTick[] {
   const ticks: KnobTick[] = [];
   for (let index = 0; index < count; index++) {

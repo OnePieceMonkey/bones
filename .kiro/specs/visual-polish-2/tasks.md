@@ -165,13 +165,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): cyan underline marks with hover labels and a centred red scan line`
     - _Requirements: 1.1, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 9.5, 13.8_
 
-- [-] 5. Checkpoint - global look, header, receipt
+- [x] 5. Checkpoint - global look, header, receipt
   - Follow the Checkpoint procedure with N = 5. The side-by-side image covers regions 1, 2, 7 (header) and 4 (receipt on film) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 5 done". Do not start any further task until the user says "weiter". The user compares `review/cp5-side-by-side.png` with the mockup. If the verdict says the film backdrop is too flat, the next task may add `film-sheet.webp` (at most 120,000 B, D4).
 
-- [ ] 6. Control panel (ledger S4)
-  - [~] 6.1 Knob label model
+- [x] 6. Control panel (ledger S4)
+  - [x] 6.1 Knob label model
     - Files: `model/knobLabels.ts` (new), `components/panel/Knob.tsx`, `src/index.ts`, `__tests__/properties/knob-labels.test.ts` (new).
     - `knobLabelPositions(count, activeIndex)` and `knobTicks(count)` as in the design (`KNOB = { center: 50, labelRadius: 46 }`, ticks from radius 40.5 to 44 percent along `knobAngle`). `Knob.tsx` uses them instead of the inline `polar`, adds `data-index` to each label, and renders the tick lines as a decorative inline SVG (`aria-hidden="true"`, no stroke yet, so pixels do not change). Role, aria attributes, keyboard operation and rule-version behaviour do not change.
     - **Property 3: Knob labels lie on one circle, are distinct and ordered**
@@ -181,7 +181,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add knob label ring model and decorative ticks`
     - _Requirements: 5.3, 5.4, 9.1, 9.4_
 
-  - [~] 6.2 Meter geometry model
+  - [x] 6.2 Meter geometry model
     - Files: `model/meterGeometry.ts` (new), `src/index.ts`, `__tests__/model/meterGeometry.test.ts` (new).
     - `METER`, `RED_ZONE` (0.75 to 1), `meterPoint`, `meterTicks(majorCount)`, `redZoneArc()` as in the design. Pure; uses the existing `needleAngle`. No component uses it yet except its test, so wire it in task 6.5 (state this in the commit body).
     - **Property 5: Meter scale geometry**
@@ -191,7 +191,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add meter scale and red zone geometry model`
     - _Requirements: 5.5_
 
-  - [~] 6.3 Shell grid and one steel panel with notch
+  - [x] 6.3 Shell grid and one steel panel with notch
     - Files: `styles/shell.css`, `styles/controls.css`, `styles/panels.css`, `__tests__/contrast.test.ts`, `__tests__/components/ControlPanel.test.tsx` (proof only), `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `grid-template-columns: 28fr 8fr 38fr 26fr`, rows `62fr 38fr`, explicit placement: `.xr-doc { grid-area: 1 / 1 / 2 / 2 }`, `.xr-shell-stagecell { grid-area: 1 / 2 / 3 / 4 }`, `.xr-cpanel { grid-area: 2 / 1 / 3 / 3 }`, `.xr-doctor { grid-area: 1 / 4 / 3 / 5 }`. Remove the old `grid-template-areas` and the `grid-area: doc|stage|doctor|ctrl` lines in `panels.css` and `controls.css`, so `shell.css` owns placement.
     - `controls.css`: new `.xr-cpanel` block from the design: negative margin `0 0 -14 u -14 u`, padding `12 u 12 u 14 u 26 u`, gap 8 u, `border-radius: 0 28 u 0 0`, sheen gradient over `brushed-steel.webp`, bevel and top shadow, `z-index: 2`, and the `::before` notch fillet with `mask` and `-webkit-mask`. Mask unsupported falls back to a square corner. No transition.
@@ -203,7 +203,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): four-column shell grid and one steel control panel with notch (R5.1)`
     - _Requirements: 5.1, 5.10, 5.11, 9.3, 10.4, 10.5_
 
-  - [~] 6.4 Toggle with the lamp above the lever
+  - [x] 6.4 Toggle with the lamp above the lever
     - Files: `components/panel/Toggle.tsx`, `components/panel/ControlPanel.tsx`, `styles/controls.css`, `__tests__/components/Toggle.test.tsx`, `__tests__/components/ControlPanel.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `Toggle.tsx`: the button content becomes `<Lamp/>` then the lever (column). The lever DOM, `data-on` and `data-lit` stay. `ControlPanel.tsx`: knob item is plaque then Knob; meter item is plaque then Meter; toggle item is Toggle then plaque. Tab order stays Knob, then Toggle. The four screws stay.
     - `controls.css`: `.xr-ptoggle { flex-direction: column; gap: calc(4 * var(--xr-u)) }`, `.xr-ptoggle-lever { width: calc(52 * var(--xr-u)) }`, `.xr-shell .xr-plamp { width: calc(26 * var(--xr-u)) }`. The lit `drop-shadow(0 0 calc(10 * var(--xr-u, 1px)) var(--xr-amber-glow))` and `brightness(0.8)` strings stay (asserted by `Toggle.test.tsx`).
@@ -213,7 +213,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): put the amber lamp above the toggle lever (R5.8)`
     - _Requirements: 5.8, 9.1_
 
-  - [~] 6.5 Rectangular VU meter (SVG)
+  - [x] 6.5 Rectangular VU meter (SVG)
     - Files: `components/panel/Meter.tsx`, `styles/controls.css`, `styles/motion.css`, `assets/index.ts`, `assets/meter.webp` (delete), `__tests__/assets.test.ts`, `__tests__/properties/images.test.tsx` (if it lists `meterUrl`), `__tests__/properties/meter.test.tsx` (new), `e2e/measure-1600.spec.ts`.
     - Rewrite `Meter.tsx` as inline SVG (viewBox `0 0 200 105`) from `meterGeometry`: bezel rect, cream face gradient (`--xr-meter-face-a`/`-b`), scale ticks and numbers in `--xr-text-on-meter`, red zone arc in `--xr-meter-zone` (0.75 to 1.0), needle line from pivot (100, 98). Root stays `.xr-pmeter` with `role="meter"`, `aria-label`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`. The needle group stays `.xr-pmeter-needle` with `data-angle`, `--from/--over/--to` and a `key` on the value, so `Meter.test.tsx` passes unchanged. All decorative SVG parts are `aria-hidden`.
     - `controls.css`: `.xr-pmeter` 150 u x 79 u (the only new size above 120 u besides the knob; on the guard allow-list). `motion.css`: `.xr-pmeter-needle { transform-origin: 100px 104px; transform-box: view-box }`. `xr-needle-swing` and its 700 ms stay (asserted by `css-constants.test.ts`). Reduced motion shows the needle at its final angle by the existing `data-motion` rules.
@@ -226,7 +226,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): replace the round gauge with a rectangular SVG VU meter, remove meter.webp (29,192 B)`
     - _Requirements: 5.5, 5.6, 5.7, 9.1, 9.4, 12.1, 12.2, 13.8_
 
-  - [~] 6.6 Large knob with engraved v1/v2/v3 ring and engraved panel labels
+  - [x] 6.6 Large knob with engraved v1/v2/v3 ring and engraved panel labels
     - Files: `styles/controls.css`, `components/panel/ControlPanel.tsx` (spacing only if needed), `e2e/measure-1600.spec.ts`.
     - `.xr-pknob { width: calc(188 * var(--xr-u)); aspect-ratio: 1 }`, `.xr-shell .xr-pknob-dial { inset: 11.5% }` (dial 144.8 u, A4). Tick lines get a stroke from `--xr-text-on-steel`. `.xr-pknob-label` and `.xr-cpanel-plaque` use `font: 500 max(11px, calc(13 * var(--xr-u))) / 1 var(--xr-font-sans)`, `letter-spacing: 0.1em` for the plaques. Each item is a flex column, `align-items: center`, gap 6 u. If the review of the ring shows labels too tight, `labelRadius` goes to 47 and `.xr-pknob` to 192 u (design note).
     - The task measures old and new dial size with Playwright before and after (old: `.xr-pknob-dial` `offsetWidth` 99 px at 1600x900, 79.2 u). The commit message states both pixel values (R5.2).
@@ -236,8 +236,8 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): enlarge the knob dial and engrave its labels (dial 99 px -> 181 px at 1600x900) (R5.2, R5.3, R5.9)`
     - _Requirements: 5.2, 5.3, 5.9, 5.11, 5.12, 10.5_
 
-- [ ] 7. Phone panel (ledger S5, phone part)
-  - [~] 7.1 Doctor title, home indicator and button icons (DOM)
+- [x] 7. Phone panel (ledger S5, phone part)
+  - [x] 7.1 Doctor title, home indicator and button icons (DOM)
     - Files: `components/HeaderIcons.tsx`, `components/panels/DoctorPanel.tsx`, `components/panels/ResultFooter.tsx`, `__tests__/components/DoctorPanel.test.tsx`, `__tests__/components/ResultFooter.test.tsx`, and app tests that query "Dr. Bones".
     - `HeaderIcons.tsx`: add `IconReplay` and `IconOverride` (`aria-hidden`, `focusable="false"`, 18x18 viewBox 24). `DoctorPanel.tsx`: title text `Dr. Bones · Radiologist` (U+00B7), and `<span className="xr-doctor-home" aria-hidden="true" />` as last child. The notch span keeps `aria-hidden`. `ResultFooter.tsx`: an `svg.xr-btn-icon` before the text of each button. Texts "Replay decision" and "Human override" and the `onClick` calls do not change.
     - Tests in the same commit: `DoctorPanel.test.tsx` heading name becomes "Dr. Bones · Radiologist", home indicator and notch are `aria-hidden` (comment: visual-polish-2 R6.2 supersedes visual-polish R8). `ResultFooter.test.tsx`: an `svg[aria-hidden="true"]` precedes each button text; callbacks once per activation by mouse and keyboard. App tests: change only the queried name if they use "Dr. Bones" as a heading name.
@@ -245,7 +245,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): Dr. Bones · Radiologist title, home indicator and button icons`
     - _Requirements: 6.1, 6.2, 6.7, 6.8, 9.4, 13.8_
 
-  - [~] 7.2 Teal bubbles, phone frame, thin bar, pill buttons
+  - [x] 7.2 Teal bubbles, phone frame, thin bar, pill buttons
     - Files: `styles/panels.css`, `styles/tokens.css`, `__tests__/contrast.test.ts`, `__tests__/components/ResultFooter.test.tsx`, `__tests__/properties/progress-bar.test.tsx` (new), `e2e/measure-1600.spec.ts`.
     - `tokens.css`: `--xr-bg-bubble #1b4f4a`, `--xr-text-bubble #f2fbfa` (8.81:1), `--xr-bg-phone-head #10242c` (14.29:1 with `#e8f4f8`).
     - `panels.css`: `.xr-doctor` frame 1 px `--xr-line-phone` with a softer glow; `.xr-doctor-notch` pill (28 % wide, 14 u high, `border-radius: 999px`, margin-top 8 u); `.xr-doctor-home` (centred, 34 % wide, 4 u high); avatar 44 u; `.xr-doctor .xr-bubble { border-radius: calc(16 * var(--xr-u)) }`; `.xr-progress { height: clamp(2px, calc(4 * var(--xr-u)), 6px); border: 0; border-radius: 999px; background: rgba(232, 244, 248, 0.14); box-shadow: none }`; fill with `--xr-bar-fill` and glow variables, red for partially approved and rejected; `.xr-footer-btn` pills with `min-height: max(44px, calc(40 * var(--xr-u)))`, `--xr-bg-pillbtn`, `--xr-text-pillbtn`, `--xr-line-pillbtn`, sans 500, focus ring as in task 3.2. `.xr-doctor-body` keeps `flex: 1 1 0; min-height: 0; overflow-y: auto`.
@@ -258,7 +258,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): phone panel with teal bubbles, thin bar and pill buttons (R6)`
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 9.3, 13.8_
 
-- [~] 8. Checkpoint - control panel and phone
+- [-] 8. Checkpoint - control panel and phone
   - Follow the Checkpoint procedure with N = 8. The side-by-side image covers regions 5 (control panel) and 6 (phone panel) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 8 done". Do not start any further task until the user says "weiter". If the verdict says the meter face or the notch fillet is not close enough, the next task uses the fallbacks from the design (`meter-face.webp` at most 120,000 B, or an inline SVG notch path).
@@ -416,7 +416,7 @@ Decisions recorded here:
 ### Review verdicts
 
 - Checkpoint 5: accepted with two changes (film fills the panel, paper 65-70 percent of film width, 24 px film margin, faint CSS X-ray texture; marks nearly invisible at rest, hug the text, full cyan on hover).
-- Checkpoint 8: pending
+- Checkpoint 8: accepted with three changes (meter as tall as the dial and centred on it, 16 px steel below, labels on one baseline, numbers >= 11 px; silver metal toggle lever; v1/v2/v3 on a tight arc <= 20 px from the dial with ticks, RULE VERSION above the arc).
 - Checkpoint 10: pending
 - Checkpoint 12: pending
 - Checkpoint 16: pending
