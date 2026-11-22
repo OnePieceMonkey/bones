@@ -1036,3 +1036,56 @@ for (const size of SIZES) {
     expect(d.scrollWidth).toBeLessThanOrEqual(d.innerWidth);
   });
 }
+
+// visual-polish-2 task 9.5: overrule stamp across the card diagonal (R3.4).
+for (const size of SIZES) {
+  test(`stamp crosses the card diagonal inside its central 60 percent at ${size.width}x${size.height} (R3.4)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const stamp = document.querySelector(".xr-glass-stamp") as HTMLElement;
+      const s = stamp.getBoundingClientRect();
+      const g = document.querySelector(".xr-glass")!.getBoundingClientRect();
+      const cs = getComputedStyle(stamp);
+      const mat = new DOMMatrixReadOnly(cs.transform);
+      const parse = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
+      const lin = (c: number) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+      };
+      const lum = (c: number[]) => 0.2126 * lin(c[0]!) + 0.7152 * lin(c[1]!) + 0.0722 * lin(c[2]!);
+      const fg = parse(getComputedStyle(stamp.querySelector(".xr-stamp-title")!).color);
+      const bgc = parse(cs.backgroundColor);
+      const a = bgc[3] ?? 1;
+      // Worst case: the fill is blended over white, the lightest backdrop.
+      const bg = [0, 1, 2].map((i) => bgc[i]! * a + 255 * (1 - a));
+      const hi = Math.max(lum(fg), lum(bg));
+      const lo = Math.min(lum(fg), lum(bg));
+      return {
+        s: { l: s.left, r: s.right, t: s.top, b: s.bottom },
+        g: { l: g.left, r: g.right, t: g.top, b: g.bottom, w: g.width, h: g.height },
+        angle: (Math.atan2(mat.b, mat.a) * 180) / Math.PI,
+        contrast: (hi + 0.05) / (lo + 0.05),
+      };
+    });
+    expect(m.s.l, "stamp inside card").toBeGreaterThanOrEqual(m.g.l - 1);
+    expect(m.s.r, "stamp inside card").toBeLessThanOrEqual(m.g.r + 1);
+    expect(m.s.t, "stamp inside card").toBeGreaterThanOrEqual(m.g.t - 1);
+    expect(m.s.b, "stamp inside card").toBeLessThanOrEqual(m.g.b + 1);
+    const cx = ((m.s.l + m.s.r) / 2 - m.g.l) / m.g.w;
+    const cy = ((m.s.t + m.s.b) / 2 - m.g.t) / m.g.h;
+    expect(cx).toBeGreaterThanOrEqual(0.2);
+    expect(cx).toBeLessThanOrEqual(0.8);
+    expect(cy).toBeGreaterThanOrEqual(0.2);
+    expect(cy).toBeLessThanOrEqual(0.8);
+    expect(m.angle).toBeGreaterThanOrEqual(-20);
+    expect(m.angle).toBeLessThanOrEqual(-5);
+    // Diagonal from the card's top-left to bottom-right corner: the stamp box has corners on both sides.
+    const side = (x: number, y: number) => (y - m.g.t) * m.g.w - (x - m.g.l) * m.g.h;
+    const signs = [[m.s.l, m.s.t], [m.s.r, m.s.t], [m.s.l, m.s.b], [m.s.r, m.s.b]].map(([x, y]) => side(x!, y!));
+    expect(Math.min(...signs) < 0 && Math.max(...signs) > 0, "stamp crosses the diagonal").toBe(true);
+    expect(m.contrast, "stamp text on its own fill").toBeGreaterThanOrEqual(4.5);
+  });
+}

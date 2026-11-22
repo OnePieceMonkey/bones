@@ -35,6 +35,11 @@ describe("GlassCard layout", () => {
     expect(stamp).toMatch(/right:/);
     expect(stamp).toMatch(/bottom:/);
     expect(stamp).not.toMatch(/\btop:/);
+    // visual-polish-2 R3.4: rotated between -20 and -5 degrees.
+    const rot = /rotate\((-?\d+(?:\.\d+)?)deg\)/.exec(stamp);
+    expect(rot).not.toBeNull();
+    expect(Number(rot![1])).toBeGreaterThanOrEqual(-20);
+    expect(Number(rot![1])).toBeLessThanOrEqual(-5);
     expect(block(panels, '.xr-glass[data-overruled="true"]')).toMatch(/padding-bottom:/);
     for (const sel of [".xr-glass .xr-field", ".xr-glass .xr-field dt", ".xr-glass .xr-field dd"]) {
       expect(block(panels, sel)).not.toMatch(/overflow\s*:\s*hidden/);

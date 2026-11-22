@@ -241,14 +241,18 @@
 .xr-glass-stamp {
   position: absolute;
   z-index: 3;
-  right: calc(8 * var(--xr-u, 1px));
-  bottom: calc(10 * var(--xr-u, 1px));
+  right: 3%;
+  bottom: 44%;
+  width: 48%;
+  box-sizing: border-box;
   margin: 0;
-  padding: calc(3 * var(--xr-u, 1px)) calc(10 * var(--xr-u, 1px));
+  padding: calc(4 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
   font-size: max(10px, calc(11 * var(--xr-u, 1px)));
-  background: var(--xr-bg-stamp-live);
+  border: 0;
+  background: rgba(58, 15, 20, var(--xr-stamp-alpha));
   color: var(--xr-text-stamp-live);
-  transform: rotate(-8deg);
+  transform: rotate(-6deg);
+  text-align: center;
   overflow: hidden;
 }
 .xr-glass-stamp .xr-stamp-frame {
@@ -262,6 +266,9 @@
 }
 .xr-glass-stamp .xr-stamp-title,
 .xr-glass-stamp .xr-stamp-bones { position: relative; z-index: 1; }
+/* visual-polish-2 R3.4: the stamp title stays on one line inside the narrow stamp. */
+.xr-glass-stamp .xr-stamp-title { white-space: nowrap; letter-spacing: 0.06em; }
+.xr-glass-stamp .xr-stamp-bones { font-size: max(10px, calc(10 * var(--xr-u, 1px))); }
 
 /* Result footer: result line, progress bar, actions */
 /* visual-polish-2 R1.4: the footer result block draws no border or outline in any result state. */

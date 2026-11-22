@@ -198,6 +198,7 @@ describe("GlassCard", () => {
     for (const r of rows) expect(linked).toContain(r.getAttribute("data-path"));
   });
 
+  // visual-polish-2 R3.4 supersedes visual-polish R7: -9deg satisfies both ranges.
   it("styles: stamp rotation 5..12 degrees and blur 4..16 px", () => {
     const css = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../styles/panels.css"), "utf8");
     const rot = /\.xr-glass-stamp\s*\{[^}]*rotate\((-?\d+(?:\.\d+)?)deg\)/.exec(css);

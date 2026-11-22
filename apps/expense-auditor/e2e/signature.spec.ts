@@ -54,6 +54,36 @@ async function checkLayout(page: Page, label: string): Promise<void> {
     const covered = m.stamp!.left <= v.left && m.stamp!.right >= v.right && m.stamp!.top <= v.top && m.stamp!.bottom >= v.bottom;
     expect(covered, `${label}: stamp hides a value completely`).toBe(false);
   }
+  // The overruled field (claimed total): its value and badge stay clear of the drawn (rotated) stamp.
+  const hits = await page.evaluate(() => {
+    const stamp = document.querySelector(".xr-glass-stamp") as HTMLElement;
+    const sb = stamp.getBoundingClientRect();
+    const mat = new DOMMatrixReadOnly(getComputedStyle(stamp).transform);
+    const ang = Math.atan2(mat.b, mat.a);
+    const cx = (sb.left + sb.right) / 2;
+    const cy = (sb.top + sb.bottom) / 2;
+    const hw = stamp.offsetWidth / 2;
+    const hh = stamp.offsetHeight / 2;
+    const poly = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].map(([x, y]) => [
+      cx + x! * Math.cos(ang) - y! * Math.sin(ang),
+      cy + x! * Math.sin(ang) + y! * Math.cos(ang),
+    ]);
+    const row = document.querySelector('.xr-glass .xr-field[data-overruled="true"]')!;
+    return [row.querySelector(".xr-field-value")!, row.querySelector(".xr-badge")!].map((e) => {
+      const r = e.getBoundingClientRect();
+      const i = 3; // inset: the box holds line leading and padding around the glyphs
+      const rect = [[r.left + i, r.top + i], [r.right - i, r.top + i], [r.right - i, r.bottom - i], [r.left + i, r.bottom - i]];
+      // Separating axis test between the rotated stamp and the axis-aligned box.
+      const axes = [[1, 0], [0, 1], [Math.cos(ang), Math.sin(ang)], [-Math.sin(ang), Math.cos(ang)]];
+      for (const [ax, ay] of axes) {
+        const pa = poly.map((p) => p[0]! * ax! + p[1]! * ay!);
+        const pb = rect.map((p) => p[0]! * ax! + p[1]! * ay!);
+        if (Math.max(...pa) <= Math.min(...pb) || Math.max(...pb) <= Math.min(...pa)) return false;
+      }
+      return true;
+    });
+  });
+  expect(hits, `${label}: stamp shape touches the overruled value or badge`).toEqual([false, false]);
   expect(m.glassBox, `${label}: glass box`).not.toBeNull();
   expect(m.stamp!.left, `${label}: stamp inside card`).toBeGreaterThanOrEqual(m.glassBox!.left - 1);
   expect(m.stamp!.right, `${label}: stamp inside card`).toBeLessThanOrEqual(m.glassBox!.right + 1);
@@ -101,9 +131,12 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
     // Backdrop luminance only; the text colour is read below.
     // visual-polish-2 R3.3: at small sizes the compact card scrolls inside; rows scrolled out of view are not painted on the card, so only visible rows are sampled.
     const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
+    // visual-polish-2 R3.3: rows are measured outside the bounding box of the stamp.
+    const sb = document.querySelector(".xr-glass-stamp")!.getBoundingClientRect();
     const inside = (el: Element) => {
       const r = el.getBoundingClientRect();
-      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+      const underStamp = r.left < sb.right && sb.left < r.right && r.top < sb.bottom && sb.top < r.bottom;
+      return !underStamp && r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
     };
     const targets = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf")).filter(inside);
     for (const el of targets) {
@@ -130,11 +163,13 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
       return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     };
     const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
+    const sb = document.querySelector(".xr-glass-stamp")!.getBoundingClientRect();
     return Array.from(
       document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf"),
     ).filter((el) => {
       const r = el.getBoundingClientRect();
-      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+      const underStamp = r.left < sb.right && sb.left < r.right && r.top < sb.bottom && sb.top < r.bottom;
+      return !underStamp && r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
     }).map((el) => {
       const [r, g, b] = parse(getComputedStyle(el).color);
       return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
