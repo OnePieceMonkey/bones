@@ -906,3 +906,9 @@ Hotspot glow, paper look, curl, notch, bubbles, header and form look are renderi
 | Class-name stability hides stale CSS. | Low | Dead rules | The S7 sweep greps each removed rule (`.xr-pknob-label` plate, `.xr-hs-ring` border) and the `xray.css` legacy section stays untouched because case-files and the old `XrayView` use it. |
 | `.xr-result` dashed rules removed from `xray.css` change the old `ResultPlate`, which case-files uses. | Low | Case-files shows a solid outline for "partially approved" | R1.3 requires the removal; the icon and text still carry the state. Noted in the S1 commit. |
 | Body and focus styles moved from `app.css` into `form.css` could leak into case-files. | Low | Style change in another app | Moved rules are scoped to `.xr-app` and `.xr-shell`; only the expense app sets `xr-app`. |
+
+## Checkpoint 10 amendment: stamp strip and confidence line
+
+- The stamp moves out of the rows into a reserved strip: `.xr-glass[data-overruled="true"]` keeps `padding-bottom: max(50px, 52 u)`, and the stamp is `left: 27%; width: 46%; bottom: 8 u; rotate(-6deg)` inside that strip. It overlaps the radial cracks of `glass-cracks.webp` below the impact point. The old "centre within the central 60 % of the height and across the diagonal" rule in R3.4 is replaced by the strip rule, because a strip below the last row cannot be in the middle of the card height.
+- Each `dd` is a grid with areas `"value badge" "conf conf"`, so the confidence is always on its own line under the value. The confidence text uses the new token `--xr-text-on-glass-muted` (`#b4ccd6`), checked at 4.5:1 on the glass over the darkest and lightest film pixel in `contrast.test.ts`.
+- To stay above the rib line the card starts 20 u higher and its `max-height` is `0.28 * photo height + 20 u - 2px`; at small viewports the card body keeps its internal scroll, the stamp strip stays outside the scroller.

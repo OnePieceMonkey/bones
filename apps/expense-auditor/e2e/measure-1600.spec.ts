@@ -1037,19 +1037,20 @@ for (const size of SIZES) {
   });
 }
 
-// visual-polish-2 task 9.5: overrule stamp across the card diagonal (R3.4).
+// visual-polish-2 task 9.5, amended by checkpoint 10: the stamp sits in the reserved strip, crosses a crack, covers no text (R3.4).
 for (const size of SIZES) {
-  test(`stamp crosses the card diagonal inside its central 60 percent at ${size.width}x${size.height} (R3.4)`, async ({ page }) => {
+  test(`stamp sits in the reserved strip, crosses a crack and covers no text at ${size.width}x${size.height} (R3.4)`, async ({ page }) => {
     await page.setViewportSize(size);
     await page.goto("/");
     await page.getByRole("button", { name: /signature case/i }).click();
     await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
-    const m = await page.evaluate(() => {
+    const m = await page.evaluate(async () => {
       const stamp = document.querySelector(".xr-glass-stamp") as HTMLElement;
       const s = stamp.getBoundingClientRect();
       const g = document.querySelector(".xr-glass")!.getBoundingClientRect();
       const cs = getComputedStyle(stamp);
       const mat = new DOMMatrixReadOnly(cs.transform);
+      const ang = Math.atan2(mat.b, mat.a);
       const parse = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
       const lin = (c: number) => {
         const v = c / 255;
@@ -1059,14 +1060,62 @@ for (const size of SIZES) {
       const fg = parse(getComputedStyle(stamp.querySelector(".xr-stamp-title")!).color);
       const bgc = parse(cs.backgroundColor);
       const a = bgc[3] ?? 1;
-      // Worst case: the fill is blended over white, the lightest backdrop.
       const bg = [0, 1, 2].map((i) => bgc[i]! * a + 255 * (1 - a));
       const hi = Math.max(lum(fg), lum(bg));
       const lo = Math.min(lum(fg), lum(bg));
+      // The drawn (rotated) shape of the stamp.
+      const cx = (s.left + s.right) / 2;
+      const cy = (s.top + s.bottom) / 2;
+      const hw = stamp.offsetWidth / 2;
+      const hh = stamp.offsetHeight / 2;
+      const poly = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].map(([x, y]) => [
+        cx + x! * Math.cos(ang) - y! * Math.sin(ang),
+        cy + x! * Math.sin(ang) + y! * Math.cos(ang),
+      ]);
+      const hits = (r: DOMRect) => {
+        const rect = [[r.left, r.top], [r.right, r.top], [r.right, r.bottom], [r.left, r.bottom]];
+        const axes = [[1, 0], [0, 1], [Math.cos(ang), Math.sin(ang)], [-Math.sin(ang), Math.cos(ang)]];
+        for (const [ax, ay] of axes) {
+          const pa = poly.map((p) => p[0]! * ax! + p[1]! * ay!);
+          const pb = rect.map((p) => p[0]! * ax! + p[1]! * ay!);
+          if (Math.max(...pa) <= Math.min(...pb) || Math.max(...pb) <= Math.min(...pa)) return false;
+        }
+        return true;
+      };
+      const bodyBox = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
+      const texts = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf, .xr-glass .xr-badge, .xr-glass .xr-answer-head")).filter((e) => {
+        const r = e.getBoundingClientRect();
+        return r.bottom <= bodyBox.bottom + 0.5 && r.top >= bodyBox.top - 0.5; // rows scrolled out of the card are not painted
+      });
+      const covered = texts.filter((e) => hits(e.getBoundingClientRect())).map((e) => (e.textContent ?? "").slice(0, 30));
+      const lastRow = bodyBox;
+      // Crack overlap: bright pixels of glass-cracks.webp under the stamp's bounding box (object-fit: cover mapping).
+      const img = document.querySelector(".xr-glass .xr-cracks") as HTMLImageElement;
+      const ir = img.getBoundingClientRect();
+      const nw = img.naturalWidth;
+      const nh = img.naturalHeight;
+      const k = Math.max(ir.width / nw, ir.height / nh);
+      const ox = (ir.width - nw * k) / 2;
+      const oy = (ir.height - nh * k) / 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const x0 = Math.max(0, Math.floor((s.left - ir.left - ox) / k));
+      const x1 = Math.min(nw, Math.ceil((s.right - ir.left - ox) / k));
+      const y0 = Math.max(0, Math.floor((s.top - ir.top - oy) / k));
+      const y1 = Math.min(nh, Math.ceil((s.bottom - ir.top - oy) / k));
+      const px = ctx.getImageData(x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)).data;
+      let bright = 0;
+      for (let i = 0; i < px.length; i += 4) if (px[i]! > 128) bright++;
       return {
         s: { l: s.left, r: s.right, t: s.top, b: s.bottom },
         g: { l: g.left, r: g.right, t: g.top, b: g.bottom, w: g.width, h: g.height },
-        angle: (Math.atan2(mat.b, mat.a) * 180) / Math.PI,
+        lastBottom: lastRow.bottom,
+        covered,
+        bright,
+        angle: (ang * 180) / Math.PI,
         contrast: (hi + 0.05) / (lo + 0.05),
       };
     });
@@ -1075,17 +1124,13 @@ for (const size of SIZES) {
     expect(m.s.t, "stamp inside card").toBeGreaterThanOrEqual(m.g.t - 1);
     expect(m.s.b, "stamp inside card").toBeLessThanOrEqual(m.g.b + 1);
     const cx = ((m.s.l + m.s.r) / 2 - m.g.l) / m.g.w;
-    const cy = ((m.s.t + m.s.b) / 2 - m.g.t) / m.g.h;
-    expect(cx).toBeGreaterThanOrEqual(0.2);
+    expect(cx, "stamp centre in the central 60 percent of the width").toBeGreaterThanOrEqual(0.2);
     expect(cx).toBeLessThanOrEqual(0.8);
-    expect(cy).toBeGreaterThanOrEqual(0.2);
-    expect(cy).toBeLessThanOrEqual(0.8);
+    expect(m.s.t, "stamp in the reserved strip below the card body").toBeGreaterThanOrEqual(m.lastBottom - 1);
+    expect(m.covered, "stamp shape covers no text").toEqual([]);
+    expect(m.bright, "stamp overlaps visible crack pixels").toBeGreaterThanOrEqual(200);
     expect(m.angle).toBeGreaterThanOrEqual(-20);
     expect(m.angle).toBeLessThanOrEqual(-5);
-    // Diagonal from the card's top-left to bottom-right corner: the stamp box has corners on both sides.
-    const side = (x: number, y: number) => (y - m.g.t) * m.g.w - (x - m.g.l) * m.g.h;
-    const signs = [[m.s.l, m.s.t], [m.s.r, m.s.t], [m.s.l, m.s.b], [m.s.r, m.s.b]].map(([x, y]) => side(x!, y!));
-    expect(Math.min(...signs) < 0 && Math.max(...signs) > 0, "stamp crosses the diagonal").toBe(true);
     expect(m.contrast, "stamp text on its own fill").toBeGreaterThanOrEqual(4.5);
   });
 }

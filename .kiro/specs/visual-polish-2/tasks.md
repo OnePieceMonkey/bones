@@ -258,13 +258,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): phone panel with teal bubbles, thin bar and pill buttons (R6)`
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 9.3, 13.8_
 
-- [-] 8. Checkpoint - control panel and phone
+- [x] 8. Checkpoint - control panel and phone
   - Follow the Checkpoint procedure with N = 8. The side-by-side image covers regions 5 (control panel) and 6 (phone panel) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 8 done". Do not start any further task until the user says "weiter". If the verdict says the meter face or the notch fillet is not close enough, the next task uses the fallbacks from the design (`meter-face.webp` at most 120,000 B, or an inline SVG notch path).
 
-- [ ] 9. Stage composition (ledger S2)
-  - [~] 9.1 ECG starts at the left-most fracture
+- [x] 9. Stage composition (ledger S2)
+  - [x] 9.1 ECG starts at the left-most fracture
     - Files: `model/ecg.ts`, `types.ts` (`EcgModel.startX`), `components/stage/EcgBand.tsx`, `styles/stage.css`, `styles/xray.css`, `__tests__/properties/ecg-start.test.ts` (new), `e2e/measure-1600.spec.ts`.
     - `ecgStartX(bones)` (minimum clamped x of fractured bones, `ECG_CENTER = 280` when none), `ecgPath(spikeXs, flatline, startX)` with the rules of the design (flat line `M{startX},30 L560,30`; beats only where `x - 14 >= startX`; spike path start `max(startX, x - 8)`). `EcgBand.tsx` sets `--xr-ecg-start` to `(startX / width) * 100%` and `viewBox = startX 0 (width - startX) height`, `preserveAspectRatio="none"`. `stage.css`: `.xr-ecg-band { left: var(--xr-ecg-start, 0%); right: 0; width: auto; height: calc(var(--xr-photo-w) * 60 / 560); aspect-ratio: auto; top: calc((50 - 3) / 62 * 100%) }` (the `top:` text stays literal for `css-constants.test.ts`; until task 9.3 defines `--xr-photo-w`, use the old width expression as the fallback inside `var()`). `xray.css`: `.xr-ecg-line` stroke 1.5 with a cyan `drop-shadow`; `.xr-ecg-spike` keeps `--xr-red` with a red `drop-shadow`.
     - **Property 1: ECG starts at the left-most fractured hotspot**
@@ -279,7 +279,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): start the ECG line at the left-most fractured hotspot (R3.6, R3.7)`
     - _Requirements: 3.6, 3.7, 3.8_
 
-  - [~] 9.2 Soft glow hotspots
+  - [x] 9.2 Soft glow hotspots
     - Files: `styles/stage.css`, `__tests__/components/hotspot.test.tsx` (proof only), `e2e/measure-1600.spec.ts`.
     - `.xr-hs-ring`: `border: 0`, `border-radius: 50%`, radial-gradient from `--xr-hs-core` and `--xr-hs-mid`, `filter: blur(calc(1.5 * var(--xr-u, 1px)))`, no box-shadow, `pointer-events: none`. States set `--xr-hs-core` and `--xr-hs-mid` (cyan glow for passed and applied-no-change, `--xr-red-glow` with `inset: -30%` for fractured, dim for not-applicable). Merge the second `.xr-hs-ring--fractured` block at the end of `stage.css` into the first. `.xr-hs-check` keeps its role, size `max(10px, 11 u)`, opacity 0.8. `.xr-hotspot .xr-bone-btn:focus-visible` keeps the white outline plus dark outer shadow (R3.10).
     - Hotspots stay at least 24x24 px focusable. Class names `.xr-hs-ring--<state>` do not change, so `hotspot.test.tsx` stays unchanged.
@@ -288,7 +288,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): replace hotspot rings with soft red and cyan bone glows (R3.9 to R3.11)`
     - _Requirements: 3.9, 3.10, 3.11, 3.12, 13.6_
 
-  - [~] 9.3 Larger skeleton anchored to the stage bottom
+  - [x] 9.3 Larger skeleton anchored to the stage bottom
     - Files: `styles/shell.css`, `styles/stage.css`, `__tests__/helpers/stageGeometry.ts` (new), `__tests__/properties/stage-layout.test.ts` (new), `__tests__/components/SkeletonPhoto.test.tsx`, `__tests__/css-constants.test.ts`, `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `.xr-shell-stagecell { overflow: hidden; container-type: size; --xr-photo-w: min(110cqw, 99.58cqh) }`. `stage.css`: `.xr-stage { place-items: end center }`, `.xr-photo { width: var(--xr-photo-w); aspect-ratio: 1208 / 1116; flex: none }`, preceded by a fallback line `width: 100%` for browsers without `cq` units. `anchors.ts`, `placeBones`, `toCropPercent`, `Stage.tsx` and `SkeletonPhoto.tsx` do not change, so anchors stay percentages of the crop box.
     - `stageGeometry.ts` mirrors the five layout formulas of the design (photo width and height, card top, rib top, card height budget, panel right edge, skeleton worst left edge).
@@ -301,7 +301,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): enlarge the skeleton and anchor it to the stage bottom (R3.5)`
     - _Requirements: 3.5, 10.4, 10.5, 5.11, 13.8_
 
-  - [~] 9.4 Glass card at the top centre with compact rows
+  - [x] 9.4 Glass card at the top centre with compact rows
     - Files: `styles/shell.css`, `styles/panels.css`, `__tests__/components/GlassCard.layout.test.tsx`, `e2e/layout.spec.ts`, `e2e/measure-1600.spec.ts`.
     - `shell.css`: `.xr-shell-stagecell .xr-glass { position: absolute; left: 24%; width: 52%; top: max(calc(2 * var(--xr-u)), calc(100% - var(--xr-photo-w) / 1.0824 * 1.06)); max-height: calc(160 * var(--xr-u)); z-index: 3 }`. Remove the old `left: 2%; bottom: 3%; width: 44%; max-height: 62%`. The flat view (`data-xray="false"`) sets `top: auto`.
     - `panels.css`: `.xr-glass .xr-field` becomes a two-column grid (30 % and the rest), `font-size: max(11px, calc(12 * var(--xr-u)))`, `line-height: 1.25`; `.xr-glass .xr-field dd` is a wrapping flex row with the confidence inline; `.xr-glass .xr-conf` 10 u; radius `calc(14 * var(--xr-u))`. Remove `.xr-glass .xr-field dt { flex: 0 0 32% }` and the `dd` `flex: 1 1 0` lines. Keep backdrop blur, `glass-cracks.webp` overlay and `overflow-y: auto` on `.xr-glass-body`. Row text, confidence text and badge text do not change.
@@ -312,7 +312,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): move the cracked glass card to the top centre above the ribs (R3.1 to R3.3)`
     - _Requirements: 3.1, 3.2, 3.3, 10.4, 13.1, 13.8_
 
-  - [~] 9.5 Overrule stamp across the card diagonal
+  - [x] 9.5 Overrule stamp across the card diagonal
     - Files: `styles/panels.css`, `__tests__/components/GlassCard.layout.test.tsx`, `__tests__/properties/glass-document.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `.xr-glass-stamp`: `right: 9%; bottom: 14%; width: 62%; box-sizing: border-box; padding: calc(5 * var(--xr-u)) calc(10 * var(--xr-u)); border: 0; background: rgba(58, 15, 20, var(--xr-stamp-alpha)); transform: rotate(-9deg); text-align: center`. `.xr-glass[data-overruled="true"]` keeps `padding-bottom: calc(26 * var(--xr-u))`. The frame stays `stamp-frame.webp`. Text colour stays `--xr-text-stamp-live`.
     - Tests in the same commit: `GlassCard.layout.test.tsx` stamp block still asserts `position: absolute`, `right:`, `bottom:`, no `top:`; add a rotation between -20 and -5. `glass-document.test.tsx` rotation test (5 to 12 degrees) only changes its comment, since `-9deg` satisfies both (visual-polish-2 R3.4 supersedes visual-polish R7). The stamp pair in the contrast table is already present from task 1.3.
@@ -321,7 +321,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): stamp OVERRULED BY RULE diagonally across the glass card (R3.4)`
     - _Requirements: 1.3, 3.4, 13.1, 13.8_
 
-- [~] 10. Checkpoint - stage composition
+- [-] 10. Checkpoint - stage composition
   - Follow the Checkpoint procedure with N = 10. The side-by-side image covers region 3 (card, skeleton, hotspots, ECG, stamp) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 10 done". Do not start any further task until the user says "weiter". The user checks the card position, the stamp, the skeleton size and the ECG start against the mockup. If the 91.5 % margin must grow, the design names the cap factor 1.1 as the lever (1.12 gives 93.2 %).
@@ -417,7 +417,7 @@ Decisions recorded here:
 
 - Checkpoint 5: accepted with two changes (film fills the panel, paper 65-70 percent of film width, 24 px film margin, faint CSS X-ray texture; marks nearly invisible at rest, hug the text, full cyan on hover).
 - Checkpoint 8: accepted with three changes (meter as tall as the dial and centred on it, 16 px steel below, labels on one baseline, numbers >= 11 px; silver metal toggle lever; v1/v2/v3 on a tight arc <= 20 px from the dial with ticks, RULE VERSION above the arc).
-- Checkpoint 10: pending
+- Checkpoint 10: accepted with two changes (stamp in a reserved empty area, never covers a value or confidence; confidence always on its own line under the value).
 - Checkpoint 12: pending
 - Checkpoint 16: pending
 

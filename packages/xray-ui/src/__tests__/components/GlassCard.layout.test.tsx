@@ -28,11 +28,11 @@ describe("GlassCard layout", () => {
     expect(screen.getByRole("note").textContent).toContain("OVERRULED BY RULE");
   });
 
-  it("puts the stamp bottom-right inside reserved space and never clips rows", () => {
+  it("puts the stamp in the reserved bottom strip and never clips rows", () => {
     const panels = css("panels.css");
     const stamp = block(panels, ".xr-glass-stamp");
     expect(stamp).toMatch(/position:\s*absolute/);
-    expect(stamp).toMatch(/right:/);
+    expect(stamp).toMatch(/left:/);
     expect(stamp).toMatch(/bottom:/);
     expect(stamp).not.toMatch(/\btop:/);
     // visual-polish-2 R3.4: rotated between -20 and -5 degrees.
@@ -40,7 +40,7 @@ describe("GlassCard layout", () => {
     expect(rot).not.toBeNull();
     expect(Number(rot![1])).toBeGreaterThanOrEqual(-20);
     expect(Number(rot![1])).toBeLessThanOrEqual(-5);
-    expect(block(panels, '.xr-glass[data-overruled="true"]')).toMatch(/padding-bottom:/);
+    expect(block(panels, '.xr-glass[data-overruled="true"]')).toMatch(/padding-bottom:\s*max\(\d+px,\s*calc\((4\d|5\d|6\d) /);
     for (const sel of [".xr-glass .xr-field", ".xr-glass .xr-field dt", ".xr-glass .xr-field dd"]) {
       expect(block(panels, sel)).not.toMatch(/overflow\s*:\s*hidden/);
     }
@@ -62,11 +62,15 @@ describe("GlassCard layout", () => {
     expect(block(css("shell.css"), '.xr-shell[data-xray="false"] .xr-shell-stagecell .xr-glass')).toMatch(/top:\s*auto/);
   });
 
-  it("lays each field out as a two-column grid with the confidence inline", () => {
+  it("lays each field out as a two-column grid with the confidence on its own line", () => {
     const panels = css("panels.css");
     expect(block(panels, ".xr-glass .xr-field")).toMatch(/display:\s*grid/);
     expect(block(panels, ".xr-glass .xr-field")).toMatch(/grid-template-columns:\s*27%/);
-    expect(block(panels, ".xr-glass .xr-field dd")).toMatch(/flex-wrap:\s*wrap/);
+    expect(block(panels, ".xr-glass .xr-field dd")).toMatch(/display:\s*grid/);
+    const conf = block(panels, ".xr-glass .xr-conf");
+    expect(conf).toMatch(/grid-area:\s*conf/);
+    expect(conf).toMatch(/display:\s*block/);
+    expect(conf).toMatch(/max\(10px/);
     expect(block(panels, ".xr-glass .xr-field dt")).not.toMatch(/flex:/);
   });
 });

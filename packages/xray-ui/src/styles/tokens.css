@@ -34,6 +34,7 @@
   --xr-glass-alpha: 0.78;       /* plain number, read by the contrast test */
   --xr-glass-tint-rgba: rgba(11, 22, 32, 0.78);
   --xr-text-on-glass: #e8f4f8;
+  --xr-text-on-glass-muted: #b4ccd6; /* confidence line on the glass, checked in contrast.test.ts */
   --xr-text-on-steel: #0b1218;  /* engraved on brushed steel (4.70:1 on the steel average) */
   --xr-text-header: #e8f4f8;
   --xr-bg-header: #0b1620;

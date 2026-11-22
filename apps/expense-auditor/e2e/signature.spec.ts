@@ -49,13 +49,8 @@ async function checkLayout(page: Page, label: string): Promise<void> {
   });
   expect(m.stamp, `${label}: stamp box`).not.toBeNull();
   expect(m.values.length, `${label}: AI card has value boxes`).toBeGreaterThan(0);
-  // visual-polish-2 R3.3, R3.4: the stamp is drawn across the compact card, so it may cover part of a value; it must not hide one entirely.
-  for (const v of m.values) {
-    const covered = m.stamp!.left <= v.left && m.stamp!.right >= v.right && m.stamp!.top <= v.top && m.stamp!.bottom >= v.bottom;
-    expect(covered, `${label}: stamp hides a value completely`).toBe(false);
-  }
-  // The overruled field (claimed total): its value and badge stay clear of the drawn (rotated) stamp.
-  const hits = await page.evaluate(() => {
+  // Checkpoint 10 verdict (R3.4): the drawn (rotated) stamp shape never touches a value, a confidence text or the badge.
+  const covered = await page.evaluate(() => {
     const stamp = document.querySelector(".xr-glass-stamp") as HTMLElement;
     const sb = stamp.getBoundingClientRect();
     const mat = new DOMMatrixReadOnly(getComputedStyle(stamp).transform);
@@ -68,22 +63,23 @@ async function checkLayout(page: Page, label: string): Promise<void> {
       cx + x! * Math.cos(ang) - y! * Math.sin(ang),
       cy + x! * Math.sin(ang) + y! * Math.cos(ang),
     ]);
-    const row = document.querySelector('.xr-glass .xr-field[data-overruled="true"]')!;
-    return [row.querySelector(".xr-field-value")!, row.querySelector(".xr-badge")!].map((e) => {
-      const r = e.getBoundingClientRect();
-      const i = 3; // inset: the box holds line leading and padding around the glyphs
-      const rect = [[r.left + i, r.top + i], [r.right - i, r.top + i], [r.right - i, r.bottom - i], [r.left + i, r.bottom - i]];
-      // Separating axis test between the rotated stamp and the axis-aligned box.
-      const axes = [[1, 0], [0, 1], [Math.cos(ang), Math.sin(ang)], [-Math.sin(ang), Math.cos(ang)]];
-      for (const [ax, ay] of axes) {
-        const pa = poly.map((p) => p[0]! * ax! + p[1]! * ay!);
-        const pb = rect.map((p) => p[0]! * ax! + p[1]! * ay!);
-        if (Math.max(...pa) <= Math.min(...pb) || Math.max(...pb) <= Math.min(...pa)) return false;
-      }
-      return true;
-    });
+    const bodyBox = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
+    return Array.from(document.querySelectorAll(".xr-glass .xr-field-value, .xr-glass .xr-conf, .xr-glass .xr-badge"))
+      .filter((e) => {
+        const r = e.getBoundingClientRect();
+        if (r.bottom > bodyBox.bottom + 0.5 || r.top < bodyBox.top - 0.5) return false; // scrolled out of the card
+        const rect = [[r.left, r.top], [r.right, r.top], [r.right, r.bottom], [r.left, r.bottom]];
+        const axes = [[1, 0], [0, 1], [Math.cos(ang), Math.sin(ang)], [-Math.sin(ang), Math.cos(ang)]];
+        for (const [ax, ay] of axes) {
+          const pa = poly.map((p) => p[0]! * ax! + p[1]! * ay!);
+          const pb = rect.map((p) => p[0]! * ax! + p[1]! * ay!);
+          if (Math.max(...pa) <= Math.min(...pb) || Math.max(...pb) <= Math.min(...pa)) return false;
+        }
+        return true;
+      })
+      .map((e) => e.textContent ?? "");
   });
-  expect(hits, `${label}: stamp shape touches the overruled value or badge`).toEqual([false, false]);
+  expect(covered, `${label}: stamp shape covers no value, confidence or badge`).toEqual([]);
   expect(m.glassBox, `${label}: glass box`).not.toBeNull();
   expect(m.stamp!.left, `${label}: stamp inside card`).toBeGreaterThanOrEqual(m.glassBox!.left - 1);
   expect(m.stamp!.right, `${label}: stamp inside card`).toBeLessThanOrEqual(m.glassBox!.right + 1);
@@ -131,12 +127,9 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
     // Backdrop luminance only; the text colour is read below.
     // visual-polish-2 R3.3: at small sizes the compact card scrolls inside; rows scrolled out of view are not painted on the card, so only visible rows are sampled.
     const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
-    // visual-polish-2 R3.3: rows are measured outside the bounding box of the stamp.
-    const sb = document.querySelector(".xr-glass-stamp")!.getBoundingClientRect();
-    const inside = (el: Element) => {
+        const inside = (el: Element) => {
       const r = el.getBoundingClientRect();
-      const underStamp = r.left < sb.right && sb.left < r.right && r.top < sb.bottom && sb.top < r.bottom;
-      return !underStamp && r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
     };
     const targets = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf")).filter(inside);
     for (const el of targets) {
@@ -163,13 +156,11 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
       return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     };
     const glassRect = document.querySelector(".xr-glass-body")!.getBoundingClientRect();
-    const sb = document.querySelector(".xr-glass-stamp")!.getBoundingClientRect();
     return Array.from(
       document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf"),
     ).filter((el) => {
       const r = el.getBoundingClientRect();
-      const underStamp = r.left < sb.right && sb.left < r.right && r.top < sb.bottom && sb.top < r.bottom;
-      return !underStamp && r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
+      return r.top >= glassRect.top - 0.5 && r.bottom <= glassRect.bottom + 0.5;
     }).map((el) => {
       const [r, g, b] = parse(getComputedStyle(el).color);
       return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
@@ -208,7 +199,7 @@ test("signature flow: decision, replay, override and trace export", async ({ pag
   await expect(page.getByRole("note").filter({ hasText: "OVERRULED BY RULE" })).toBeVisible();
 
   // Layout and readability, at both supported shell sizes.
-  for (const size of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }]) {
+  for (const size of [{ width: 1280, height: 720 }, { width: 1440, height: 900 }, { width: 1600, height: 900 }]) {
     await page.setViewportSize(size);
     const label = `${size.width}x${size.height}`;
     await checkLayout(page, label);

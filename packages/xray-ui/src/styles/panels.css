@@ -191,9 +191,9 @@
   flex-direction: column;
   min-height: 0;
 }
-/* visual-polish-2 R3.3, R3.4: the stamp is part of the picture and may cover a row end; the last row stays mostly clear of it. */
+/* visual-polish-2 R3.4 (checkpoint 10): the bottom strip below the last row is reserved for the stamp; no row text is ever under it. */
 .xr-glass[data-overruled="true"] {
-  padding-bottom: calc(14 * var(--xr-u, 1px));
+  padding-bottom: max(50px, calc(52 * var(--xr-u, 1px)));
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .xr-glass { background: var(--xr-bg-panel); }
@@ -209,20 +209,33 @@
   display: grid;
   grid-template-columns: 27% minmax(0, 1fr);
   gap: calc(8 * var(--xr-u, 1px));
-  font-size: max(11px, calc(12 * var(--xr-u, 1px)));
-  line-height: 1.25;
-  padding: calc(2 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
+  font-size: max(11px, calc(11 * var(--xr-u, 1px)));
+  line-height: 1.15;
+  padding: calc(1 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
 }
-.xr-glass .xr-answer-head { margin-bottom: calc(2 * var(--xr-u, 1px)); }
+.xr-glass .xr-answer-head { margin-bottom: 0; line-height: 1.2; }
+.xr-glass .xr-answer-fields { gap: 0; }
+/* visual-polish-2 R3.3 (checkpoint 10): value (and badge) on the first line, confidence always on its own line below. */
 .xr-glass .xr-field dd {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "value badge" "conf conf";
+  justify-content: start;
   align-items: baseline;
   gap: 0 calc(8 * var(--xr-u, 1px));
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.xr-glass .xr-conf { display: inline; margin-left: 0; font-size: max(10px, calc(10 * var(--xr-u, 1px))); }
+.xr-glass .xr-field-value { grid-area: value; min-width: 0; }
+.xr-glass .xr-badge { grid-area: badge; justify-self: start; }
+.xr-glass .xr-conf {
+  grid-area: conf;
+  display: block;
+  margin-left: 0;
+  font-size: max(10px, calc(9 * var(--xr-u, 1px)));
+  line-height: 1.15;
+  color: var(--xr-text-on-glass-muted);
+}
 .xr-glass .xr-cracks {
   position: absolute;
   inset: 0;
@@ -241,12 +254,13 @@
 .xr-glass-stamp {
   position: absolute;
   z-index: 3;
-  right: 3%;
-  bottom: 44%;
-  width: 48%;
+  left: 27%;
+  bottom: calc(8 * var(--xr-u, 1px));
+  width: 46%;
   box-sizing: border-box;
   margin: 0;
-  padding: calc(4 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
+  padding: calc(2 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
+  line-height: 1.2;
   font-size: max(10px, calc(11 * var(--xr-u, 1px)));
   border: 0;
   background: rgba(58, 15, 20, var(--xr-stamp-alpha));
