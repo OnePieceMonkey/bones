@@ -13,7 +13,6 @@ import paperUrl from "./paper.webp";
 import screwUrl from "./screw.webp";
 import skeletonUrl from "./skeleton.webp";
 import stampFrameUrl from "./stamp-frame.webp";
-import toggleUrl from "./toggle.webp";
 import splinter1Url from "./splinters/splinter-1.webp";
 import splinter2Url from "./splinters/splinter-2.webp";
 import splinter3Url from "./splinters/splinter-3.webp";
@@ -37,7 +36,6 @@ export {
   screwUrl,
   skeletonUrl,
   stampFrameUrl,
-  toggleUrl,
   splinter1Url,
   splinter2Url,
   splinter3Url,

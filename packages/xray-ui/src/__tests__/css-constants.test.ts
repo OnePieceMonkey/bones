@@ -173,7 +173,7 @@ describe("control motion", () => {
     expect(motion).toMatch(/@keyframes xr-needle-swing[\s\S]*?var\(--from[\s\S]*?var\(--over[\s\S]*?var\(--to/);
   });
   it("moves the lever in at most 150 ms", () => {
-    expect(duration(controls, /\.xr-ptoggle-img\s*{[^}]*transition:\s*transform\s+(\d+)ms/)).toBeLessThanOrEqual(150);
+    expect(duration(controls, /\.xr-ptoggle-arm\s*{[^}]*transition:\s*transform\s+(\d+)ms/)).toBeLessThanOrEqual(150);
   });
   it("fades the lamp in 150 to 500 ms", () => {
     const d = duration(controls, /\.xr-plamp\s*{[^}]*transition:\s*filter\s+(\d+)ms/);

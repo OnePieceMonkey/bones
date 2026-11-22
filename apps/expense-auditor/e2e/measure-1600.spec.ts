@@ -726,3 +726,42 @@ for (const size of SIZES) {
     expect(m.scrollH).toBeLessThanOrEqual(size.height);
   });
 }
+
+// Checkpoint 8 verdict (R5.8): silver metal toggle lever, CSS and SVG only, tilted by transform.
+for (const size of SIZES) {
+  test(`toggle is a chrome base with a tilting lever and no image at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const read = () =>
+      page.evaluate(() => {
+        const lever = document.querySelector(".xr-ptoggle-lever")!;
+        const arm = lever.querySelector(".xr-ptoggle-arm")!;
+        return {
+          imgs: lever.querySelectorAll("img").length,
+          baseImage: getComputedStyle(lever.querySelector(".xr-ptoggle-base")!).backgroundImage,
+          hasPolygon: lever.querySelector("polygon") !== null,
+          hasBall: lever.querySelector("circle") !== null,
+          transform: getComputedStyle(arm).transform,
+          checked: document.querySelector(".xr-ptoggle")!.getAttribute("aria-checked"),
+          lampBottom: document.querySelector(".xr-ptoggle .xr-plamp")!.getBoundingClientRect().bottom,
+          leverTop: lever.getBoundingClientRect().top,
+          labelTop: document.querySelector(".xr-cpanel-item--toggle .xr-cpanel-plaque")!.getBoundingClientRect().top,
+          leverBottom: lever.getBoundingClientRect().bottom,
+        };
+      });
+    const on = await read();
+    await page.getByRole("switch", { name: "X-RAY" }).click();
+    const off = await read();
+    expect(on.checked).toBe("true");
+    expect(off.checked).toBe("false");
+    expect(on.imgs).toBe(0);
+    expect(on.baseImage).toContain("conic-gradient");
+    expect(on.hasPolygon && on.hasBall).toBe(true);
+    expect(on.transform).not.toBe(off.transform);
+    expect(on.lampBottom).toBeLessThanOrEqual(on.leverTop + 1);
+    expect(on.labelTop).toBeGreaterThanOrEqual(on.leverBottom);
+  });
+}

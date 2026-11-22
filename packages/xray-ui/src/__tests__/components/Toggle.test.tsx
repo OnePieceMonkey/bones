@@ -46,8 +46,19 @@ describe("Toggle and Lamp", () => {
     expect(rule(".xr-ptoggle-lever")).toContain("calc(52 *");
     expect(rule(".xr-shell .xr-plamp")).toContain("calc(26 *");
   });
-  it("styles the lever flip and lamp filters in CSS", () => {
-    expect(rule('.xr-ptoggle-lever[data-on="true"] .xr-ptoggle-img')).toContain("scaleY(-1)");
+  it("draws the lever as SVG with a chrome base and no image", () => {
+    const { container } = render(<Toggle xray={false} onXrayChange={() => {}} />);
+    const lever = container.querySelector(".xr-ptoggle-lever")!;
+    expect(lever.querySelector("img")).toBeNull();
+    expect(lever.querySelector(".xr-ptoggle-base")).not.toBeNull();
+    expect(lever.querySelector("polygon.xr-ptoggle-arm-shape")).not.toBeNull();
+    expect(lever.querySelector("circle.xr-ptoggle-ball")).not.toBeNull();
+    expect(rule(".xr-ptoggle-base")).toContain("conic-gradient");
+  });
+  it("styles the lever tilt and lamp filters in CSS", () => {
+    expect(rule(".xr-ptoggle-arm")).toContain("rotate(180deg)");
+    expect(rule('.xr-ptoggle-lever[data-on="true"] .xr-ptoggle-arm')).toContain("rotate(0deg)");
+    expect(css).not.toContain("scaleY(-1)");
     const on = rule('.xr-plamp[data-lit="true"]');
     expect(on).toContain("brightness(1.6)");
     expect(on).toMatch(/drop-shadow\(0 0 calc\(10 \* var\(--xr-u, 1px\)\) var\(--xr-amber-glow\)\)/);
