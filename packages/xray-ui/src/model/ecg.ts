@@ -19,34 +19,49 @@ function beatSegment(x: number): string {
   );
 }
 
-function spikeSegment(x: number): string {
-  return `M${x - 8},30 L${x - 3},30 L${x},2 L${x + 3},56 L${x + 8},30`;
+/** Start of the line when no bone is fractured: the centre of the model. */
+export const ECG_CENTER = 280;
+
+/** Left-most clamped x of the fractured bones, ECG_CENTER when none is fractured. */
+export function ecgStartX(bones: readonly BoneView[]): number {
+  const xs = bones
+    .filter((b) => b.state === "fractured")
+    .map((b) => clamp(b.position.x, SPIKE_MIN_X, SPIKE_MAX_X));
+  return xs.length === 0 ? ECG_CENTER : Math.min(...xs);
+}
+
+function spikeSegmentFrom(x: number, startX: number): string {
+  return `M${Math.max(startX, x - 8)},30 L${Math.max(startX, x - 3)},30 L${x},2 L${x + 3},56 L${x + 8},30`;
 }
 
 export function ecgPath(
   spikeXs: readonly number[],
   flatline: boolean,
+  startX = 0,
 ): { linePath: string; spikePath: string } {
   if (flatline) {
-    return { linePath: `M0,${ECG.baseline} L${ECG.width},${ECG.baseline}`, spikePath: "" };
+    return { linePath: `M${startX},${ECG.baseline} L${ECG.width},${ECG.baseline}`, spikePath: "" };
   }
-  const parts: string[] = [`M0,${ECG.baseline}`];
+  const parts: string[] = [`M${startX},${ECG.baseline}`];
   for (let x = ECG.beatStart; x <= LAST_BEAT_X; x += ECG.beatGap) {
+    if (x - 14 < startX) continue;
     if (spikeXs.some((s) => Math.abs(s - x) <= BEAT_SKIP_DISTANCE)) continue;
     parts.push(`L${x - 14},30`, beatSegment(x));
   }
   parts.push(`L${ECG.width},${ECG.baseline}`);
-  return { linePath: parts.join(" "), spikePath: spikeXs.map(spikeSegment).join(" ") };
+  return { linePath: parts.join(" "), spikePath: spikeXs.map((x) => spikeSegmentFrom(x, startX)).join(" ") };
 }
 
-export function buildEcgModel(trace: Trace, bones: readonly BoneView[]): EcgModel {
+/** `fullWidth` keeps the line at x = 0 (the stand-alone ECG); the stage band starts at the fracture. */
+export function buildEcgModel(trace: Trace, bones: readonly BoneView[], fullWidth = false): EcgModel {
   const flatline = trace.result === "rejected";
   const spikeXs = flatline
     ? []
     : bones
         .filter((b) => b.state === "fractured")
         .map((b) => clamp(b.position.x, SPIKE_MIN_X, SPIKE_MAX_X));
-  const { linePath, spikePath } = ecgPath(spikeXs, flatline);
+  const startX = fullWidth ? 0 : ecgStartX(bones);
+  const { linePath, spikePath } = ecgPath(spikeXs, flatline, startX);
   const summary = flatline
     ? "flatline"
     : `${spikeXs.length} spike${spikeXs.length === 1 ? "" : "s"}`;
@@ -59,5 +74,6 @@ export function buildEcgModel(trace: Trace, bones: readonly BoneView[]): EcgMode
     spikeXs,
     flatline,
     summary,
+    startX,
   };
 }

@@ -109,6 +109,8 @@ export interface EcgModel {
   flatline: boolean;
   /** "2 spikes" | "1 spike" | "0 spikes" | "flatline". */
   summary: string;
+  /** Left end of the line in model units, 0..width. */
+  startX: number;
 }
 
 export type FilmSource =

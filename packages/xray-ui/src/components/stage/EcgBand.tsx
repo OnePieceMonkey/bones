@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Trace } from "@bones/core";
 import { cx } from "../../cx";
 import { animClass, useReducedMotion } from "../../hooks/useReducedMotion";
@@ -23,10 +24,13 @@ export function EcgBand({ trace, anatomy, anchors, reducedMotion, className }: E
   const model = buildEcgModel(trace, bones);
   const moving = !model.flatline && !reduced;
   return (
-    <div className={cx("xr-ecg-band", model.flatline && "xr-ecg-band--flat", className)}>
+    <div
+      className={cx("xr-ecg-band", model.flatline && "xr-ecg-band--flat", className)}
+      style={{ "--xr-ecg-start": `${(model.startX / model.width) * 100}%` } as CSSProperties}
+    >
       <svg
         className="xr-ecg-band-svg"
-        viewBox={`0 0 ${model.width} ${model.height}`}
+        viewBox={`${model.startX} 0 ${model.width - model.startX} ${model.height}`}
         preserveAspectRatio="none"
         aria-hidden="true"
         focusable="false"

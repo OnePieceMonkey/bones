@@ -236,10 +236,12 @@
 /* ECG band: 50 % of the full image = (50 - 3) / 62 of the crop box. */
 .xr-ecg-band {
   position: absolute;
-  left: 0;
-  width: 100%;
+  left: var(--xr-ecg-start, 0%);
+  right: 0;
+  width: auto;
+  height: calc(var(--xr-photo-w, min(100cqw, 100cqh * 1.0824)) * 60 / 560);
   top: calc((50 - 3) / 62 * 100%);
-  aspect-ratio: 560 / 60;
+  aspect-ratio: auto;
   transform: translateY(-50%);
   overflow: hidden;
   pointer-events: none;

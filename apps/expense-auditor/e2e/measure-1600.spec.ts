@@ -821,3 +821,39 @@ for (const size of SIZES) {
     expect(m.scrollH).toBeLessThanOrEqual(size.height);
   });
 }
+
+// visual-polish-2 task 9.1: the ECG starts at the left-most fractured hotspot (R3.6, R3.7, R3.8).
+test("ECG band starts at the left-most fractured hotspot and runs to the stage edge (R3.6, R3.8)", async ({ page }) => {
+  await openSample(page, /signature case/i);
+  const m = await page.evaluate(() => {
+    const centres = Array.from(document.querySelectorAll('.xr-hotspot[data-state="fractured"]')).map((el) => {
+      const r = el.getBoundingClientRect();
+      return r.left + r.width / 2;
+    });
+    const band = document.querySelector(".xr-ecg-band")!.getBoundingClientRect();
+    const photo = document.querySelector(".xr-photo")!.getBoundingClientRect();
+    const spike = getComputedStyle(document.querySelector(".xr-ecg-spike")!).stroke;
+    const line = getComputedStyle(document.querySelector(".xr-ecg-line")!).stroke;
+    const root = getComputedStyle(document.documentElement);
+    return { left: Math.min(...centres), count: centres.length, bandLeft: band.left, bandRight: band.right, photoRight: photo.right, spike, line, red: root.getPropertyValue("--xr-red").trim(), cyan: root.getPropertyValue("--xr-cyan").trim() };
+  });
+  expect(m.count).toBeGreaterThan(0);
+  expect(Math.abs(m.bandLeft - m.left)).toBeLessThanOrEqual(8);
+  expect(Math.abs(m.bandRight - m.photoRight)).toBeLessThanOrEqual(1);
+  const rgb = (hex: string) => {
+    const n = parseInt(hex.replace("#", ""), 16);
+    return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
+  };
+  expect(m.spike).toBe(rgb(m.red));
+  expect(m.line).toBe(rgb(m.cyan));
+});
+test("ECG band starts at the photo centre when nothing is fractured (R3.7)", async ({ page }) => {
+  await openSample(page, /clean meal/i);
+  const m = await page.evaluate(() => {
+    const band = document.querySelector(".xr-ecg-band")!.getBoundingClientRect();
+    const photo = document.querySelector(".xr-photo")!.getBoundingClientRect();
+    return { fractured: document.querySelectorAll('.xr-hotspot[data-state="fractured"]').length, bandLeft: band.left, centre: photo.left + photo.width / 2 };
+  });
+  expect(m.fractured).toBe(0);
+  expect(Math.abs(m.bandLeft - m.centre)).toBeLessThanOrEqual(8);
+});

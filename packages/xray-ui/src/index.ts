@@ -105,4 +105,4 @@ export { defaultFormat, safeFormat, resultLabel, summariseValue } from "./model/
 export type { Formatter } from "./model/format";
 export { VIEWBOX, REGION_BOXES, layoutBone, chipFor } from "./model/skeletonLayout";
 export type { RegionBox } from "./model/skeletonLayout";
-export { ECG, ecgPath, buildEcgModel } from "./model/ecg";
+export { ECG, ECG_CENTER, ecgPath, ecgStartX, buildEcgModel } from "./model/ecg";

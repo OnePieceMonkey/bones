@@ -6,7 +6,7 @@ import type { EcgLineProps } from "../types";
 
 export function EcgLine({ trace, anatomy, reducedMotion, className }: EcgLineProps) {
   const reduced = useReducedMotion(reducedMotion);
-  const model = buildEcgModel(trace, selectBones(trace, anatomy));
+  const model = buildEcgModel(trace, selectBones(trace, anatomy), true);
   const animated = !model.flatline;
 
   return (
