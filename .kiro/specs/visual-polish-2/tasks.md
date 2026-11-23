@@ -356,13 +356,13 @@ Decisions recorded here:
     - Commit message: `refactor(expense-auditor): keep only layout in app.css and guard against visual rules (D2, A9)`
     - _Requirements: 8.1, 8.7, 9.7, 13.8_
 
-- [-] 12. Checkpoint - start screen and live form
+- [x] 12. Checkpoint - start screen and live form
   - Follow the Checkpoint procedure with N = 12. The side-by-side image still compares the Signature screen with the mockup; `cp12-start-1600.png` is the start screen for the user's visual review of region 8.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 12 done". Do not start any further task until the user says "weiter".
 
-- [ ] 13. Sweeps, accessibility and cleanup (ledger S7)
-  - [~] 13.1 Playwright sweeps at three viewports
+- [x] 13. Sweeps, accessibility and cleanup (ledger S7)
+  - [x] 13.1 Playwright sweeps at three viewports
     - Files: `apps/expense-auditor/e2e/measure-1600.spec.ts`.
     - Boxed_Element sweep on the Signature screen at 1600x900: every element with a visible border, non-transparent background or image, or box-shadow that is not on the allow-list of the design (`.xr-glass`, `.xr-rulebox`, `.xr-doctor`, `.xr-bubble`, `.xr-footer-btn`, `.xr-header`, `.xr-header-pill`, `.xr-header-action`, `.xr-steel`, `.xr-cpanel`, `.xr-pmeter`, `.xr-doc-paper`, `.xr-doc-film` (the film pseudo-element belongs to `.xr-doc`), `.xr-hotspot .xr-bone-btn`, image elements) fails (R1.6). Findings are fixed in CSS in this task, not hidden by the allow-list.
     - Font sweep: no element outside the wordmark and headline has a computed `font-family` starting with "Cormorant SC"; none outside `.xr-doc` contains `monospace`, `Menlo` or `Consolas`; every other text element has `font-weight` 400 or 500 (R2.2 to R2.4).
@@ -372,7 +372,7 @@ Decisions recorded here:
     - Commit message: `test(expense-auditor): add boxed, font, focus and layout sweeps at three viewports`
     - _Requirements: 1.6, 2.2, 2.3, 2.4, 2.6, 9.1, 9.2, 9.4, 10.1, 10.2, 10.3, 10.4, 10.6, 11.4_
 
-  - [~] 13.2 Dead-rule cleanup and guard proof
+  - [x] 13.2 Dead-rule cleanup and guard proof
     - Files: `packages/xray-ui/src/styles/*.css`, `packages/xray-ui/src/__tests__/assets.test.ts`, `__tests__/styles/` (if a check is added).
     - Grep each removed or replaced rule and delete leftovers: the old `.xr-pknob-label` plate and active outline, the old `.xr-hs-ring` border rules, the old round-gauge CSS for `.xr-pmeter`, `.xr-doc-paper` `paper.webp` url, old `.app-*` references in `packages/xray-ui`. The `xray.css` legacy section stays untouched because case-files and the old `XrayView` still use it.
     - Prove with the existing suites, without edits: `fonts.test.ts`, `domain-isolation.test.ts`, `guards/assets-guard.test.ts`, `source-hygiene.test.ts`, `guards/motion-guard.test.ts`, `a11y-roles.test.tsx`. Add one assertion to `assets.test.ts` that the Asset_Dir total equals the measured value and stays at most 1,500,000 B (expected 619,406 B), and that the failure message contains total and budget (R12.1, R12.6). Verify no `img` without positive integer `width` and `height` (existing Property 20 stays green; R12.5).
@@ -386,15 +386,15 @@ Decisions recorded here:
     - Commit message: `docs(xray-ui): document the type system, scaling and 1600 references`
     - _Requirements: 2.1, 11.1, 12.1_
 
-- [ ] 15. Final: 1440x900 references and last review
-  - [~] 15.1 Regenerate the two 1440x900 references and remove the skips
+- [x] 15. Final: 1440x900 references and last review
+  - [x] 15.1 Regenerate the two 1440x900 references and remove the skips
     - Files: `apps/expense-auditor/e2e/signature-case.spec.ts`, `e2e/start-screen.spec.ts`, `e2e/__screenshots__/start-screen.spec.ts/start-screen.png`, `e2e/__screenshots__/signature-case.spec.ts/signature-case.png`.
     - Remove the `test.skip` lines added in task 1.2. Regenerate on purpose with `pnpm --filter @bones/expense-auditor exec vite build` and `pnpm --filter @bones/expense-auditor exec playwright test --project=chromium start-screen.spec.ts signature-case.spec.ts --update-snapshots`. Look at both new images before committing. Only these two PNGs change; the 1600 PNGs and the PNGs of other specs do not.
     - Run `pnpm e2e` without the update flag: all specs pass, none skipped.
     - Commit message: `test(expense-auditor): regenerate 1440x900 references and remove skips (start-screen.png, signature-case.png)`
     - _Requirements: 11.5, 11.9_
 
-- [~] 16. Final checkpoint
+- [-] 16. Final checkpoint
   - Follow the Checkpoint procedure with N = 16, with these additions before the commit of the review images:
     - The side-by-side image is also saved as `review/final-side-by-side.png` (R11.10).
     - Run `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e` (no skips, no update flag) and `git diff --exit-code <commit before this feature> -- packages/core`. No file under `packages/core` may differ.

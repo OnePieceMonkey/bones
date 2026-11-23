@@ -1,0 +1,728 @@
+{
+  "pbtResults": {
+    "7.2 Teal bubbles, phone frame, thin bar, pill buttons": {
+      "status": "passed",
+      "lastRunTimestamp": 1795347579478
+    }
+  },
+  "executionHistory": {
+    "1.1 Playwright project chromium-1600, reference and scroll specs": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218096
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176223490
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176318461
+      }
+    ],
+    "1.2 Skip the two 1440 reference tests": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218151
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176318576
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176378694
+      }
+    ],
+    "1.3 New tokens and contrast pairs (no look change)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218177
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176379315
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176514703
+      }
+    ],
+    "1.4 CSS source helpers and the 120 u size guard": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218202
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176514098
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176610173
+      }
+    ],
+    "2.1 Unbox labels and remove dashed outlines": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218223
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176609509
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176754542
+      }
+    ],
+    "2.2 One type system": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218247
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176755087
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176908191
+      }
+    ],
+    "3.1 Header icons, action icon prop and contextNote": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218268
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176908292
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177038972
+      }
+    ],
+    "3.2 Framed header, glass pill, ghost actions": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218301
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177039512
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177344359
+      }
+    ],
+    "4.1 Film backdrop, white paper, tilt, curl, clips": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218325
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177344896
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177555184
+      }
+    ],
+    "4.2 Field marks, hover labels and centred scan line": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218346
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177555465
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177965689
+      }
+    ],
+    "5. Checkpoint - global look, header, receipt": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218366
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177971193
+      },
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795178083363
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795205843927
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206117575
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206120868
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206286477
+      }
+    ],
+    "6.1 Knob label model": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218387
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206286578
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206402729
+      }
+    ],
+    "6.2 Meter geometry model": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218406
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206403320
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206503749
+      }
+    ],
+    "6.3 Shell grid and one steel panel with notch": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218428
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206504418
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206721981
+      }
+    ],
+    "6.4 Toggle with the lamp above the lever": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218450
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206722409
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206858741
+      }
+    ],
+    "6.5 Rectangular VU meter (SVG)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218477
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795206859419
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795207988965
+      }
+    ],
+    "6.6 Large knob with engraved v1/v2/v3 ring and engraved panel labels": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218501
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795207989703
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795208246844
+      }
+    ],
+    "7.1 Doctor title, home indicator and button icons (DOM)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218528
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795208247338
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795208361879
+      }
+    ],
+    "7.2 Teal bubbles, phone frame, thin bar, pill buttons": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218548
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795208361151
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795347614120
+      }
+    ],
+    "8. Checkpoint - control panel and phone": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218567
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795347614587
+      },
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795347712983
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795348433136
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795348436250
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349078130
+      }
+    ],
+    "9.1 ECG starts at the left-most fracture": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218587
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349078220
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349284474
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349287588
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349383580
+      }
+    ],
+    "9.2 Soft glow hotspots": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218607
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349383668
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349533056
+      }
+    ],
+    "9.3 Larger skeleton anchored to the stage bottom": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218629
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349533722
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349765562
+      }
+    ],
+    "9.4 Glass card at the top centre with compact rows": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218651
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795349766327
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795350601973
+      }
+    ],
+    "9.5 Overrule stamp across the card diagonal": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218673
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795350602529
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795351123809
+      }
+    ],
+    "10. Checkpoint - stage composition": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218697
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795351123923
+      },
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795351233835
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795361995687
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795361998928
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795362536654
+      }
+    ],
+    "11.1 Custom file button and steel live form": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218721
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795362536721
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795362801284
+      }
+    ],
+    "11.2 Move app buttons, inputs, dialog, error and status styling into xray-ui": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218745
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795362802120
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363071200
+      }
+    ],
+    "11.3 Strip visual rules from app.css and add the app guard rule": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218767
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363070655
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363211077
+      }
+    ],
+    "12. Checkpoint - start screen and live form": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218790
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363211666
+      },
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363372825
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795423676923
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795423681235
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795425755424
+      }
+    ],
+    "13.1 Playwright sweeps at three viewports": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218815
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795425755478
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426111094
+      }
+    ],
+    "13.2 Dead-rule cleanup and guard proof": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218836
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426111167
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426405391
+      }
+    ],
+    "15.1 Regenerate the two 1440x900 references and remove the skips": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218859
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426405950
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426566952
+      }
+    ],
+    "16. Final checkpoint": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176218882
+      },
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426567578
+      }
+    ],
+    "1. Preparation: guards, tokens, chromium-1600 project (ledger S0)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176610235
+      }
+    ],
+    "2. Global look and typography (ledger S1)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795176908225
+      }
+    ],
+    "3. Header (ledger S5, header part)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177344400
+      }
+    ],
+    "4. Receipt on film (ledger S3)": [
+      {
+        "executionId": "6725821a-7aa9-4a06-b43f-2b0380e5db01",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795177965733
+      }
+    ],
+    "6. Control panel (ledger S4)": [
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795208246881
+      }
+    ],
+    "7. Phone panel (ledger S5, phone part)": [
+      {
+        "executionId": "44c00a11-856b-41c0-9b6b-2aca0978bf2d",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795347614185
+      }
+    ],
+    "9. Stage composition (ledger S2)": [
+      {
+        "executionId": "eefc8b62-ef7c-4114-9087-7fdd8570b3ec",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795351123855
+      }
+    ],
+    "11. Start screen, live form and app.css move (ledger S6)": [
+      {
+        "executionId": "bbd1c239-2a02-45a9-9522-5cc3eef8b5a5",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795363211119
+      }
+    ],
+    "13. Sweeps, accessibility and cleanup (ledger S7)": [
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426405455
+      }
+    ],
+    "15. Final: 1440x900 references and last review": [
+      {
+        "executionId": "9f7685b0-0566-42b6-a9c4-41baab94b7ae",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795426566997
+      }
+    ]
+  }
+}
