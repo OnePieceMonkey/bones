@@ -9,7 +9,6 @@ async function openSignatureCase(page: Page): Promise<void> {
 }
 
 test("signature case matches the reference image", async ({ page }) => {
-  test.skip(true, "refs return in the last task (visual-polish-2 R11.9)");
   await openSignatureCase(page);
   await expect(page).toHaveScreenshot("signature-case.png");
 });
