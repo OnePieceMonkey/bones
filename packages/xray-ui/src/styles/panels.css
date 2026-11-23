@@ -238,7 +238,17 @@
     0 0 16px rgba(5, 9, 13, 0.85);
 }
 .xr-glass .xr-field-value { grid-area: value; min-width: 0; }
-.xr-glass .xr-badge { grid-area: badge; justify-self: start; }
+.xr-glass .xr-badge {
+  grid-area: badge;
+  justify-self: start;
+  /* R1.6, R2.4: a flat red mark, no filled box around the text. */
+  margin-left: 0;
+  padding: 0;
+  background: none;
+  color: var(--xr-red);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
 .xr-glass .xr-conf {
   grid-area: conf;
   display: block;

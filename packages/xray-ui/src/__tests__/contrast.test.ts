@@ -152,7 +152,7 @@ describe("new surface contrast", () => {
     const { light, dark } = await extremePixels(join(assets, "film.webp"));
     for (const [label, px] of [["darkest", dark], ["lightest", light]] as const) {
       const bg = rgbToHex(blend(tint, alpha!, px));
-      for (const token of ["--xr-text-on-glass", "--xr-text-on-glass-muted"]) {
+      for (const token of ["--xr-text-on-glass", "--xr-text-on-glass-muted", "--xr-red"]) {
         const ratio = contrastRatio(need(token), bg);
         expect(ratio, failMessage(`${token} on ${label} film pixel`, ratio, 4.5)).toBeGreaterThanOrEqual(4.5);
       }

@@ -84,7 +84,7 @@
 }
 .xr-pmeter-num {
   fill: var(--xr-text-on-meter);
-  font: 600 13px / 1 var(--xr-font-sans);
+  font: 500 13px / 1 var(--xr-font-sans);
 }
 .xr-pmeter-needle-line {
   stroke: var(--xr-red);
