@@ -23,26 +23,14 @@ main {
 }
 
 /* Start screen */
-.app-sheets {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--xr-space-3);
-  margin: 0;
-  padding: calc(70 * var(--xr-u, 1px)) 0 0;
-}
-
-.app-sheets + .app-status {
+.xr-start ~ .app-status {
   position: absolute;
   bottom: var(--xr-space-3);
   left: 50%;
   margin: 0;
   transform: translateX(-50%);
 }
-
-.app-live-form ~ .app-status {
+.xr-start[data-form="shown"] ~ .app-status {
   bottom: calc(60 * var(--xr-u, 1px) + 60px);
 }
 

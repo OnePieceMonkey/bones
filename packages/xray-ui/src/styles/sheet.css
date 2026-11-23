@@ -96,6 +96,37 @@
 .xr-sheet:focus-visible:not(:disabled)::after {
   opacity: 1;
 }
+/* Start layout. Hidden form: headline and sheet row are one block centred vertically in the stage.
+   Shown form: headline at the top, the row centred below it (the older layout). */
+.xr-start {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(44 * var(--xr-u, 1px));
+  pointer-events: none;
+}
+.xr-start .xr-form-strip { pointer-events: auto; }
+.xr-start-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--xr-space-3);
+  margin: 0;
+  pointer-events: auto;
+}
+.xr-start[data-form="hidden"] .xr-start-head {
+  position: relative;
+  top: auto;
+  align-self: stretch;
+}
+.xr-start[data-form="shown"] .xr-start-row {
+  position: absolute;
+  inset: 0;
+  padding: calc(70 * var(--xr-u, 1px)) 0 0;
+}
 /* Start headline block */
 .xr-start-head {
   position: absolute;

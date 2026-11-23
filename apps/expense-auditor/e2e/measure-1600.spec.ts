@@ -1206,7 +1206,7 @@ for (const size of SIZES) {
     expect(d.scrollWidth, "width").toBeLessThanOrEqual(d.innerWidth);
     const boxes = await page.evaluate(() => {
       const strip = document.querySelector(".xr-form-strip")!.getBoundingClientRect();
-      const sheets = Array.from(document.querySelectorAll(".app-sheets .xr-sheet")).map((e) => e.getBoundingClientRect());
+      const sheets = Array.from(document.querySelectorAll(".xr-start-row .xr-sheet")).map((e) => e.getBoundingClientRect());
       return { strip: { top: strip.top, bottom: strip.bottom, left: strip.left, right: strip.right }, sheetBottom: Math.max(...sheets.map((r) => r.bottom)) };
     });
     expect(boxes.strip.top, "strip below sheets").toBeGreaterThanOrEqual(boxes.sheetBottom);
@@ -1247,7 +1247,7 @@ for (const size of SIZES) {
     const m = await page.evaluate(() => {
       const st = Array.from(document.querySelectorAll("[role=status]")).find((e) => e.textContent?.includes("Reading receipt"))!.getBoundingClientRect();
       const strip = document.querySelector(".xr-form-strip")!.getBoundingClientRect();
-      const sheets = Array.from(document.querySelectorAll(".app-sheets .xr-sheet")).map((e) => e.getBoundingClientRect());
+      const sheets = Array.from(document.querySelectorAll(".xr-start-row .xr-sheet")).map((e) => e.getBoundingClientRect());
       return {
         st: { t: st.top, b: st.bottom, l: st.left, r: st.right },
         strip: { t: strip.top, b: strip.bottom, l: strip.left, r: strip.right },
@@ -1272,8 +1272,8 @@ for (const size of SIZES) {
     await page.setViewportSize(size);
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator(".app-sheets .xr-sheet")).toHaveCount(3);
-    const cards = await page.$$eval(".app-sheets .xr-sheet", (els) =>
+    await expect(page.locator(".xr-start-row .xr-sheet")).toHaveCount(3);
+    const cards = await page.$$eval(".xr-start-row .xr-sheet", (els) =>
       els.map((el) => {
         const s = getComputedStyle(el);
         const paper = el.querySelector(".xr-sheet-paper")!;
@@ -1342,3 +1342,25 @@ test("start cards lift 4 px and glow on hover and keyboard focus; transitions ar
   expect(ring.style).toBe("solid");
   expect(ring.color).toBe("rgb(255, 255, 255)");
 });
+
+// visual-polish-2 checkpoint 12 verdict: with the live form hidden the headline and the cards are one block centred in the stage (R8.11).
+for (const size of SIZES) {
+  test(`start block is vertically centred in the stage when the form is hidden at ${size.width}x${size.height} (R8.11)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator(".xr-start-row .xr-sheet")).toHaveCount(3);
+    const m = await page.evaluate(() => {
+      const stage = document.querySelector(".xr-viewport")!.getBoundingClientRect();
+      const head = document.querySelector(".xr-start-head")!.getBoundingClientRect();
+      const row = document.querySelector(".xr-start-row")!.getBoundingClientRect();
+      const top = Math.min(head.top, row.top);
+      const bottom = Math.max(head.bottom, row.bottom);
+      return { stageCentre: (stage.top + stage.bottom) / 2, blockCentre: (top + bottom) / 2, headBottom: head.bottom, rowTop: row.top };
+    });
+    expect(Math.abs(m.blockCentre - m.stageCentre), JSON.stringify(m)).toBeLessThanOrEqual(24);
+    expect(m.rowTop, "cards below the headline").toBeGreaterThanOrEqual(m.headBottom);
+    const d = await scrollDims(page);
+    expect(d.scrollHeight).toBeLessThanOrEqual(d.innerHeight);
+  });
+}

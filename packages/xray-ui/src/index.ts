@@ -61,6 +61,8 @@ export { FormStrip, FormStripField, FormStripFile } from "./components/FormStrip
 export type { FormStripProps, FormStripFieldProps, FormStripFileProps } from "./components/FormStrip";
 export { StartHeadline } from "./components/StartHeadline";
 export type { StartHeadlineProps } from "./components/StartHeadline";
+export { StartLayout } from "./components/StartLayout";
+export type { StartLayoutProps } from "./components/StartLayout";
 export { FilmClip } from "./components/FilmClip";
 export { AnswerCard } from "./components/AnswerCard";
 export { DrBonesChat } from "./components/DrBonesChat";

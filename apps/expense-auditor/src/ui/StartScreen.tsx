@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { FilmSheet, FormStrip, FormStripField, FormStripFile, ShellFrame, StartHeadline } from "@bones/xray-ui";
+import { FilmSheet, FormStrip, FormStripField, FormStripFile, ShellFrame, StartHeadline, StartLayout } from "@bones/xray-ui";
 import { DEFAULT_TRIP } from "../extraction/samples";
 import type { PreparedImage } from "../extraction/imageResize";
 import type { PhotoRequest } from "../state/sessionStore";
@@ -83,50 +83,52 @@ export function StartScreen({
   return (
     <>
       <ShellFrame heading="Expense Auditor" xray lightboxLabel={label} {...motion}>
-        <StartHeadline
-          title="Pick a receipt to X-ray."
-          subtitle="The AI reads the receipt. The rules decide."
-        />
-        {liveAvailable ? (
-          <form onSubmit={(e) => void onSubmit(e)} className="app-live-form">
-            <FormStrip legend="Live receipt photo" disabled={busy || preparing}>
-              <FormStripFile
-                label="Upload receipt photo"
-                accept="image/jpeg,image/png"
-                placeholder="Choose a photo"
-                onFile={onFile}
+        <StartLayout formShown={liveAvailable}>
+          <StartHeadline
+            title="Pick a receipt to X-ray."
+            subtitle="The AI reads the receipt. The rules decide."
+          />
+          {liveAvailable ? (
+            <form onSubmit={(e) => void onSubmit(e)} className="app-live-form">
+              <FormStrip legend="Live receipt photo" disabled={busy || preparing}>
+                <FormStripFile
+                  label="Upload receipt photo"
+                  accept="image/jpeg,image/png"
+                  placeholder="Choose a photo"
+                  onFile={onFile}
+                />
+                <FormStripField label="Trip start">
+                  <input type="date" required value={tripStart} onChange={(e) => setTripStart(e.target.value)} />
+                </FormStripField>
+                <FormStripField label="Trip end">
+                  <input type="date" required value={tripEnd} onChange={(e) => setTripEnd(e.target.value)} />
+                </FormStripField>
+                <button type="submit" disabled={file === null}>
+                  Read receipt
+                </button>
+              </FormStrip>
+            </form>
+          ) : null}
+          <div role="group" aria-label="Load sample receipt" className="xr-start-row">
+            {SAMPLE_IDS.map((id) => (
+              <FilmSheet
+                key={id}
+                id={`sample-${id}`}
+                title={SAMPLE_NAMES[id]}
+                description={SAMPLE_FILM_LINES[id]}
+                lines={sampleThumbLines(id)}
+                disabled={busy}
+                selected={busy && picked === id}
+                onSelect={() => {
+                  if (busy) return;
+                  setPicked(id);
+                  onLoadSample(id);
+                }}
+                {...motion}
               />
-              <FormStripField label="Trip start">
-                <input type="date" required value={tripStart} onChange={(e) => setTripStart(e.target.value)} />
-              </FormStripField>
-              <FormStripField label="Trip end">
-                <input type="date" required value={tripEnd} onChange={(e) => setTripEnd(e.target.value)} />
-              </FormStripField>
-              <button type="submit" disabled={file === null}>
-                Read receipt
-              </button>
-            </FormStrip>
-          </form>
-        ) : null}
-        <div role="group" aria-label="Load sample receipt" className="app-sheets">
-          {SAMPLE_IDS.map((id) => (
-            <FilmSheet
-              key={id}
-              id={`sample-${id}`}
-              title={SAMPLE_NAMES[id]}
-              description={SAMPLE_FILM_LINES[id]}
-              lines={sampleThumbLines(id)}
-              disabled={busy}
-              selected={busy && picked === id}
-              onSelect={() => {
-                if (busy) return;
-                setPicked(id);
-                onLoadSample(id);
-              }}
-              {...motion}
-            />
-          ))}
-        </div>
+            ))}
+          </div>
+        </StartLayout>
         {busy ? (
           <p role="status" className="xr-status app-status">
             Reading receipt
