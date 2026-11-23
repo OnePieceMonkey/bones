@@ -163,6 +163,9 @@ Feasibility check of the three hard criteria together at 1600x900:
 
 At 1280x720 the card has 156 px and needs 138 px. This is the tightest case. If the card content grows, the row layout (one line per field) is the lever, not the card width.
 
+### Final review note: glass card text size
+The final review requires computed font sizes of at least 14 px for labels and values and 12 px for confidence at 1600x900 and 1440x900 (R3.3). The card may grow in height. Its bottom must stay above the rib line (22 % of the photo height, R3.1); if it does not fit, reduce padding or raise the card instead of hiding the skeleton. The stamp strip, the 12/6 px spacing and the contrast rules are unchanged.
+
 ### Region comparison tables
 
 #### Region 1: Global look and boxed labels (R1)

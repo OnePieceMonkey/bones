@@ -419,7 +419,7 @@ Decisions recorded here:
 - Checkpoint 8: accepted with three changes (meter as tall as the dial and centred on it, 16 px steel below, labels on one baseline, numbers >= 11 px; silver metal toggle lever; v1/v2/v3 on a tight arc <= 20 px from the dial with ticks, RULE VERSION above the arc).
 - Checkpoint 10: accepted with two changes (stamp in a reserved empty area, never covers a value or confidence; confidence always on its own line under the value).
 - Checkpoint 12: accepted with four changes (start cards: white paper thumbnails with 3-5 real lines, film-sheet cards without hard border and lift/glow on hover/focus; start block centred vertically when the live form is hidden; glass card spacing 12/6 px).
-- Checkpoint 16: pending
+- Final review: accepted with one small change (glass card text at least 14 px for labels and values, 12 px for confidence at 1600x900 and 1440x900).
 
 ## Task Dependency Graph
 
