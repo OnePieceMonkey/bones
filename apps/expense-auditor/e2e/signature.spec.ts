@@ -101,12 +101,13 @@ async function checkLayout(page: Page, label: string): Promise<void> {
 
 /**
  * The glass card is translucent on purpose (backdrop-filter), so alpha 1 is not asserted.
- * Instead: hide the card text, screenshot the card, take the brightest backdrop pixel
+ * Instead: hide the card text (glyph colour only; the dark halo stays), screenshot the card, take the brightest backdrop pixel
  * behind each label and value, and require WCAG AA contrast (4.5:1) for the real text colour.
  */
 async function checkGlassReadability(page: Page, label: string): Promise<void> {
   const style = await page.addStyleTag({
-    content: ".xr-glass *, .xr-glass-stamp { color: transparent !important; text-shadow: none !important; } .xr-glass-stamp { visibility: hidden !important; }",
+    // Checkpoint 12: the dark text halo is part of the backdrop the text sits on, so only the glyph colour is hidden.
+    content: ".xr-glass *, .xr-glass-stamp { color: transparent !important; } .xr-glass-stamp { visibility: hidden !important; }",
   });
   const shot = (await page.screenshot()).toString("base64");
   await style.evaluate((el) => (el as unknown as Element).remove());
@@ -133,7 +134,10 @@ async function checkGlassReadability(page: Page, label: string): Promise<void> {
     };
     const targets = Array.from(document.querySelectorAll(".xr-glass .xr-field dt, .xr-glass .xr-field-value, .xr-glass .xr-conf")).filter(inside);
     for (const el of targets) {
-      const r = el.getBoundingClientRect();
+      // Checkpoint 12: sample behind the text itself (a Range over its contents), not the whole grid cell.
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const r = range.getBoundingClientRect();
       const x0 = Math.max(0, Math.floor(r.left * scale));
       const y0 = Math.max(0, Math.floor(r.top * scale));
       const w = Math.max(1, Math.min(bmp.width - x0, Math.ceil(r.width * scale)));

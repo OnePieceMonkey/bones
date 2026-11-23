@@ -1364,3 +1364,38 @@ for (const size of SIZES) {
     expect(d.scrollHeight).toBeLessThanOrEqual(d.innerHeight);
   });
 }
+
+// visual-polish-2 checkpoint 12 verdict: glass card spacing, at least 12 px under the title and 6 px between rows (R3.3).
+for (const size of SIZES) {
+  test(`glass card keeps 12 px under the title and 6 px between rows, rows stay inside at ${size.width}x${size.height} (R3.3)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.getByRole("button", { name: /signature case/i }).click();
+    await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+    const m = await page.evaluate(() => {
+      const head = document.querySelector(".xr-glass .xr-answer-head")!.getBoundingClientRect();
+      const rows = Array.from(document.querySelectorAll(".xr-glass .xr-field")).map((f) => f.getBoundingClientRect());
+      const body = document.querySelector(".xr-glass-body")!;
+      const glass = document.querySelector(".xr-glass")!.getBoundingClientRect();
+      const b = body.getBoundingClientRect();
+      return {
+        headToFirst: rows[0]!.top - head.bottom,
+        betweenRows: rows.slice(1).map((r, i) => r.top - rows[i]!.bottom),
+        rowCount: rows.length,
+        bodyScrolls: body.scrollHeight > body.clientHeight + 1,
+        lastRowInside: rows[rows.length - 1]!.bottom <= b.bottom + 0.5,
+        glassHeight: glass.height,
+        overflowPx: body.scrollHeight - body.clientHeight,
+      };
+    });
+    console.log(`glass ${size.width}x${size.height}: ${JSON.stringify(m)}`);
+    expect(m.rowCount).toBe(4);
+    expect(m.headToFirst, "title to first row").toBeGreaterThanOrEqual(12 - 0.5);
+    for (const g of m.betweenRows) expect(g, "between rows").toBeGreaterThanOrEqual(6 - 0.5);
+    // All four rows are visible without scrolling at 1600x900 and 1440x900; at 1280x720 the card scrolls inside (as before).
+    if (size.width >= 1440) {
+      expect(m.bodyScrolls, "card body scrolls").toBe(false);
+      expect(m.lastRowInside, "last row inside").toBe(true);
+    }
+  });
+}

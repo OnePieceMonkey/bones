@@ -321,13 +321,13 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): stamp OVERRULED BY RULE diagonally across the glass card (R3.4)`
     - _Requirements: 1.3, 3.4, 13.1, 13.8_
 
-- [-] 10. Checkpoint - stage composition
+- [x] 10. Checkpoint - stage composition
   - Follow the Checkpoint procedure with N = 10. The side-by-side image covers region 3 (card, skeleton, hotspots, ECG, stamp) of the design.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 10 done". Do not start any further task until the user says "weiter". The user checks the card position, the stamp, the skeleton size and the ECG start against the mockup. If the 91.5 % margin must grow, the design names the cap factor 1.1 as the lever (1.12 gives 93.2 %).
 
-- [ ] 11. Start screen, live form and app.css move (ledger S6)
-  - [~] 11.1 Custom file button and steel live form
+- [x] 11. Start screen, live form and app.css move (ledger S6)
+  - [x] 11.1 Custom file button and steel live form
     - Files: `components/FormStrip.tsx` (add `FormStripFile`), `styles/form.css` (new), `styles/sheet.css`, `src/index.ts`, `apps/expense-auditor/src/ui/` (the file in which the live form is rendered), `__tests__/components/FormStrip.test.tsx`, `e2e/measure-1600.spec.ts`.
     - `FormStripFile` with the DOM from the design: `.xr-file` wrapper, label span with an id, native `input[type="file"]` with `aria-labelledby` (visually hidden by the clip pattern, not `display: none`, stays in the tab order), and a `label.xr-file-button` (`aria-hidden`) with an icon and the file name or the placeholder. `.xr-file-input:focus-visible + .xr-file-button` draws the ring (3 px white outline plus dark outer shadow, at least 3:1). Props: `label`, `accept`, `placeholder`, `onFile`. The app swaps its `<input type="file">` for `FormStripFile` with label "Upload receipt photo" and placeholder "Choose a photo". The accessible name stays exactly "Upload receipt photo".
     - `form.css` (imported in `index.ts` next to `sheet.css`): move every `.xr-form-strip*` rule and `.xr-form-strip input|button` rule out of `sheet.css`. The strip is a steel surface with sheen and radius `18 u`, engraved legend and labels (`--xr-text-on-steel`, `--xr-engrave`), inputs and button with `appearance: none`, `font-family: var(--xr-font-sans)`, `min-height: max(44px, calc(36 * var(--xr-u)))`, pill button and file button, input fill `rgba(5, 9, 13, 0.55)` with inner shadow and `--xr-text`. `.xr-form-strip` stays `position: absolute; bottom: 14 u`, one wrapping row at 1280x720 within `max-width: 94 %`. Transitions (if any) get the `data-motion` pair or exact reduced-motion entry in `form.css`. Add the contrast pair for the input text on the darkest steel blend to Property 7.
@@ -337,7 +337,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): steel live form with a custom file button (R8.1 to R8.4)`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.6, 8.8, 9.2, 10.6_
 
-  - [~] 11.2 Move app buttons, inputs, dialog, error and status styling into xray-ui
+  - [x] 11.2 Move app buttons, inputs, dialog, error and status styling into xray-ui
     - Files: `styles/form.css`, `styles/header.css`, `apps/expense-auditor/src/ui/OverrideDialog.tsx`, `ErrorPanel.tsx`, `DecisionView.tsx`, `StartScreen.tsx` (the files that use `.app-*` classes), `apps/expense-auditor/tests/guards/contrast.node.test.ts`.
     - `form.css` adds `.xr-btn`, `.xr-btn--primary`, `.xr-input`, `.xr-field-label`, `.xr-counter`, `.xr-field-error`, `.xr-dialog`, `.xr-error`, `.xr-status` with the visual parts of the old `.app-*` rules (colours, borders, radius, font tokens, focus ring). `header.css`: `.xr-header-status [role="status"]` takes over `.app-note` (muted, no box). Rule names follow the move table of the design.
     - App: class names change in the `.tsx` files (`app-button` to `xr-btn`, `app-button-primary` to `xr-btn xr-btn--primary`, `app-input` to `xr-input`, `app-error` to `xr-error`, `app-dialog` to `xr-dialog`, `app-status` to `xr-status`, `app-note` removed in favour of the header status rule, `app-field label` to `xr-field-label`, counter and field error likewise). Only class names change; no handler, request or flow changes (R8.7). Old `.app-*` rules stay in `app.css` until task 11.3 (dead, harmless).
@@ -347,7 +347,7 @@ Decisions recorded here:
     - Commit message: `refactor(expense-auditor): move button, input, dialog, error and status styling to xray-ui form.css (D2)`
     - _Requirements: 8.1, 8.4, 8.7, 9.2, 13.8_
 
-  - [~] 11.3 Strip visual rules from app.css and add the app guard rule
+  - [x] 11.3 Strip visual rules from app.css and add the app guard rule
     - Files: `apps/expense-auditor/src/styles/app.css`, `apps/expense-auditor/src/App.tsx` (root class), `packages/xray-ui/src/styles/form.css`, `apps/expense-auditor/tests/guards/no-visual-in-app.node.test.ts`.
     - `app.css` keeps only layout of app-owned wrappers (`main` padding, `.app-sheets`, `.app-field` and `.app-actions` flex, `.app-sheets + .app-status` positions) and the `body` rule (its font becomes `var(--xr-font-sans)`). All colour, border, background, shadow and font declarations go away. The `:focus-visible` outline moves to `form.css` scoped to `.xr-shell, .xr-app`; the app root gets `className="xr-app"` (only the expense app sets it, so case-files is not affected).
     - Guard: add the rule `visual declaration in app.css` (pattern `(?:^|[;{\s])(?:border(?:-[a-z]+)*|box-shadow|text-shadow|font-family|font-weight|color|background(?:-[a-z]+)*)\s*:` on `.css`) with a small parser that strips the `body { ... }` block before matching. Add two sample entries to the existing bad and clean sample tests (a bad `app.css` with `color: red` outside `body`, a clean one with only `display: flex`).
@@ -356,7 +356,7 @@ Decisions recorded here:
     - Commit message: `refactor(expense-auditor): keep only layout in app.css and guard against visual rules (D2, A9)`
     - _Requirements: 8.1, 8.7, 9.7, 13.8_
 
-- [~] 12. Checkpoint - start screen and live form
+- [-] 12. Checkpoint - start screen and live form
   - Follow the Checkpoint procedure with N = 12. The side-by-side image still compares the Signature screen with the mockup; `cp12-start-1600.png` is the start screen for the user's visual review of region 8.
   - Ensure all tests pass, ask the user if questions arise.
   - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint 12 done". Do not start any further task until the user says "weiter".
@@ -418,7 +418,7 @@ Decisions recorded here:
 - Checkpoint 5: accepted with two changes (film fills the panel, paper 65-70 percent of film width, 24 px film margin, faint CSS X-ray texture; marks nearly invisible at rest, hug the text, full cyan on hover).
 - Checkpoint 8: accepted with three changes (meter as tall as the dial and centred on it, 16 px steel below, labels on one baseline, numbers >= 11 px; silver metal toggle lever; v1/v2/v3 on a tight arc <= 20 px from the dial with ticks, RULE VERSION above the arc).
 - Checkpoint 10: accepted with two changes (stamp in a reserved empty area, never covers a value or confidence; confidence always on its own line under the value).
-- Checkpoint 12: pending
+- Checkpoint 12: accepted with four changes (start cards: white paper thumbnails with 3-5 real lines, film-sheet cards without hard border and lift/glow on hover/focus; start block centred vertically when the live form is hidden; glass card spacing 12/6 px).
 - Checkpoint 16: pending
 
 ## Task Dependency Graph

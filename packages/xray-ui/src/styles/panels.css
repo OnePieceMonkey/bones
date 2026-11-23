@@ -179,7 +179,7 @@
   grid-area: glass;
   position: relative;
   box-sizing: border-box;
-  padding: calc(10 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(6 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
   background: var(--xr-glass-tint-rgba);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -209,12 +209,13 @@
   display: grid;
   grid-template-columns: 27% minmax(0, 1fr);
   gap: calc(8 * var(--xr-u, 1px));
-  font-size: max(11px, calc(11 * var(--xr-u, 1px)));
-  line-height: 1.15;
-  padding: calc(1 * var(--xr-u, 1px)) calc(6 * var(--xr-u, 1px));
+  font-size: max(11px, calc(10 * var(--xr-u, 1px)));
+  line-height: 1.05;
+  padding: 0 calc(6 * var(--xr-u, 1px));
 }
-.xr-glass .xr-answer-head { margin-bottom: 0; line-height: 1.2; }
-.xr-glass .xr-answer-fields { gap: 0; }
+/* checkpoint 12: at least 12 px under the title and 6 px between rows. */
+.xr-glass .xr-answer-head { margin-bottom: 12px; line-height: 1; }
+.xr-glass .xr-answer-fields { gap: 6px; }
 /* visual-polish-2 R3.3 (checkpoint 10): value (and badge) on the first line, confidence always on its own line below. */
 .xr-glass .xr-field dd {
   display: grid;
@@ -226,6 +227,16 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+/* checkpoint 12: a dark halo keeps row text at 4.5:1 wherever a bright crack line runs behind it. */
+.xr-glass .xr-field :is(dt, .xr-field-value, .xr-conf) {
+  text-shadow:
+    0 0 1px rgb(5, 9, 13),
+    0 0 3px rgb(5, 9, 13),
+    0 0 5px rgb(5, 9, 13),
+    0 0 8px rgb(5, 9, 13),
+    0 0 12px rgb(5, 9, 13),
+    0 0 16px rgba(5, 9, 13, 0.85);
+}
 .xr-glass .xr-field-value { grid-area: value; min-width: 0; }
 .xr-glass .xr-badge { grid-area: badge; justify-self: start; }
 .xr-glass .xr-conf {
@@ -233,7 +244,7 @@
   display: block;
   margin-left: 0;
   font-size: max(10px, calc(9 * var(--xr-u, 1px)));
-  line-height: 1.15;
+  line-height: 1.05;
   color: var(--xr-text-on-glass-muted);
 }
 .xr-glass .xr-cracks {
@@ -393,7 +404,7 @@
   display: flex;
   align-items: center;
   gap: calc(10 * var(--xr-u, 1px));
-  padding: calc(8 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(6 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
   background: var(--xr-bg-phone-head);
   color: var(--xr-text-phone-head);
 }
