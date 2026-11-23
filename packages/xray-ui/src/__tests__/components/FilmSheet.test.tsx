@@ -40,25 +40,40 @@ describe("FilmSheet", () => {
     expect(css).toMatch(/\.xr-sheet\[data-reduced="true"\], \.xr-sheet\[data-reduced="true"\]::after \{ transition: none; \}/);
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{\s*\.xr-sheet, \.xr-sheet::after \{ transition: none; \}/);
   });
-  it("shows a decorative paper thumbnail that does not change the name or description", () => {
-    const { container } = render(<FilmSheet id="s1" title="T" description="D" onSelect={() => {}} />);
-    const img = container.querySelector("img.xr-sheet-thumb");
-    expect(img).toHaveAttribute("alt", "");
-    expect(img).toHaveAttribute("aria-hidden", "true");
-    expect(img).toHaveAttribute("width");
-    expect(img).toHaveAttribute("width", "90");
-    expect(img).toHaveAttribute("height", "130");
+  it("shows a decorative paper thumbnail with the caller's lines that does not change the name or description", () => {
+    const lines = ["HARBOR GRILL", "Grilled salmon 22.00", "TOTAL 48.00"];
+    const { container } = render(<FilmSheet id="s1" title="T" description="D" lines={lines} onSelect={() => {}} />);
+    expect(container.querySelector("img")).toBeNull();
     const paper = container.querySelector(".xr-sheet-paper");
     expect(paper).toHaveAttribute("aria-hidden", "true");
-    expect(paper?.querySelectorAll(".xr-sheet-line").length).toBeGreaterThanOrEqual(3);
-    expect(paper?.getAttribute("style")).toMatch(/--xr-tilt: (-3|2|-1)deg/);
+    expect([...(paper?.querySelectorAll(".xr-sheet-line") ?? [])].map((e) => e.textContent)).toEqual(lines);
+    const tilt = Number(/--xr-tilt: (-?[\d.]+)deg/.exec(paper?.getAttribute("style") ?? "")?.[1]);
+    expect(tilt).toBeGreaterThanOrEqual(-3);
+    expect(tilt).toBeLessThanOrEqual(3);
     const b = screen.getByRole("button", { name: "T" });
     expect(b).toHaveAccessibleDescription("D");
   });
-  it("lifts 4 px on hover with a pseudo-element glow that fades in", () => {
-    expect(css).toMatch(/\.xr-sheet:hover:not\(:disabled\)[^{]*\{[^}]*translateY\(calc\(-4 \*/);
-    expect(css).toMatch(/\.xr-sheet::after \{[^}]*opacity: 0;[^}]*transition: opacity/);
+
+  it("derives the tilt from the title without randomness, in [-3, 3]", () => {
+    const tiltOf = (title: string) => {
+      const { container } = render(<FilmSheet id="s1" title={title} description="D" onSelect={() => {}} />);
+      const t = Number(/--xr-tilt: (-?[\d.]+)deg/.exec(container.querySelector(".xr-sheet-paper")?.getAttribute("style") ?? "")?.[1]);
+      cleanup();
+      return t;
+    };
+    const titles = ["Signature case", "Clean meal", "Outside the trip window"];
+    const tilts = titles.map(tiltOf);
+    expect(titles.map(tiltOf)).toEqual(tilts);
+    expect(new Set(tilts).size).toBeGreaterThan(1);
+    for (const t of tilts) expect(Math.abs(t)).toBeLessThanOrEqual(3);
   });
+
+  it("has no border and lifts and glows on hover and keyboard focus", () => {
+    expect(css).toMatch(/\.xr-sheet \{[^}]*border: 0;/);
+    expect(css).toMatch(/\.xr-sheet:focus-visible:not\(:disabled\)[^{]*\{[^}]*translateY\(-4px\)/);
+    expect(css).toMatch(/\.xr-sheet:focus-visible:not\(:disabled\)::after/);
+  });
+
   it("keeps the clip decorative", () => {
     const { container } = render(<FilmSheet id="s1" title="T" description="D" onSelect={() => {}} />);
     expect(container.querySelector(".xr-sheet-clip")).toHaveAttribute("aria-hidden", "true");

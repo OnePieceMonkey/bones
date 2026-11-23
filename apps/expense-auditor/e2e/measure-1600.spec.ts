@@ -1265,3 +1265,80 @@ for (const size of SIZES) {
     release();
   });
 }
+
+// visual-polish-2 checkpoint 12 verdict: start cards are film sheets with white paper thumbnails (R8.9, R8.10).
+for (const size of SIZES) {
+  test(`start cards: paper thumbnails tilted -3..3, 3-5 mono lines, no border, no dashed at ${size.width}x${size.height} (R8.9)`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator(".app-sheets .xr-sheet")).toHaveCount(3);
+    const cards = await page.$$eval(".app-sheets .xr-sheet", (els) =>
+      els.map((el) => {
+        const s = getComputedStyle(el);
+        const paper = el.querySelector(".xr-sheet-paper")!;
+        const m = new DOMMatrix(getComputedStyle(paper).transform);
+        const lines = Array.from(paper.querySelectorAll(".xr-sheet-line"));
+        const mono = getComputedStyle(document.documentElement).getPropertyValue("--xr-font-mono").trim();
+        return {
+          borders: [s.borderTopWidth, s.borderRightWidth, s.borderBottomWidth, s.borderLeftWidth],
+          styles: [s.borderTopStyle, s.outlineStyle],
+          radius: parseFloat(s.borderTopLeftRadius),
+          tilt: Math.atan2(m.b, m.a) * (180 / Math.PI),
+          paperBg: getComputedStyle(paper).backgroundColor,
+          lineCount: lines.length,
+          lineFonts: lines.map((l) => getComputedStyle(l).fontFamily),
+          mono,
+          lineText: lines.map((l) => l.textContent),
+          ariaHidden: paper.getAttribute("aria-hidden"),
+        };
+      }),
+    );
+    for (const c of cards) {
+      expect(c.borders, "border widths").toEqual(["0px", "0px", "0px", "0px"]);
+      expect(c.styles.join(" ")).not.toMatch(/dashed|dotted/);
+      expect(c.radius, "rounded corners").toBeGreaterThanOrEqual(8);
+      expect(c.tilt).toBeGreaterThanOrEqual(-3.01);
+      expect(c.tilt).toBeLessThanOrEqual(3.01);
+      expect(c.paperBg, "paper is white").toBe("rgb(247, 246, 241)");
+      expect(c.lineCount).toBeGreaterThanOrEqual(3);
+      expect(c.lineCount).toBeLessThanOrEqual(5);
+      for (const f of c.lineFonts) expect(f).toBe(c.mono);
+      expect(c.ariaHidden).toBe("true");
+    }
+    expect(new Set(cards.map((c) => c.tilt.toFixed(2))).size, "tilts differ").toBeGreaterThan(1);
+    expect(cards[0]!.lineText.join("|")).toContain("HARBOR GRILL");
+    expect(cards[0]!.lineText.join("|").toLowerCase()).not.toMatch(/approved|rejected|capped|deduct/);
+  });
+}
+test("start cards lift 4 px and glow on hover and keyboard focus; transitions are none under reduced motion (R8.10)", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const card = page.getByRole("button", { name: /clean meal/i });
+  const top = async () => (await card.boundingBox())!.y;
+  const glow = () => card.evaluate((el) => getComputedStyle(el, "::after").opacity);
+  const rest = await top();
+  expect(await glow()).toBe("0");
+  await card.hover();
+  expect(rest - (await top()), "hover lift").toBeCloseTo(4, 0);
+  expect(await glow()).toBe("1");
+  expect(await card.evaluate((el) => getComputedStyle(el).transitionDuration)).toBe("0s");
+  await page.screenshot({ path: "/tmp/start-hover-1600.png" });
+  await page.mouse.move(5, 5);
+  expect(await top()).toBeCloseTo(rest, 0);
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.getByRole("button", { name: /signature case/i }).focus();
+  await page.keyboard.press("Tab");
+  await expect(card).toBeFocused();
+  expect(rest - (await top()), "focus lift").toBeCloseTo(4, 0);
+  expect(await glow()).toBe("1");
+  const ring = await card.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { w: parseFloat(s.outlineWidth), style: s.outlineStyle, color: s.outlineColor };
+  });
+  expect(ring.w).toBeGreaterThanOrEqual(3);
+  expect(ring.style).toBe("solid");
+  expect(ring.color).toBe("rgb(255, 255, 255)");
+});

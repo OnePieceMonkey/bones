@@ -4,7 +4,7 @@ import { FilmSheet, FormStrip, FormStripField, FormStripFile, ShellFrame, StartH
 import { DEFAULT_TRIP } from "../extraction/samples";
 import type { PreparedImage } from "../extraction/imageResize";
 import type { PhotoRequest } from "../state/sessionStore";
-import { SAMPLE_FILM_LINES, SAMPLE_IDS } from "../extraction/samples";
+import { SAMPLE_FILM_LINES, SAMPLE_IDS, sampleThumbLines } from "../extraction/samples";
 import type { SampleId } from "../extraction/samples";
 import type { StartError, UploadProblem } from "../state/reducer";
 import { ErrorPanel } from "./ErrorPanel";
@@ -115,6 +115,7 @@ export function StartScreen({
               id={`sample-${id}`}
               title={SAMPLE_NAMES[id]}
               description={SAMPLE_FILM_LINES[id]}
+              lines={sampleThumbLines(id)}
               disabled={busy}
               selected={busy && picked === id}
               onSelect={() => {

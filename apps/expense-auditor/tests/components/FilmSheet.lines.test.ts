@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { SAMPLE_FILM_LINES, SAMPLE_IDS, SAMPLES } from "../../src/extraction/samples";
+import { SAMPLE_FILM_LINES, SAMPLE_IDS, SAMPLES, sampleThumbLines } from "../../src/extraction/samples";
 
 const FORBIDDEN = ["approved", "rejected", "denied", "capped", "deduct"];
 const RESULT_LABELS = ["approved", "partially approved", "rejected"];
@@ -28,5 +28,25 @@ describe("film sheet text", () => {
       }),
       { numRuns: 100 },
     );
+  });
+});
+
+describe("film sheet thumbnail lines", () => {
+  // **Validates: Requirements 8.9**
+  it("are 3 to 5 lines from the receipt, with merchant, two items and the printed total, and name no result", () => {
+    for (const id of SAMPLE_IDS) {
+      const lines = sampleThumbLines(id);
+      expect(lines.length).toBeGreaterThanOrEqual(3);
+      expect(lines.length).toBeLessThanOrEqual(5);
+      expect(lines.every((l) => l.length <= 20)).toBe(true);
+      expect(lines[lines.length - 1]).toMatch(/^TOTAL\s+\d+\.\d{2}$/);
+      for (const l of lines) for (const w of [...FORBIDDEN, ...RESULT_LABELS]) expect(l.toLowerCase()).not.toContain(w);
+    }
+    expect(sampleThumbLines("signature")).toEqual([
+      "HARBOR GRILL",
+      "Grilled salmon 22.00",
+      "Caesar salad   11.00",
+      "TOTAL          48.00",
+    ]);
   });
 });

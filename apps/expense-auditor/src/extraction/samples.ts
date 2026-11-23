@@ -71,4 +71,32 @@ export const SAMPLE_FILM_LINES: Record<SampleId, string> = {
   "outside-window": "Airport Cafe, 2024-03-25. Two items, printed total 21.50.",
 };
 
+const PRICE_LINE = /^(.*?)\s{2,}(\d+\.\d{2})$/;
+
+/** Fixed-width text row: label left, price right (20 characters). */
+function priceRow(label: string, price: string): string {
+  return `${label.padEnd(14)}${price.padStart(6)}`;
+}
+
+/**
+ * Three to five lines for the paper thumbnail of a film sheet, taken from the recorded receipt text:
+ * the merchant, the first two items with their prices and the printed total. These are inputs, not results.
+ */
+export function sampleThumbLines(id: SampleId): string[] {
+  const sample = (SAMPLES as Array<{ id?: string; receiptText?: unknown }>).find((s) => s.id === id);
+  if (sample === undefined || typeof sample.receiptText !== "string") return [];
+  const rows = sample.receiptText.split("\n");
+  const merchant = rows[0]?.trim() ?? "";
+  const first = rows.findIndex((r) => r.startsWith("---"));
+  const second = rows.findIndex((r, i) => i > first && r.startsWith("---"));
+  const body = first >= 0 && second > first ? rows.slice(first + 1, second) : [];
+  const priced = (row: string): string | null => {
+    const m = PRICE_LINE.exec(row.trim());
+    return m === null ? null : priceRow(m[1] as string, m[2] as string);
+  };
+  const items = body.map(priced).filter((r): r is string => r !== null).slice(0, 2);
+  const total = rows.map((r) => (r.startsWith("TOTAL") ? priced(r) : null)).find((r) => r !== null) ?? null;
+  return [merchant, ...items, ...(total === null ? [] : [total])].filter((r) => r.length > 0);
+}
+
 export const DEFAULT_TRIP: TripWindow = { start: "2024-03-10", end: "2024-03-20" };
