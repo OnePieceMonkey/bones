@@ -394,7 +394,7 @@ Decisions recorded here:
     - Commit message: `test(expense-auditor): regenerate 1440x900 references and remove skips (start-screen.png, signature-case.png)`
     - _Requirements: 11.5, 11.9_
 
-- [-] 16. Final checkpoint
+- [x] 16. Final checkpoint
   - Follow the Checkpoint procedure with N = 16, with these additions before the commit of the review images:
     - The side-by-side image is also saved as `review/final-side-by-side.png` (R11.10).
     - Run `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e` (no skips, no update flag) and `git diff --exit-code <commit before this feature> -- packages/core`. No file under `packages/core` may differ.
