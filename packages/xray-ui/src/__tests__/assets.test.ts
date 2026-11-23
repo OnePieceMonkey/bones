@@ -110,6 +110,19 @@ describe("asset bundle", () => {
   });
 });
 
+describe("asset total after the meter swap (visual-polish-2 R12.1, R12.6)", () => {
+  // Measured value of the Asset_Dir without index.ts. The task text expected 619,406 B;
+  // the real measured total is 608,548 B. Changing any image must update this number on purpose.
+  const MEASURED_TOTAL = 608_548;
+  const actual = listing(assetDir, (p) => p === "index.ts");
+  const total = actual.reduce((s, e) => s + e.size, 0);
+  it("equals the measured value and stays within the budget", () => {
+    expect(total, `asset total ${total} bytes, budget ${ASSET_BUDGET} bytes`).toBe(MEASURED_TOTAL);
+    expect(total, `asset total ${total} bytes exceeds budget ${ASSET_BUDGET} bytes`).toBeLessThanOrEqual(
+      ASSET_BUDGET,
+    );
+  });
+});
 describe("checkAssets", () => {
   it("names every missing file", () => {
     const msgs = checkAssets([{ path: "a.webp", size: 1 }], ["a.webp", "b.webp", "c.webp"], 100);
