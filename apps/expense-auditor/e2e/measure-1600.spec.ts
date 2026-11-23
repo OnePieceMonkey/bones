@@ -1399,3 +1399,185 @@ for (const size of SIZES) {
     }
   });
 }
+
+// visual-polish-2 task 13.1: sweeps at three viewports. They cover what no earlier test in this file or in layout.spec.ts
+// covers: boxed elements (R1.6), fonts (R2.2 to R2.4, R2.6), keyboard focus (R9.2), roles and decorative marks (R9.1, R9.4).
+// Page scroll (R10.1 to R10.3, R10.6) and region layout (R10.4) are asserted by the specs above and by layout.spec.ts.
+async function openSignature(page: Page, size: { width: number; height: number }): Promise<void> {
+  await page.setViewportSize(size);
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await page.getByRole("button", { name: /signature case/i }).click();
+  await page.waitForSelector('.xr-shell[data-intro="done"]', { timeout: 10_000 });
+}
+
+const BOXED_ALLOW = [
+  ".xr-glass",
+  ".xr-rulebox",
+  ".xr-doctor",
+  ".xr-bubble",
+  ".xr-footer-btn",
+  ".xr-header",
+  ".xr-header-pill",
+  ".xr-header-action",
+  ".xr-steel",
+  ".xr-cpanel",
+  ".xr-pmeter",
+  ".xr-doc-paper",
+  ".xr-doc", // the film is the ::before of .xr-doc
+  ".xr-hotspot .xr-bone-btn",
+  "img",
+];
+
+for (const size of SIZES) {
+  test(`boxed-element sweep: only allow-listed elements draw a box on the Signature screen at ${size.width}x${size.height} (R1.6)`, async ({ page }) => {
+    await openSignature(page, size);
+    const found = await page.evaluate((allow) => {
+      const out: string[] = [];
+      const visible = (c: string) => {
+        const m = /rgba?\(([^)]*)\)/.exec(c);
+        if (!m) return false;
+        const p = m[1]!.split(",").map((x) => parseFloat(x));
+        return (p[3] ?? 1) > 0;
+      };
+      for (const el of Array.from(document.body.querySelectorAll("*"))) {
+        if (el.closest("svg") && el.tagName.toLowerCase() !== "svg") continue; // SVG shapes are drawings, not boxes
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        // R1.6 is about boxes around plain text: an element that owns a non-blank text node. Text-free drawings (screws,
+        // clips, glows, the progress bar, the toggle base) and layout containers are not boxes around text.
+        const ownsText = Array.from(el.childNodes).some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? "").trim() !== "");
+        if (!ownsText) continue;
+        if (allow.some((sel) => el.matches(sel))) continue;
+        const s = getComputedStyle(el);
+        const reasons: string[] = [];
+        const sides = [
+          [s.borderTopWidth, s.borderTopStyle, s.borderTopColor],
+          [s.borderRightWidth, s.borderRightStyle, s.borderRightColor],
+          [s.borderBottomWidth, s.borderBottomStyle, s.borderBottomColor],
+          [s.borderLeftWidth, s.borderLeftStyle, s.borderLeftColor],
+        ];
+        // A single side line (an underline mark, a divider) is not a rectangle around text: report only 2 or more sides.
+        const drawn = sides.filter(([w, st, c]) => parseFloat(w!) > 0 && st !== "none" && st !== "hidden" && visible(c!));
+        if (drawn.length >= 2) reasons.push(`border(${drawn.length} sides)`);
+        if (visible(s.backgroundColor)) reasons.push(`background-color ${s.backgroundColor}`);
+        if (s.backgroundImage !== "none") reasons.push("background-image");
+        if (s.boxShadow !== "none") reasons.push("box-shadow");
+        if (reasons.length > 0) out.push(`${el.tagName.toLowerCase()}.${String(el.getAttribute("class")).replace(/\s+/g, ".")}: ${reasons.join(", ")}`);
+      }
+      return out;
+    }, BOXED_ALLOW);
+    expect(found, "boxed elements outside the allow-list").toEqual([]);
+  });
+}
+
+for (const size of SIZES) {
+  test(`font sweep: serif only on wordmark and headline, mono only in the paper, sans weights 400/500 at ${size.width}x${size.height} (R2.2 to R2.4)`, async ({ page }) => {
+    await openSignature(page, size);
+    const read = (checkMono: boolean) =>
+      page.evaluate((mono) => {
+        const bad: string[] = [];
+        const label = (el: Element) => `${el.tagName.toLowerCase()}.${String(el.getAttribute("class")).replace(/\s+/g, ".")}`;
+        for (const el of Array.from(document.body.querySelectorAll("*"))) {
+          if (["SCRIPT", "STYLE"].includes(el.tagName)) continue;
+          const box = el.getBoundingClientRect();
+          if (box.width === 0 || box.height === 0 || el.closest("dialog:not([open])")) continue; // not rendered
+          // The visually hidden h1 is clipped to 1 px and carries no visible type (R7.9).
+          if (el.closest(".xr-visually-hidden")) continue;
+          // Only elements that own text: a direct, non-blank text node.
+          const own = Array.from(el.childNodes).some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? "").trim() !== "");
+          if (!own) continue;
+          const s = getComputedStyle(el);
+          const family = s.fontFamily;
+          const isWordmark = el.matches(".xr-wordmark, .xr-wordmark *, .xr-start-title, .xr-start-title *");
+          if (/^"?Cormorant SC/i.test(family) && !isWordmark) bad.push(`${label(el)}: serif ${family}`);
+          if (mono && /monospace|Menlo|Consolas/i.test(family) && !el.closest(".xr-doc")) bad.push(`${label(el)}: mono ${family}`);
+          const w = parseInt(s.fontWeight, 10);
+          if (!isWordmark && w !== 400 && w !== 500) bad.push(`${label(el)}: weight ${s.fontWeight}`);
+        }
+        return bad;
+      }, checkMono);
+    // R2.3 limits the mono rule to the Signature screen: the start cards show paper thumbnails in mono on purpose (R8.9).
+    expect(await read(true), "Signature screen").toEqual([]);
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    expect(await read(false), "start screen").toEqual([]);
+  });
+}
+
+for (const size of SIZES) {
+  test(`no request to an external font host on the start and Signature screens at ${size.width}x${size.height} (R2.6)`, async ({ page }) => {
+    const external: string[] = [];
+    page.on("request", (r) => {
+      const u = new URL(r.url());
+      if (!["localhost", "127.0.0.1"].includes(u.hostname) && u.protocol !== "data:" && u.protocol !== "blob:") external.push(r.url());
+    });
+    await openSignature(page, size);
+    expect(external).toEqual([]);
+  });
+}
+
+for (const size of SIZES) {
+  test(`focus sweep: knob, toggle, hotspot, footer buttons and header actions show a 3 px solid outline at ${size.width}x${size.height} (R9.2)`, async ({ page }) => {
+    await openSignature(page, size);
+    const targets: Array<[string, string]> = [
+      ["knob", ".xr-pknob"],
+      ["toggle", ".xr-ptoggle"],
+      ["hotspot", ".xr-hotspot button.xr-bone-btn"],
+      ...Array.from({ length: 2 }, (_, i): [string, string] => [`footer button ${i + 1}`, `.xr-footer-btn >> nth=${i}`]),
+      ...Array.from({ length: 2 }, (_, i): [string, string] => [`header action ${i + 1}`, `.xr-header-action >> nth=${i}`]),
+    ];
+    for (const [name, selector] of targets) {
+      const loc = page.locator(selector).first();
+      await expect(loc, name).toBeAttached();
+      // Real keyboard focus: move through the tab order until the target holds focus.
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      let focused = false;
+      for (let i = 0; i < 60 && !focused; i += 1) {
+        await page.keyboard.press("Tab");
+        focused = await loc.evaluate((el) => el === document.activeElement || el.contains(document.activeElement));
+      }
+      expect(focused, `${name} reachable with Tab`).toBe(true);
+      const o = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement;
+        const s = getComputedStyle(el);
+        return { width: parseFloat(s.outlineWidth), style: s.outlineStyle, color: s.outlineColor };
+      });
+      expect(o.style, `${name} outline style`).toBe("solid");
+      expect(o.width, `${name} outline width`).toBeGreaterThanOrEqual(3);
+      expect(o.color, `${name} outline colour is visible`).not.toMatch(/rgba\([^)]*,\s*0\)$/);
+    }
+  });
+}
+
+for (const size of SIZES) {
+  test(`roles and decorative marks: slider, meter, switch; decorative parts are hidden from assistive technology at ${size.width}x${size.height} (R9.1, R9.4)`, async ({ page }) => {
+    await openSignature(page, size);
+    await expect(page.getByRole("slider")).toHaveCount(1);
+    await expect(page.getByRole("meter")).toHaveCount(1);
+    await expect(page.getByRole("switch")).toHaveCount(1);
+    const missing = await page.evaluate(() => {
+      const hidden = (el: Element) => el.closest('[aria-hidden="true"]') !== null || el.getAttribute("alt") === "";
+      const sels = [
+        ".xr-doctor-notch",
+        ".xr-doctor-home",
+        ".xr-doctor-avatar",
+        ".xr-pknob-ticks",
+        ".xr-clip",
+        ".xr-footer-btn svg",
+        ".xr-header-action svg",
+        ".xr-doc img",
+        ".xr-glass img",
+        ".xr-photo img",
+      ];
+      const out: string[] = [];
+      for (const sel of sels) for (const el of Array.from(document.querySelectorAll(sel))) if (!hidden(el)) out.push(sel);
+      return { out, counts: sels.map((s) => [s, document.querySelectorAll(s).length] as const) };
+    });
+    expect(missing.out, "decorative elements without aria-hidden or empty alt").toEqual([]);
+    // The sweep must not pass by matching nothing.
+    for (const [sel, n] of missing.counts) {
+      if (!sel.startsWith(".xr-doc img") && !sel.startsWith(".xr-glass img") && !sel.startsWith(".xr-photo img")) expect(n, `${sel} exists`).toBeGreaterThan(0);
+    }
+  });
+}
