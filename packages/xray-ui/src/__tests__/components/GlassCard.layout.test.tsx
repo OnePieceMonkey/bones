@@ -70,7 +70,9 @@ describe("GlassCard layout", () => {
     const conf = block(panels, ".xr-glass .xr-conf");
     expect(conf).toMatch(/grid-area:\s*conf/);
     expect(conf).toMatch(/display:\s*block/);
-    expect(conf).toMatch(/max\(10px/);
+    expect(conf).toMatch(/max\(12px/);
+    // final review: labels and values at least 14 px.
+    expect(block(panels, ".xr-glass .xr-field")).toMatch(/font-size:\s*max\(14px/);
     expect(block(panels, ".xr-glass .xr-field dt")).not.toMatch(/flex:/);
   });
 });

@@ -179,7 +179,7 @@
   grid-area: glass;
   position: relative;
   box-sizing: border-box;
-  padding: calc(6 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
+  padding: calc(5 * var(--xr-u, 1px)) calc(14 * var(--xr-u, 1px));
   background: var(--xr-glass-tint-rgba);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -193,7 +193,7 @@
 }
 /* visual-polish-2 R3.4 (checkpoint 10): the bottom strip below the last row is reserved for the stamp; no row text is ever under it. */
 .xr-glass[data-overruled="true"] {
-  padding-bottom: max(50px, calc(52 * var(--xr-u, 1px)));
+  padding-bottom: max(44px, calc(46 * var(--xr-u, 1px)));
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .xr-glass { background: var(--xr-bg-panel); }
@@ -209,7 +209,8 @@
   display: grid;
   grid-template-columns: 27% minmax(0, 1fr);
   gap: calc(8 * var(--xr-u, 1px));
-  font-size: max(11px, calc(10 * var(--xr-u, 1px)));
+  /* final review: labels and values at least 14 px, confidence at least 12 px (R3.3). */
+  font-size: max(14px, calc(11.2 * var(--xr-u, 1px)));
   line-height: 1.05;
   padding: 0 calc(6 * var(--xr-u, 1px));
 }
@@ -253,7 +254,7 @@
   grid-area: conf;
   display: block;
   margin-left: 0;
-  font-size: max(10px, calc(9 * var(--xr-u, 1px)));
+  font-size: max(12px, calc(9.6 * var(--xr-u, 1px)));
   line-height: 1.05;
   color: var(--xr-text-on-glass-muted);
 }
@@ -264,7 +265,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.55;
+  /* final review: 0.55 -> 0.4 keeps the larger row text at 4.5:1 where crack lines run behind it. */
+  opacity: 0.4;
   mix-blend-mode: screen;
   pointer-events: none;
 }

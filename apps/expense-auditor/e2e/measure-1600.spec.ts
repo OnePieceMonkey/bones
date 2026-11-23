@@ -1389,6 +1389,39 @@ for (const size of SIZES) {
       };
     });
     console.log(`glass ${size.width}x${size.height}: ${JSON.stringify(m)}`);
+    // Final review: readable text. Computed font sizes (labels and values at least 14 px, confidence at least 12 px).
+    const fonts = await page.evaluate(() => {
+      const px = (sel: string) => Array.from(document.querySelectorAll(`.xr-glass .xr-field ${sel}`)).map((e) => parseFloat(getComputedStyle(e).fontSize));
+      const photo = document.querySelector(".xr-photo")!.getBoundingClientRect();
+      const glass = document.querySelector(".xr-glass")!.getBoundingClientRect();
+      // Skull and rib hotspots stay unobstructed: the card bottom stays above the rib line.
+      const spots = Array.from(document.querySelectorAll(".xr-hotspot")).map((h) => {
+        const r = h.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const hit = document.elementFromPoint(cx, cy);
+        return { below: cy >= photo.top + 0.22 * photo.height, covered: !!hit?.closest(".xr-glass") };
+      });
+      return {
+        dt: px("dt"),
+        value: px(".xr-field-value"),
+        conf: px(".xr-conf"),
+        ribGap: photo.top + 0.22 * photo.height - glass.bottom,
+        spots: spots.length,
+        coveredBelowRibs: spots.filter((x) => x.below && x.covered).length,
+        coveredAbove: spots.filter((x) => !x.below && x.covered).length,
+      };
+    });
+    console.log(`glass fonts ${size.width}x${size.height}: ${JSON.stringify(fonts)}`);
+    if (size.width >= 1440) {
+      expect(fonts.dt.length).toBe(4);
+      for (const f of fonts.dt) expect(f, "label font").toBeGreaterThanOrEqual(14);
+      for (const f of fonts.value) expect(f, "value font").toBeGreaterThanOrEqual(14);
+      for (const f of fonts.conf) expect(f, "confidence font").toBeGreaterThanOrEqual(12);
+      expect(fonts.ribGap, "card bottom above the rib line").toBeGreaterThanOrEqual(-0.5);
+      expect(fonts.spots, "hotspots exist").toBeGreaterThan(0);
+      expect(fonts.coveredBelowRibs, "no hotspot from the rib line down is under the card").toBe(0);
+    }
     expect(m.rowCount).toBe(4);
     expect(m.headToFirst, "title to first row").toBeGreaterThanOrEqual(12 - 0.5);
     for (const g of m.betweenRows) expect(g, "between rows").toBeGreaterThanOrEqual(6 - 0.5);
