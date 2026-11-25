@@ -7,7 +7,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(here, ".."); // packages/xray-ui/src
 
 // "case" is not checked: it is a TypeScript keyword. demo/ is outside src and not scanned.
-const FORBIDDEN = /\b(receipt|expense|alcohol|meal|trip|suspect)\b/i;
+// case-files R20.8: "clue" and "culprit" added for the ensemble component.
+const FORBIDDEN = /\b(receipt|expense|alcohol|meal|trip|suspect|clue|culprit)\b/i;
 const EXTENSIONS = [".ts", ".tsx", ".css"];
 
 function collect(dir: string): string[] {

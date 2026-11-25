@@ -137,6 +137,24 @@ export interface CommonProps {
   className?: string;
 }
 
+export interface EnsembleMember {
+  id: string;
+  label: string;
+  anatomy: Anatomy;
+  /** Additive, default false. Highlights this member, e.g. the accused party. */
+  accused?: boolean;
+}
+
+export interface SkeletonEnsembleProps extends CommonProps {
+  trace: Trace;
+  /** 1 to 4 members; further entries are ignored. */
+  members: EnsembleMember[];
+  xray: boolean;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  selectLabel: string;
+}
+
 export interface LightboxProps extends CommonProps {
   title?: string;
   xray: boolean;

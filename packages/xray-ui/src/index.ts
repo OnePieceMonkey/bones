@@ -36,6 +36,7 @@ export { SkeletonPhoto } from "./components/stage/SkeletonPhoto";
 export type { SkeletonPhotoProps } from "./components/stage/SkeletonPhoto";
 export { Stage } from "./components/stage/Stage";
 export type { StageProps } from "./components/stage/Stage";
+export { SkeletonEnsemble } from "./components/stage/SkeletonEnsemble";
 export { RuleBox } from "./components/stage/RuleBox";
 export type { RuleBoxProps } from "./components/stage/RuleBox";
 export { Hotspot } from "./components/stage/Hotspot";
