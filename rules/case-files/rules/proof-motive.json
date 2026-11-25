@@ -1,0 +1,25 @@
+{
+  "id": "proof-motive",
+  "version": "1.0.0",
+  "effect": "deducting",
+  "condition": {
+    "kind": "comparison",
+    "left": {
+      "kind": "path",
+      "segments": [
+        "subject",
+        "motiveAny"
+      ]
+    },
+    "op": ">=",
+    "right": {
+      "kind": "literal",
+      "value": 1
+    }
+  },
+  "effectConfig": {
+    "deductionAmount": 1,
+    "scope": "proof"
+  },
+  "messageTemplate": "{{subject.name}} had a motive."
+}

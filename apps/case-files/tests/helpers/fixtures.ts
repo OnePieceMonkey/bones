@@ -1,6 +1,9 @@
 import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { CoreError } from "@bones/core";
+import { buildBundle } from "../../src/rules/catalog";
+import type { RuleBundle } from "../../src/rules/catalog";
 
 /** Test helper for the recorded cases. They are hand-written fixtures. */
 
@@ -32,4 +35,21 @@ export function readRecorded(): RecordedFile[] {
       const text = readFileSync(join(RECORDED_DIR, fileName), "utf8");
       return { fileName, text, json: JSON.parse(text) };
     });
+}
+
+export const rulesRoot = resolve(HERE, "../../../../rules/case-files");
+
+/** Reads every JSON file of a rules sub-folder, keyed by file name. */
+export function readRuleDir(dir: "rules" | "rule-sets"): Record<string, unknown> {
+  const base = resolve(rulesRoot, dir);
+  const out: Record<string, unknown> = {};
+  for (const name of readdirSync(base).filter((n) => n.endsWith(".json")).sort()) {
+    out[name] = JSON.parse(readFileSync(resolve(base, name), "utf8"));
+  }
+  return out;
+}
+
+/** Builds the template bundle from the real rule files with node:fs. */
+export function loadTestBundle(): RuleBundle | CoreError {
+  return buildBundle(readRuleDir("rules"), readRuleDir("rule-sets"));
 }

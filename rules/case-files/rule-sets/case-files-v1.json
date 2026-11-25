@@ -1,0 +1,18 @@
+{
+  "id": "case-files",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "ruleId": "proof-means",
+      "ruleVersion": "1.0.0"
+    },
+    {
+      "ruleId": "proof-opportunity",
+      "ruleVersion": "1.0.0"
+    },
+    {
+      "ruleId": "statement-location-contradicted",
+      "ruleVersion": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "proof-opportunity",
+  "version": "1.0.0",
+  "effect": "deducting",
+  "condition": {
+    "kind": "comparison",
+    "left": {
+      "kind": "path",
+      "segments": [
+        "subject",
+        "opportunityAny"
+      ]
+    },
+    "op": ">=",
+    "right": {
+      "kind": "literal",
+      "value": 1
+    }
+  },
+  "effectConfig": {
+    "deductionAmount": 1,
+    "scope": "proof"
+  },
+  "messageTemplate": "{{subject.name}} was placed at the scene during the crime window."
+}

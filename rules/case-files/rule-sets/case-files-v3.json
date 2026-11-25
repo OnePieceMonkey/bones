@@ -1,0 +1,30 @@
+{
+  "id": "case-files",
+  "version": "3.0.0",
+  "rules": [
+    {
+      "ruleId": "proof-means",
+      "ruleVersion": "2.0.0"
+    },
+    {
+      "ruleId": "proof-opportunity",
+      "ruleVersion": "2.0.0"
+    },
+    {
+      "ruleId": "proof-motive",
+      "ruleVersion": "2.0.0"
+    },
+    {
+      "ruleId": "statement-location-contradicted",
+      "ruleVersion": "2.0.0"
+    },
+    {
+      "ruleId": "statement-possession-contradicted",
+      "ruleVersion": "2.0.0"
+    },
+    {
+      "ruleId": "statement-sighting-contradicted",
+      "ruleVersion": "1.0.0"
+    }
+  ]
+}
