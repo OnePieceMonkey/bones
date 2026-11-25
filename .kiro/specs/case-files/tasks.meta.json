@@ -193,6 +193,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615147999
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632333681
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632417403
       }
     ],
     "4.3 runCasePipeline": [
@@ -200,6 +210,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148028
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632417913
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632662241
       }
     ],
     "4.4 Replay, replay store and verdictOf": [
@@ -207,6 +227,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148050
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632662915
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632820991
       }
     ],
     "4.5 Accusation": [
@@ -214,6 +244,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148072
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632820545
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632936555
       }
     ],
     "4.6 Reducer, session store and human override": [
@@ -221,6 +261,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148096
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795632937052
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633165857
       }
     ],
     "4.7 Trace export": [
@@ -228,6 +278,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148119
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633165126
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633299811
       }
     ],
     "5.1 SkeletonEnsemble": [
@@ -410,6 +470,13 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795617100036
+      }
+    ],
+    "4. Pipeline, Trace, replay, override, accusation": [
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633299883
       }
     ]
   }

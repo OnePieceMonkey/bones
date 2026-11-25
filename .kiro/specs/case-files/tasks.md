@@ -152,7 +152,7 @@ Decisions recorded here:
     - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint solver done". Do not start any further task until the user says "weiter". After "weiter", record the verdict under "Review verdicts" with the commit `docs(case-files): record solver done verdict`.
     - _Requirements: 23.2, 23.5, 23.6_
 
-- [ ] 4. Pipeline, Trace, replay, override, accusation
+- [x] 4. Pipeline, Trace, replay, override, accusation
   - [x] 4.1 Ports, clock and hash
     - Files (new): `apps/case-files/src/pipeline/ports.ts`, `src/pipeline/hash.ts`, `tests/helpers/fakes.ts`, `tests/unit/ports.node.test.ts`.
     - Copy in shape from `apps/expense-auditor/src/pipeline/ports.ts` and `hash.ts` (D20, copy, no import): `makeClock` returns strictly increasing times at least 1 ms apart, id port (UUID), `KernelPorts` factory `forInput(hex, byteLength)` with a hasher that returns the precomputed hex and checks the byte length, `sha256Hex(bytes)` through Web Crypto in `hash.ts` only. `fakes.ts`: `counterPorts()` with fixed clock and ids for tests.
@@ -161,7 +161,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add kernel ports, strictly increasing clock and sha256`
     - _Requirements: 9.4, 9.5, 12.8, 19.4, 19.6, 22.1_
 
-  - [~] 4.2 RecordedCaseAdapter
+  - [x] 4.2 RecordedCaseAdapter
     - Files (new): `apps/case-files/src/extraction/RecordedCaseAdapter.ts`, `src/extraction/samples.ts` (list of the three recorded entries through `import.meta.glob("../../recorded/*.json")`, `RecordedCaseId`, sheet list helper), `tests/unit/recordedAdapter.node.test.ts`.
     - Browser twin of the core `RecordedAdapter`, in the pattern of `apps/expense-auditor/src/extraction/RecordedSampleAdapter.ts`: constructor `(caseId, cases = RECORDED_CASES)`, guards input, finds the entry by id, parses it with a stored-entry zod schema, returns `structuredClone(entry.extraction)`, or the CoreError `fixture_not_found` or `fixture_invalid`. No network call.
     - Unit tests: returns a clone (mutating the result does not change the entry); unknown id; malformed entry; each of the three ids returns an extraction whose `rawModelOutput` parses.
@@ -169,7 +169,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add browser RecordedCaseAdapter for the three recorded cases`
     - _Requirements: 7.8, 7.9, 8.1, 8.4_
 
-  - [~] 4.3 runCasePipeline
+  - [x] 4.3 runCasePipeline
     - Files (new): `apps/case-files/src/pipeline/runCasePipeline.ts`, `tests/properties/pipeline-determinism.node.test.ts`, `tests/unit/pipeline.node.test.ts`. Edit: `tests/unit/expected-matrix.node.test.ts` (run the real pipeline for the nine combinations instead of `solve` alone).
     - Order: extraction, size guard (UTF-8 bytes of `rawModelOutput` above 32,768 gives `input_too_large` before parsing), core `validate` with `modelOutputSchema`, `deriveFacts`, `solve`, build the Decision (`result` `approved` when `accepted`, else `rejected`; `amountCents` = number of convictable suspects, 1 when accepted; `ruleOutcomes` = Solver outcomes), `createTrace` with the template Rule_Set (id and version of the label), `validatedFields` = the DerivedCase, `inputHash` = SHA-256 of the UTF-8 bytes of `rawModelOutput`. Per Requirement 9.2 as amended, only `ruleOutcomes` of `evaluate` is used. The first CoreError is returned and later steps do not run (spy test).
     - **Property 10: Pipeline determinism**
@@ -180,7 +180,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add case pipeline with Solver-derived result and Trace`
     - _Requirements: 2.13, 2.14, 6.1, 6.2, 7.5, 8.4, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 19.4_
 
-  - [~] 4.4 Replay, replay store and verdictOf
+  - [x] 4.4 Replay, replay store and verdictOf
     - Files (new): `apps/case-files/src/pipeline/replayCase.ts`, `src/pipeline/replayStore.ts`, `tests/properties/replay-equivalence.node.test.ts`, `tests/unit/replayStore.node.test.ts`, `tests/unit/replay.node.test.ts`.
     - `replayCase({original, label, bundle, ports})`: no call to core `replay` (Requirement 10.1 as amended). It runs `solve` on the stored `validatedFields`, builds the Decision as in task 4.3, and calls `createTrace` with the extraction fields of the original and `options.inputHash` of the original. No adapter, no hasher, no network. `verdictOf(trace, bundle)` recomputes `{verdict, convictable}` from the stored Trace and its `ruleSetVersion` (requirement 6.3). `ReplayStore` and `putReplay` as in `apps/expense-auditor/src/pipeline/replayStore.ts` (v1 is never replaced).
     - **Property 11: Replay equivalence**
@@ -191,7 +191,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add app-level replay, replay store and verdictOf`
     - _Requirements: 6.3, 10.1, 10.2, 10.3, 10.4_
 
-  - [~] 4.5 Accusation
+  - [x] 4.5 Accusation
     - Files (new): `apps/case-files/src/state/accusation.ts`, `tests/properties/accusation-correctness.node.test.ts`, `tests/unit/accusation.node.test.ts`.
     - `computeAccusation(trace, suspectId, convictable, clock)` returns the `AccusationRecord` `{decisionId, ruleSetVersion, suspectId, verdict, proofRuleIds, createdAt}`; `boundTo(ruleId)` finds the suspect for proof ids (`<template>:<suspectId>`) and, for statement ids, through the Binder's bindings. A pure function of the Trace, suspect id and convictable list. It reads no `rawModelOutput`, no `confidence`.
     - **Property 12: Accusation correctness**
@@ -202,7 +202,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add pure accusation record`
     - _Requirements: 11.7, 11.8, 11.12_
 
-  - [~] 4.6 Reducer, session store and human override
+  - [x] 4.6 Reducer, session store and human override
     - Files (new): `apps/case-files/src/state/reducer.ts`, `src/state/sessionStore.ts`, `src/state/selectors.ts` (`effectiveView` copied from the expense app, domain-free), `src/state/intro.ts` (only what `ShellFrame` needs), `tests/unit/reducer.node.test.ts`, `tests/unit/sessionStore.node.test.ts`, `tests/properties/override-immutability.node.test.ts`.
     - Reducer as in the design: `StartState | CaseState`, `CaseState` with `origin`, `original`, `replays`, `selected`, `overrides`, `accusation`, `selectedSuspectId`, `xray` (starts `false`, D15), `notice`; actions `case_ready`, `version_selected`, `suspect_selected`, `xray_toggled`, `accused` (also sets `xray: true`), `override_added`, `notice`, `reset`. Store: `loadRecordedCase(id)` (pipeline with v1), `selectVersion(label)` (cached replay or `replayCase`; on CoreError keep the previous Trace and set a notice), `selectSuspect`, `toggleXray`, `accuse(suspectId)` (rejected effective result refuses), `submitOverride(form)` (core `override`, `{ok:false, field, message}` on `invalid_override_input`), `reset()` (discard everything, requirement 11.11). `effectiveResult` from core; two overrides with the same `createdAt` give the `ambiguous_override` error and keep the rule result.
     - **Property 13: Override immutability**
@@ -213,7 +213,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add session reducer, store, accusation and override flow`
     - _Requirements: 10.3, 10.5, 10.6, 10.7, 11.2, 11.4, 11.5, 11.6, 11.7, 11.10, 11.11, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 19.4_
 
-  - [~] 4.7 Trace export
+  - [x] 4.7 Trace export
     - Files (new): `apps/case-files/src/export/exportTrace.ts`, `tests/properties/export-roundtrip.node.test.ts`, `tests/unit/export.node.test.ts`.
     - `buildCaseExport(trace, overrides, accusation)` and `exportTrace` serialise the Trace, the overrides and the Accusation_Records to JSON, in the pattern of `apps/expense-auditor/src/export/exportTrace.ts`. First item of the scope cut order (requirement 9.8).
     - **Property 14: Export round trip**
