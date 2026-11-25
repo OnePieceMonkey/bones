@@ -61,8 +61,22 @@ main {
 .xr-shell .xr-shell-frame .case-actions {
   grid-area: 2 / 3 / 3 / 4;
   align-self: end;
+  position: relative;
+  z-index: 3; /* above the stage cell, which spans the same grid area and would otherwise take the clicks */
   min-width: 0;
   padding: 0 calc(8 * var(--xr-u, 1px)) calc(8 * var(--xr-u, 1px));
+}
+/* Verdict view: the banner sits between the Glass_Card and the ensemble. */
+.case-top.case-top-verdict {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.case-banner {
+  display: grid;
+  gap: calc(2 * var(--xr-u, 1px));
+  min-width: 0;
+}
+.case-banner .xr-status {
+  margin: 0;
 }
 .case-reason {
   margin: calc(4 * var(--xr-u, 1px)) 0 0;

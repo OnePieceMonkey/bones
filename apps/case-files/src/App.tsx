@@ -6,6 +6,7 @@ import type { SessionStore } from "./state/sessionStore";
 import { ErrorPanel } from "./ui/ErrorPanel";
 import { CaseScreen } from "./ui/CaseScreen";
 import { StartScreen } from "./ui/StartScreen";
+import { VerdictView } from "./ui/VerdictView";
 export interface AppProps {
   store?: SessionStore | null;
   /** Set when the rule bundle failed to load. */
@@ -41,6 +42,8 @@ function Screens({ store }: { store: SessionStore }) {
           onLoadCase={(id) => void store.loadRecordedCase(id)}
           liveAvailable={false}
         />
+      ) : state.accusation !== null ? (
+        <VerdictView key={state.sessionId} state={state} accusation={state.accusation} store={store} />
       ) : (
         <CaseScreen key={state.sessionId} state={state} store={store} />
       )}
