@@ -14,6 +14,8 @@ export interface FilmSheetProps extends CommonProps {
   disabled?: boolean;
   /** True while this sheet is being loaded: it slides in. */
   selected?: boolean;
+  /** Optional small visible label on the sheet edge (for example a provenance note). Absent: the DOM is unchanged. */
+  note?: string;
   onSelect: () => void;
 }
 
@@ -36,18 +38,20 @@ export function FilmSheet({
   lines = [],
   disabled,
   selected,
+  note,
   onSelect,
   reducedMotion,
   className,
 }: FilmSheetProps) {
   const descId = `${id}-desc`;
+  const hasNote = note !== undefined && note !== "";
   return (
     <button
       type="button"
       id={id}
       className={cx("xr-sheet", className)}
       aria-labelledby={`${id}-title`}
-      aria-describedby={descId}
+      aria-describedby={hasNote ? `${descId} ${id}-note` : descId}
       disabled={disabled === true}
       data-selected={selected === true ? "true" : "false"}
       {...(reducedMotion === true ? { "data-reduced": "true" } : {})}
@@ -63,6 +67,7 @@ export function FilmSheet({
       <span id={descId} className="xr-sheet-desc">
         {description}
       </span>
+      {hasNote ? <span id={`${id}-note`} className="xr-sheet-note">{note}</span> : null}
     </button>
   );
 }

@@ -175,6 +175,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.xr-sheet-note {
+  position: absolute;
+  top: calc(10 * var(--xr-u, 1px));
+  left: calc(12 * var(--xr-u, 1px));
+  font-size: max(10px, calc(10 * var(--xr-u, 1px)));
+  color: var(--xr-text-on-sheet);
+  pointer-events: none;
+}
 .xr-sheet[data-selected="true"] {
   transform: translateY(calc(-12 * var(--xr-u, 1px))) scale(1.04);
 }

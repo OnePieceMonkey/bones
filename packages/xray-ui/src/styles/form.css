@@ -68,6 +68,28 @@
   border-radius: calc(10 * var(--xr-u, 1px));
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25);
 }
+/* Select in the strip (case-files R14): same pill as the text inputs. Additive; no other app uses a select here. */
+.xr-form-strip select {
+  box-sizing: border-box;
+  min-height: max(44px, calc(36 * var(--xr-u, 1px)));
+  padding: 2px calc(12 * var(--xr-u, 1px));
+  font-family: var(--xr-font-sans);
+  font-size: max(13px, calc(13 * var(--xr-u, 1px)));
+  color: var(--xr-text);
+  color-scheme: dark;
+  background: rgba(5, 9, 13, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: calc(10 * var(--xr-u, 1px));
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.xr-form-strip select:disabled {
+  opacity: 0.6;
+}
+.xr-form-strip select:focus-visible {
+  outline: 3px solid var(--xr-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--xr-focus-contrast);
+}
 .xr-form-strip button,
 .xr-file-button {
   display: inline-flex;

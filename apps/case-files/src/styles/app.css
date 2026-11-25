@@ -1,1 +1,27 @@
-/* Layout only. Motion lives in packages/xray-ui. */
+/* Case Files styles. Layout of app-owned wrappers only (position, flex, gap,
+   padding, margin, size). Every visual rule (colour, border, background, shadow,
+   font) lives in packages/xray-ui. Only `body` may carry page colours and font. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--xr-bg-deep);
+  color: var(--xr-text);
+  font-family: var(--xr-font-sans);
+  line-height: 1.5;
+}
+main {
+  min-height: 100vh;
+  padding: var(--xr-space-4);
+}
+/* Start screen */
+.xr-start ~ .app-status {
+  position: absolute;
+  bottom: var(--xr-space-3);
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+}

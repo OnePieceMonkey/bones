@@ -79,3 +79,12 @@ describe("FilmSheet", () => {
     expect(container.querySelector(".xr-sheet-clip")).toHaveAttribute("aria-hidden", "true");
   });
 });
+
+describe("FilmSheet note", () => {
+  it("shows an optional visible note, and adds no node when the note is absent", () => {
+    const { container, rerender } = render(<FilmSheet id="s1" title="T" description="D" onSelect={() => {}} />);
+    expect(container.querySelector(".xr-sheet-note")).toBeNull();
+    rerender(<FilmSheet id="s1" title="T" description="D" note="Recorded demo case" onSelect={() => {}} />);
+    expect(container.querySelector(".xr-sheet-note")).toHaveTextContent("Recorded demo case");
+  });
+});
