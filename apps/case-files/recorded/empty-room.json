@@ -1,0 +1,132 @@
+{
+  "id": "empty-room",
+  "title": "The Empty Room",
+  "origin": "fixture",
+  "extraction": {
+    "proposedFields": {
+      "title": "The Empty Room",
+      "setting": "A bare back room, swept clean except for a single dropped glove.",
+      "victim": {
+        "name": "Mr. Okafor"
+      },
+      "crime": {
+        "placeId": "back-room",
+        "startMin": 1200,
+        "endMin": 1260,
+        "weaponItemId": "wrench"
+      },
+      "places": [
+        {
+          "id": "back-room",
+          "name": "the back room"
+        },
+        {
+          "id": "office",
+          "name": "the office"
+        }
+      ],
+      "items": [
+        {
+          "id": "wrench",
+          "name": "an iron wrench"
+        }
+      ],
+      "suspects": [
+        {
+          "id": "dana",
+          "name": "Dana",
+          "statements": [
+            {
+              "id": "st-dana-1",
+              "kind": "possession",
+              "text": "I never held the weapon.",
+              "itemId": "wrench",
+              "held": false
+            }
+          ]
+        },
+        {
+          "id": "felix",
+          "name": "Felix",
+          "statements": [
+            {
+              "id": "st-felix-1",
+              "kind": "location",
+              "text": "I was in the office the entire time.",
+              "placeId": "office",
+              "startMin": 1190,
+              "endMin": 1270
+            }
+          ]
+        },
+        {
+          "id": "greta",
+          "name": "Greta",
+          "statements": [
+            {
+              "id": "st-greta-1",
+              "kind": "location",
+              "text": "I was in the office too, with Felix.",
+              "placeId": "office",
+              "startMin": 1195,
+              "endMin": 1265
+            }
+          ]
+        }
+      ],
+      "clues": [
+        {
+          "id": "cl-1",
+          "kind": "presence",
+          "text": "Dana is firmly seen in the back room during the murder.",
+          "reliability": "firm",
+          "suspectId": "dana",
+          "placeId": "back-room",
+          "startMin": 1210,
+          "endMin": 1250
+        },
+        {
+          "id": "cl-2",
+          "kind": "motive",
+          "text": "Dana had a firmly documented grudge against Mr. Okafor.",
+          "reliability": "firm",
+          "suspectId": "dana"
+        },
+        {
+          "id": "cl-3",
+          "kind": "holding",
+          "text": "A smudged print, possibly Dana's, was lifted from the wrench.",
+          "reliability": "weak",
+          "suspectId": "dana",
+          "itemId": "wrench"
+        }
+      ],
+      "confidence": {
+        "title": 0.97,
+        "setting": 0.93,
+        "victim": 0.96,
+        "crime": 0.91,
+        "suspects.0.statements.0": 0.9,
+        "suspects.1.statements.0": 0.9,
+        "suspects.2.statements.0": 0.9,
+        "clues.0": 0.88,
+        "clues.1": 0.88,
+        "clues.2": 0.55
+      }
+    },
+    "confidence": {
+      "title": 0.97,
+      "setting": 0.93,
+      "victim": 0.96,
+      "crime": 0.91,
+      "suspects.0.statements.0": 0.9,
+      "suspects.1.statements.0": 0.9,
+      "suspects.2.statements.0": 0.9,
+      "clues.0": 0.88,
+      "clues.1": 0.88,
+      "clues.2": 0.55
+    },
+    "sources": {},
+    "rawModelOutput": "{\"title\":\"The Empty Room\",\"setting\":\"A bare back room, swept clean except for a single dropped glove.\",\"victim\":{\"name\":\"Mr. Okafor\"},\"crime\":{\"placeId\":\"back-room\",\"startMin\":1200,\"endMin\":1260,\"weaponItemId\":\"wrench\"},\"places\":[{\"id\":\"back-room\",\"name\":\"the back room\"},{\"id\":\"office\",\"name\":\"the office\"}],\"items\":[{\"id\":\"wrench\",\"name\":\"an iron wrench\"}],\"suspects\":[{\"id\":\"dana\",\"name\":\"Dana\",\"statements\":[{\"id\":\"st-dana-1\",\"kind\":\"possession\",\"text\":\"I never held the weapon.\",\"itemId\":\"wrench\",\"held\":false}]},{\"id\":\"felix\",\"name\":\"Felix\",\"statements\":[{\"id\":\"st-felix-1\",\"kind\":\"location\",\"text\":\"I was in the office the entire time.\",\"placeId\":\"office\",\"startMin\":1190,\"endMin\":1270}]},{\"id\":\"greta\",\"name\":\"Greta\",\"statements\":[{\"id\":\"st-greta-1\",\"kind\":\"location\",\"text\":\"I was in the office too, with Felix.\",\"placeId\":\"office\",\"startMin\":1195,\"endMin\":1265}]}],\"clues\":[{\"id\":\"cl-1\",\"kind\":\"presence\",\"text\":\"Dana is firmly seen in the back room during the murder.\",\"reliability\":\"firm\",\"suspectId\":\"dana\",\"placeId\":\"back-room\",\"startMin\":1210,\"endMin\":1250},{\"id\":\"cl-2\",\"kind\":\"motive\",\"text\":\"Dana had a firmly documented grudge against Mr. Okafor.\",\"reliability\":\"firm\",\"suspectId\":\"dana\"},{\"id\":\"cl-3\",\"kind\":\"holding\",\"text\":\"A smudged print, possibly Dana's, was lifted from the wrench.\",\"reliability\":\"weak\",\"suspectId\":\"dana\",\"itemId\":\"wrench\"}],\"confidence\":{\"title\":0.97,\"setting\":0.93,\"victim\":0.96,\"crime\":0.91,\"suspects.0.statements.0\":0.9,\"suspects.1.statements.0\":0.9,\"suspects.2.statements.0\":0.9,\"clues.0\":0.88,\"clues.1\":0.88,\"clues.2\":0.55}}"
+  }
+}

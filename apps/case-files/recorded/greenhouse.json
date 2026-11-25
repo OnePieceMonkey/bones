@@ -1,0 +1,173 @@
+{
+  "id": "greenhouse",
+  "title": "The Midnight Greenhouse",
+  "origin": "fixture",
+  "extraction": {
+    "proposedFields": {
+      "title": "The Midnight Greenhouse",
+      "setting": "A locked greenhouse behind a manor, smelling of soil and bitter almond.",
+      "victim": {
+        "name": "Edgar Voss"
+      },
+      "crime": {
+        "placeId": "greenhouse",
+        "startMin": 1320,
+        "endMin": 1380,
+        "weaponItemId": "shears"
+      },
+      "places": [
+        {
+          "id": "greenhouse",
+          "name": "the greenhouse"
+        },
+        {
+          "id": "library",
+          "name": "the library"
+        },
+        {
+          "id": "kitchen",
+          "name": "the kitchen"
+        }
+      ],
+      "items": [
+        {
+          "id": "shears",
+          "name": "a pair of pruning shears"
+        },
+        {
+          "id": "letter",
+          "name": "a torn letter"
+        }
+      ],
+      "suspects": [
+        {
+          "id": "widow",
+          "name": "the widow",
+          "statements": [
+            {
+              "id": "st-widow-1",
+              "kind": "location",
+              "text": "I was reading in the library all evening.",
+              "placeId": "library",
+              "startMin": 1300,
+              "endMin": 1400
+            }
+          ]
+        },
+        {
+          "id": "gardener",
+          "name": "the gardener",
+          "statements": [
+            {
+              "id": "st-gardener-1",
+              "kind": "location",
+              "text": "I was in the kitchen the whole time.",
+              "placeId": "kitchen",
+              "startMin": 1310,
+              "endMin": 1390
+            }
+          ]
+        },
+        {
+          "id": "nephew",
+          "name": "the nephew",
+          "statements": [
+            {
+              "id": "st-nephew-1",
+              "kind": "sighting",
+              "text": "I saw the gardener in the greenhouse at that hour.",
+              "seenSuspectId": "gardener",
+              "placeId": "greenhouse",
+              "startMin": 1320,
+              "endMin": 1360
+            }
+          ]
+        }
+      ],
+      "clues": [
+        {
+          "id": "cl-1",
+          "kind": "holding",
+          "text": "The shears were found wiped clean in the widow's coat pocket.",
+          "reliability": "firm",
+          "suspectId": "widow",
+          "itemId": "shears"
+        },
+        {
+          "id": "cl-2",
+          "kind": "presence",
+          "text": "A witness firmly places the widow in the greenhouse at the time of the murder.",
+          "reliability": "firm",
+          "suspectId": "widow",
+          "placeId": "greenhouse",
+          "startMin": 1330,
+          "endMin": 1350
+        },
+        {
+          "id": "cl-3",
+          "kind": "motive",
+          "text": "The widow stood to inherit the estate and argued with Edgar that week.",
+          "reliability": "firm",
+          "suspectId": "widow"
+        },
+        {
+          "id": "cl-4",
+          "kind": "holding",
+          "text": "The gardener had access to the shears earlier in the day.",
+          "reliability": "weak",
+          "suspectId": "gardener",
+          "itemId": "shears"
+        },
+        {
+          "id": "cl-5",
+          "kind": "motive",
+          "text": "The gardener had recently been threatened with dismissal.",
+          "reliability": "firm",
+          "suspectId": "gardener"
+        },
+        {
+          "id": "cl-6",
+          "kind": "presence",
+          "text": "The gardener is firmly placed in the kitchen at the time of the murder.",
+          "reliability": "firm",
+          "suspectId": "gardener",
+          "placeId": "kitchen",
+          "startMin": 1320,
+          "endMin": 1380
+        }
+      ],
+      "confidence": {
+        "title": 0.97,
+        "setting": 0.93,
+        "victim": 0.96,
+        "crime": 0.91,
+        "suspects.0.statements.0": 0.9,
+        "suspects.1.statements.0": 0.9,
+        "suspects.2.statements.0": 0.9,
+        "clues.0": 0.88,
+        "clues.1": 0.88,
+        "clues.2": 0.88,
+        "clues.3": 0.62,
+        "clues.4": 0.88,
+        "clues.5": 0.88
+      }
+    },
+    "confidence": {
+      "title": 0.97,
+      "setting": 0.93,
+      "victim": 0.96,
+      "crime": 0.91,
+      "suspects.0.statements.0": 0.9,
+      "suspects.1.statements.0": 0.9,
+      "suspects.2.statements.0": 0.9,
+      "clues.0": 0.88,
+      "clues.1": 0.88,
+      "clues.2": 0.88,
+      "clues.3": 0.62,
+      "clues.4": 0.88,
+      "clues.5": 0.88
+    },
+    "sources": {},
+    "rawModelOutput": "{\"title\":\"The Midnight Greenhouse\",\"setting\":\"A locked greenhouse behind a manor, smelling of soil and bitter almond.\",\"victim\":{\"name\":\"Edgar Voss\"},\"crime\":{\"placeId\":\"greenhouse\",\"startMin\":1320,\"endMin\":1380,\"weaponItemId\":\"shears\"},\"places\":[{\"id\":\"greenhouse\",\"name\":\"the greenhouse\"},{\"id\":\"library\",\"name\":\"the library\"},{\"id\":\"kitchen\",\"name\":\"the kitchen\"}],\"items\":[{\"id\":\"shears\",\"name\":\"a pair of pruning shears\"},{\"id\":\"letter\",\"name\":\"a torn letter\"}],\"suspects\":[{\"id\":\"widow\",\"name\":\"the widow\",\"statements\":[{\"id\":\"st-widow-1\",\"kind\":\"location\",\"text\":\"I was reading in the library all evening.\",\"placeId\":\"library\",\"startMin\":1300,\"endMin\":1400}]},{\"id\":\"gardener\",\"name\":\"the gardener\",\"statements\":[{\"id\":\"st-gardener-1\",\"kind\":\"location\",\"text\":\"I was in the kitchen the whole time.\",\"placeId\":\"kitchen\",\"startMin\":1310,\"endMin\":1390}]},{\"id\":\"nephew\",\"name\":\"the nephew\",\"statements\":[{\"id\":\"st-nephew-1\",\"kind\":\"sighting\",\"text\":\"I saw the gardener in the greenhouse at that hour.\",\"seenSuspectId\":\"gardener\",\"placeId\":\"greenhouse\",\"startMin\":1320,\"endMin\":1360}]}],\"clues\":[{\"id\":\"cl-1\",\"kind\":\"holding\",\"text\":\"The shears were found wiped clean in the widow's coat pocket.\",\"reliability\":\"firm\",\"suspectId\":\"widow\",\"itemId\":\"shears\"},{\"id\":\"cl-2\",\"kind\":\"presence\",\"text\":\"A witness firmly places the widow in the greenhouse at the time of the murder.\",\"reliability\":\"firm\",\"suspectId\":\"widow\",\"placeId\":\"greenhouse\",\"startMin\":1330,\"endMin\":1350},{\"id\":\"cl-3\",\"kind\":\"motive\",\"text\":\"The widow stood to inherit the estate and argued with Edgar that week.\",\"reliability\":\"firm\",\"suspectId\":\"widow\"},{\"id\":\"cl-4\",\"kind\":\"holding\",\"text\":\"The gardener had access to the shears earlier in the day.\",\"reliability\":\"weak\",\"suspectId\":\"gardener\",\"itemId\":\"shears\"},{\"id\":\"cl-5\",\"kind\":\"motive\",\"text\":\"The gardener had recently been threatened with dismissal.\",\"reliability\":\"firm\",\"suspectId\":\"gardener\"},{\"id\":\"cl-6\",\"kind\":\"presence\",\"text\":\"The gardener is firmly placed in the kitchen at the time of the murder.\",\"reliability\":\"firm\",\"suspectId\":\"gardener\",\"placeId\":\"kitchen\",\"startMin\":1320,\"endMin\":1380}],\"confidence\":{\"title\":0.97,\"setting\":0.93,\"victim\":0.96,\"crime\":0.91,\"suspects.0.statements.0\":0.9,\"suspects.1.statements.0\":0.9,\"suspects.2.statements.0\":0.9,\"clues.0\":0.88,\"clues.1\":0.88,\"clues.2\":0.88,\"clues.3\":0.62,\"clues.4\":0.88,\"clues.5\":0.88}}"
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "id": "candlesticks",
+  "title": "Two Candlesticks",
+  "origin": "fixture",
+  "extraction": {
+    "proposedFields": {
+      "title": "Two Candlesticks",
+      "setting": "A dim parlour where two silver candlesticks stood on the mantel, now one short.",
+      "victim": {
+        "name": "Mrs. Pemberton"
+      },
+      "crime": {
+        "placeId": "parlour",
+        "startMin": 1260,
+        "endMin": 1320,
+        "weaponItemId": "candlestick"
+      },
+      "places": [
+        {
+          "id": "parlour",
+          "name": "the parlour"
+        },
+        {
+          "id": "study",
+          "name": "the study"
+        },
+        {
+          "id": "hall",
+          "name": "the hall"
+        }
+      ],
+      "items": [
+        {
+          "id": "candlestick",
+          "name": "a silver candlestick"
+        }
+      ],
+      "suspects": [
+        {
+          "id": "ada",
+          "name": "Ada",
+          "statements": [
+            {
+              "id": "st-ada-1",
+              "kind": "location",
+              "text": "I was in the study reading.",
+              "placeId": "study",
+              "startMin": 1250,
+              "endMin": 1330
+            }
+          ]
+        },
+        {
+          "id": "bram",
+          "name": "Bram",
+          "statements": [
+            {
+              "id": "st-bram-1",
+              "kind": "location",
+              "text": "I never left the hall that night.",
+              "placeId": "hall",
+              "startMin": 1255,
+              "endMin": 1325
+            }
+          ]
+        },
+        {
+          "id": "clara",
+          "name": "Clara",
+          "statements": [
+            {
+              "id": "st-clara-1",
+              "kind": "possession",
+              "text": "I never touched the candlestick.",
+              "itemId": "candlestick",
+              "held": false
+            }
+          ]
+        }
+      ],
+      "clues": [
+        {
+          "id": "cl-1",
+          "kind": "holding",
+          "text": "Ada's gloves had wax residue matching the missing candlestick.",
+          "reliability": "firm",
+          "suspectId": "ada",
+          "itemId": "candlestick"
+        },
+        {
+          "id": "cl-2",
+          "kind": "presence",
+          "text": "Ada is firmly seen entering the parlour at the time of the murder.",
+          "reliability": "firm",
+          "suspectId": "ada",
+          "placeId": "parlour",
+          "startMin": 1270,
+          "endMin": 1300
+        },
+        {
+          "id": "cl-3",
+          "kind": "motive",
+          "text": "Ada was named out of Mrs. Pemberton's will that very morning.",
+          "reliability": "firm",
+          "suspectId": "ada"
+        },
+        {
+          "id": "cl-4",
+          "kind": "holding",
+          "text": "Bram's cufflink, matching the candlestick's polish, was found at the scene.",
+          "reliability": "firm",
+          "suspectId": "bram",
+          "itemId": "candlestick"
+        },
+        {
+          "id": "cl-5",
+          "kind": "presence",
+          "text": "Bram is firmly placed in the parlour at the time of the murder.",
+          "reliability": "firm",
+          "suspectId": "bram",
+          "placeId": "parlour",
+          "startMin": 1265,
+          "endMin": 1310
+        }
+      ],
+      "confidence": {
+        "title": 0.97,
+        "setting": 0.93,
+        "victim": 0.96,
+        "crime": 0.91,
+        "suspects.0.statements.0": 0.9,
+        "suspects.1.statements.0": 0.9,
+        "suspects.2.statements.0": 0.9,
+        "clues.0": 0.88,
+        "clues.1": 0.88,
+        "clues.2": 0.88,
+        "clues.3": 0.68,
+        "clues.4": 0.88
+      }
+    },
+    "confidence": {
+      "title": 0.97,
+      "setting": 0.93,
+      "victim": 0.96,
+      "crime": 0.91,
+      "suspects.0.statements.0": 0.9,
+      "suspects.1.statements.0": 0.9,
+      "suspects.2.statements.0": 0.9,
+      "clues.0": 0.88,
+      "clues.1": 0.88,
+      "clues.2": 0.88,
+      "clues.3": 0.68,
+      "clues.4": 0.88
+    },
+    "sources": {},
+    "rawModelOutput": "{\"title\":\"Two Candlesticks\",\"setting\":\"A dim parlour where two silver candlesticks stood on the mantel, now one short.\",\"victim\":{\"name\":\"Mrs. Pemberton\"},\"crime\":{\"placeId\":\"parlour\",\"startMin\":1260,\"endMin\":1320,\"weaponItemId\":\"candlestick\"},\"places\":[{\"id\":\"parlour\",\"name\":\"the parlour\"},{\"id\":\"study\",\"name\":\"the study\"},{\"id\":\"hall\",\"name\":\"the hall\"}],\"items\":[{\"id\":\"candlestick\",\"name\":\"a silver candlestick\"}],\"suspects\":[{\"id\":\"ada\",\"name\":\"Ada\",\"statements\":[{\"id\":\"st-ada-1\",\"kind\":\"location\",\"text\":\"I was in the study reading.\",\"placeId\":\"study\",\"startMin\":1250,\"endMin\":1330}]},{\"id\":\"bram\",\"name\":\"Bram\",\"statements\":[{\"id\":\"st-bram-1\",\"kind\":\"location\",\"text\":\"I never left the hall that night.\",\"placeId\":\"hall\",\"startMin\":1255,\"endMin\":1325}]},{\"id\":\"clara\",\"name\":\"Clara\",\"statements\":[{\"id\":\"st-clara-1\",\"kind\":\"possession\",\"text\":\"I never touched the candlestick.\",\"itemId\":\"candlestick\",\"held\":false}]}],\"clues\":[{\"id\":\"cl-1\",\"kind\":\"holding\",\"text\":\"Ada's gloves had wax residue matching the missing candlestick.\",\"reliability\":\"firm\",\"suspectId\":\"ada\",\"itemId\":\"candlestick\"},{\"id\":\"cl-2\",\"kind\":\"presence\",\"text\":\"Ada is firmly seen entering the parlour at the time of the murder.\",\"reliability\":\"firm\",\"suspectId\":\"ada\",\"placeId\":\"parlour\",\"startMin\":1270,\"endMin\":1300},{\"id\":\"cl-3\",\"kind\":\"motive\",\"text\":\"Ada was named out of Mrs. Pemberton's will that very morning.\",\"reliability\":\"firm\",\"suspectId\":\"ada\"},{\"id\":\"cl-4\",\"kind\":\"holding\",\"text\":\"Bram's cufflink, matching the candlestick's polish, was found at the scene.\",\"reliability\":\"firm\",\"suspectId\":\"bram\",\"itemId\":\"candlestick\"},{\"id\":\"cl-5\",\"kind\":\"presence\",\"text\":\"Bram is firmly placed in the parlour at the time of the murder.\",\"reliability\":\"firm\",\"suspectId\":\"bram\",\"placeId\":\"parlour\",\"startMin\":1265,\"endMin\":1310}],\"confidence\":{\"title\":0.97,\"setting\":0.93,\"victim\":0.96,\"crime\":0.91,\"suspects.0.statements.0\":0.9,\"suspects.1.statements.0\":0.9,\"suspects.2.statements.0\":0.9,\"clues.0\":0.88,\"clues.1\":0.88,\"clues.2\":0.88,\"clues.3\":0.68,\"clues.4\":0.88}}"
+  }
+}
