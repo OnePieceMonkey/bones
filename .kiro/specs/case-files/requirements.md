@@ -98,7 +98,7 @@ These need a decision by the owner. Each has a workaround inside the app, so non
 - **Replay**: A new Trace made from the stored `validatedFields` of the Original_Trace under another Rule_Set, without extraction.
 - **Override**: A core `Override` that overrules the Case result.
 - **Accusation_Record**: The record of Decision D11.
-- **Recorded_Case**: A stored model output in `apps/case-files/recorded/`.
+- **Recorded_Case**: A hand-written fixture in the model output format, stored in `apps/case-files/recorded/`. It is not real LLM output (Requirement 24).
 - **Live_Function**: The serverless function `api/case.ts` that asks the LLM for a case.
 - **Live_Mode**: The mode in which the start screen can call the Live_Function.
 - **Anatomy_Builder**: The pure function that builds an Xray_UI `Anatomy` for a Case (combined) and per Suspect.
@@ -227,7 +227,7 @@ These need a decision by the owner. Each has a workaround inside the app, so non
 
 ### Requirement 7: Recorded cases
 
-**User Story:** As a viewer without an API key, I want three stored cases, so that the whole demo works offline.
+**User Story:** As a viewer without an API key, I want three stored cases (hand-written fixtures in the model output format, see Requirement 24), so that the whole demo works offline.
 
 #### Acceptance Criteria
 
@@ -489,3 +489,14 @@ These need a decision by the owner. Each has a workaround inside the app, so non
 7. THE scope cut order, to apply from the first item when the Time_Box is at risk, SHALL be: (1) live mode and its README part (Requirements 17, 18); (2) trace export and the export round-trip property (9.8); (3) `extraMessages` (15.5), with the reason then shown on the Glass_Card only; (4) `overruled` and `stampDetail` on the Glass_Card (the card then never cracks); (5) typed animation of the Result_Banner (shown at once); (6) the `sighting` kind and its rule (the knob keeps v3 through the `Firm` rules).
 8. THE following SHALL NOT be cut: recorded mode, the three Recorded_Cases, the Solver and its property tests, the pipeline with Trace, replay and override, the guards, the no-scroll checks at the three Viewports, keyboard access and reduced motion.
 9. THE Case_Files_App SHALL add no feature that is not named in this document, and each task SHALL list the requirement numbers that it satisfies.
+
+### Requirement 24: Honest labelling of recorded cases
+
+**User Story:** As a viewer, I want to know that the three demo cases are hand-written fixtures and not real LLM output, so that the demo makes no false claim about the model.
+
+#### Acceptance Criteria
+
+1. THE README SHALL state in one sentence that the three Recorded_Cases are hand-written fixtures in the model output format and not real LLM output, and a test SHALL assert that the README contains that sentence.
+2. THE StartScreen SHALL show the visible text "Recorded demo case" on each of the three Recorded_Case sheets, with a text contrast ratio of at least 4.5:1 and no new raster image, and THE Case_Files_App SHALL pass that text to the generic Xray_UI `FilmSheet` through an existing or optional domain-free prop.
+3. WHERE Live_Mode (Requirement 17) is built, THE README MAY add one real recorded LLM case, labelled "Recorded LLM case", and THE Case_Files_App SHALL NOT label that case "Recorded demo case" and SHALL NOT label any of the three fixtures "Recorded LLM case".
+4. THE source code, the code comments and the recorded JSON files of the three Recorded_Cases SHALL NOT claim LLM authorship, and any field or comment that names their origin (such as `source` or `origin`) SHALL say `fixture`.

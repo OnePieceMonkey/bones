@@ -68,7 +68,8 @@ Decisions recorded here:
     - `recorded-parity.node.test.ts`: for each file: `JSON.parse(rawModelOutput)` equals `proposedFields` (requirement 7.7); the proposed fields validate with `modelOutputSchema`; at most 4 suspects and 5 statements per suspect; across the three cases every statement kind occurs at least once (location, possession, sighting); one confidence value below 0.80 per case; `sources` is `{}`; the three ids are exactly `greenhouse`, `candlesticks`, `empty-room`; no key named like a culprit (requirement 2.10) at any depth.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, core/expense diff empty, `git status` clean.
     - Commit message: `feat(case-files): add three recorded cases with parity test`
-    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.6, 7.7, 2.12, 19.4_
+    - Fixture labelling (requirement 24.4): the three files and `fixtures.ts` are hand-written fixtures, not LLM output. Any header comment or origin field (for example `source` or `origin`) says `fixture`; no file comment, README line or field name claims LLM authorship. The parity test asserts that no recorded file contains the words `LLM`, `gpt` or `model-generated` and that an origin field, if present, equals `fixture`.
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.6, 7.7, 2.12, 19.4, 24.4_
 
 - [ ] 2. Rules v1, v2, v3 with Fact_Deriver and Rule_Binder
   - [ ] 2.1 Rule files, Rule_Sets, catalog and rules README
@@ -268,7 +269,8 @@ Decisions recorded here:
     - Component tests: three sheets with the title texts, a click starts the recorded case, the live card is disabled with the note, keyboard activation of a sheet, `ErrorPanel` role and message for `fixture_not_found`.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, core/expense diff empty, `git status` clean.
     - Commit message: `feat(case-files): add app shell, start screen and error panel`
-    - _Requirements: 8.1, 11.1, 11.2, 14.1, 14.2, 14.3, 14.10, 14.11, 16.1, 16.2, 16.6_
+    - Honest label (requirement 24.2): each of the three recorded sheets shows the small visible note "Recorded demo case", passed to the generic `FilmSheet` through an existing or optional domain-free prop. Contrast at least 4.5:1, no new raster. The component test asserts the note on each of the three sheets, and the start-screen e2e spec asserts the same text three times.
+    - _Requirements: 8.1, 11.1, 11.2, 14.1, 14.2, 14.3, 14.10, 14.11, 16.1, 16.2, 16.6, 24.2_
 
   - [ ] 6.3 CaseScreen
     - Files (new): `apps/case-files/src/ui/CaseScreen.tsx`, `src/ui/VersionNote.tsx`, `tests/components/CaseScreen.test.tsx`. Edit: `src/App.tsx`, `src/styles/app.css` (layout only).
@@ -451,7 +453,8 @@ Decisions recorded here:
     - `readme.node.test.ts`: every `pnpm …` script named in the README exists in `apps/case-files/package.json` or the root `package.json`; the README names ports 5201 and 5202 and Q1 to Q7.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, core/expense diff empty, `git status` clean.
     - Commit message: `docs(case-files): add app README with matrix, scripts and limitations`
-    - _Requirements: 22.1, 22.3, 22.4_
+    - Honest sentence (requirement 24.1): the README states in one sentence that the three recorded cases are hand-written fixtures in the model output format, not real LLM output. `readme.node.test.ts` also asserts that this sentence is present.
+    - _Requirements: 22.1, 22.3, 22.4, 24.1_
 
   - [ ] 10.2 Root README entry
     - Files: `README.md` (root).
