@@ -4,6 +4,7 @@ import type { CoreError } from "@bones/core";
 import { useSession } from "./state/sessionStore";
 import type { SessionStore } from "./state/sessionStore";
 import { ErrorPanel } from "./ui/ErrorPanel";
+import { CaseScreen } from "./ui/CaseScreen";
 import { StartScreen } from "./ui/StartScreen";
 export interface AppProps {
   store?: SessionStore | null;
@@ -41,10 +42,7 @@ function Screens({ store }: { store: SessionStore }) {
           liveAvailable={false}
         />
       ) : (
-        // The case screen arrives in task 6.3.
-        <p role="status" className="xr-status">
-          Case open: {state.origin.kind === "recorded" ? state.origin.caseId : state.origin.theme}
-        </p>
+        <CaseScreen key={state.sessionId} state={state} store={store} />
       )}
     </main>
   );

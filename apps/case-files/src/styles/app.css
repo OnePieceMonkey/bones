@@ -25,3 +25,49 @@ main {
   margin: 0;
   transform: translateX(-50%);
 }
+
+/* Case screen layout. Four suspects need 4 x 160px in the stage, so the columns give the stage more
+   room (document 20, stage 55 incl. the control panel overlap column, Dr. Bones 25). The ensemble stays in
+   the top 62 % row, above the control panel; the buttons sit to the right of the control panel. */
+.xr-shell .xr-shell-frame .xr-viewport {
+  grid-template-columns: 20fr 17fr 38fr 25fr;
+}
+.xr-shell .xr-shell-stagecell .case-center {
+  display: grid;
+  grid-template-rows: 62fr 38fr;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 calc(8 * var(--xr-u, 1px));
+}
+.case-top {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: calc(4 * var(--xr-u, 1px));
+  min-width: 0;
+  min-height: 0;
+  padding-top: calc(8 * var(--xr-u, 1px));
+}
+.xr-shell .xr-shell-stagecell .case-center .xr-glass.xr-glass {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  max-height: calc(150 * var(--xr-u, 1px));
+}
+.case-actions {
+  align-self: end;
+  min-width: 0;
+  padding: 0 0 calc(8 * var(--xr-u, 1px)) 31%;
+}
+.case-reason {
+  margin: calc(4 * var(--xr-u, 1px)) 0 0;
+  text-align: center;
+}
+/* Keep the same layout with X-RAY off: the stage cell stretches instead of centring its content. */
+.xr-shell[data-xray="false"] .xr-shell-stagecell.xr-shell-stagecell {
+  align-content: stretch;
+  justify-items: stretch;
+  grid-template-rows: minmax(0, 1fr);
+}
