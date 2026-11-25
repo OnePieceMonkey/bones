@@ -62,6 +62,29 @@ describe("GlassCard layout", () => {
     expect(block(css("shell.css"), '.xr-shell[data-xray="false"] .xr-shell-stagecell .xr-glass')).toMatch(/top:\s*auto/);
   });
 
+  // case-files R13.10, R15.8: optional props, defaults unchanged.
+  it("overruled forces cracks and the stamp without any overruled field; stampDetail appears in the stamp", () => {
+    const { container } = render(
+      <GlassCard trace={signatureTrace()} anatomy={signatureAnatomy()} overruled stampDetail="v2" />,
+    );
+    expect(container.querySelector(".xr-glass")?.getAttribute("data-overruled")).toBe("true");
+    expect(container.querySelector(".xr-cracks")).not.toBeNull();
+    const note = screen.getByRole("note");
+    expect(note.textContent).toContain("OVERRULED BY RULE");
+    expect(note.querySelector(".xr-stamp-bones")?.textContent).toBe("v2");
+  });
+
+  it("overruled false keeps the field-based behaviour", () => {
+    const base = signatureTrace();
+    const trace = { ...base, proposedFields: { ...base.proposedFields, "receipt.alcoholCents": 650 } };
+    const off = render(<GlassCard trace={trace} anatomy={signatureAnatomy()} showUnlabelled overruled={false} />);
+    const offHtml = off.container.innerHTML;
+    cleanup();
+    const def = render(<GlassCard trace={trace} anatomy={signatureAnatomy()} showUnlabelled />);
+    expect(offHtml).toBe(def.container.innerHTML);
+    expect(screen.getByRole("note").textContent).toContain("OVERRULED BY RULE");
+  });
+
   it("lays each field out as a two-column grid with the confidence on its own line", () => {
     const panels = css("panels.css");
     expect(block(panels, ".xr-glass .xr-field")).toMatch(/display:\s*grid/);

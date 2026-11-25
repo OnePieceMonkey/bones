@@ -3,24 +3,32 @@ import { glassCracksUrl, stampFrameUrl } from "../../assets";
 import { useHoveredRule } from "../../hooks/useHoveredRule";
 import { summariseValue } from "../../model/format";
 import { fieldViews, hasFieldLabel, relatedFields, selectBones } from "../../model/selectors";
-import type { AnswerCardProps } from "../../types";
+import type { AnswerCardProps, GlassCardExtraProps } from "../../types";
 import { AssetImage } from "../shell/AssetImage";
 
-export type GlassCardProps = AnswerCardProps;
+export type GlassCardProps = AnswerCardProps & GlassCardExtraProps;
 
 /**
  * Frosted-glass AI answer. Same row markup as AnswerCard. When a field is
  * overruled, the glass shows cracks and exactly one tilted stamp naming the
  * first overruled bone (anatomy order) and its rule version.
  */
-export function GlassCard({ trace, anatomy, className, showUnlabelled = false }: GlassCardProps) {
+export function GlassCard({
+  trace,
+  anatomy,
+  className,
+  showUnlabelled = false,
+  overruled,
+  stampDetail,
+}: GlassCardProps) {
   const { hoveredRuleId } = useHoveredRule();
   const bones = selectBones(trace, anatomy);
   const fields = fieldViews(trace, anatomy, bones);
-  const anyOverruled = fields.some((f) => f.overruled);
+  const fieldOverruled = fields.some((f) => f.overruled);
+  const anyOverruled = overruled === true || fieldOverruled;
   const visibleFields = showUnlabelled ? fields : fields.filter((f) => hasFieldLabel(anatomy, f.path));
 
-  const firstOverruled = anyOverruled
+  const firstOverruled = fieldOverruled
     ? bones.find((b) => b.state === "fractured" && fields.some((f) => f.overruled && f.overruledBy.includes(b.label)))
     : undefined;
 
@@ -59,11 +67,15 @@ export function GlassCard({ trace, anatomy, className, showUnlabelled = false }:
         <div className="xr-stamp xr-glass-stamp" role="note">
           <AssetImage className="xr-stamp-frame" src={stampFrameUrl} width={640} height={362} />
           <span className="xr-stamp-title">OVERRULED BY RULE</span>
-          {firstOverruled && (
-            <span className="xr-stamp-bones">
-              {firstOverruled.label}
-              {firstOverruled.version !== null ? ` ${firstOverruled.version}` : ""}
-            </span>
+          {stampDetail !== undefined && stampDetail !== "" ? (
+            <span className="xr-stamp-bones">{stampDetail}</span>
+          ) : (
+            firstOverruled && (
+              <span className="xr-stamp-bones">
+                {firstOverruled.label}
+                {firstOverruled.version !== null ? ` ${firstOverruled.version}` : ""}
+              </span>
+            )
           )}
         </div>
       )}

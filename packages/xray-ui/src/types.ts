@@ -206,6 +206,13 @@ export interface DocumentPanelProps extends CommonProps {
   source: FilmSource;
 }
 
+export interface GlassCardExtraProps {
+  /** true forces the cracked glass and the stamp; false or omitted keeps the field-based computation. */
+  overruled?: boolean;
+  /** Text shown after the stamp title (for example a version label); replaces the bone label. */
+  stampDetail?: string;
+}
+
 export interface AnswerCardProps extends CommonProps {
   trace: Trace;
   anatomy: Anatomy;
