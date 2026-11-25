@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { isCoreError } from "@bones/core";
 import type { ChatMessage, EffectiveResult } from "@bones/xray-ui";
 import {
@@ -22,6 +22,7 @@ import type { CaseState } from "../state/reducer";
 import { displayedTrace, effectiveView } from "../state/selectors";
 import type { SessionStore } from "../state/sessionStore";
 import { ErrorPanel } from "./ErrorPanel";
+import { OverrideDialog } from "./OverrideDialog";
 import { Toolbar } from "./Toolbar";
 import { VersionNote, versionNoteText } from "./VersionNote";
 
@@ -68,6 +69,8 @@ const ACCUSE_NEEDS_SUSPECT = "Pick a suspect to accuse.";
 export function CaseScreen({ state, store, bundle, reducedMotion }: CaseScreenProps) {
   const [replayKey, setReplayKey] = useState(0);
   const [accuseError, setAccuseError] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const overrideRef = useRef<HTMLButtonElement>(null);
   const rules = useMemo(() => bundle ?? loadBundle(), [bundle]);
 
   const trace = displayedTrace(state);
@@ -130,22 +133,6 @@ export function CaseScreen({ state, store, bundle, reducedMotion }: CaseScreenPr
         introPhase={introPhaseFor(state.xray)}
         headerActions={<Toolbar state={state} store={store} />}
         statusNote={<VersionNote note={versionNoteText(state.selected)} />}
-        controls={
-          <ControlPanel
-            trace={trace}
-            anatomy={combined}
-            versions={VERSIONS}
-            value={state.selected}
-            onVersionChange={(v) => {
-              if (isVersionLabel(v)) store.selectVersion(v);
-            }}
-            xray={state.xray}
-            onXrayChange={(next) => {
-              if (next !== state.xray) store.toggleXray();
-            }}
-            {...motion}
-          />
-        }
         {...motion}
       >
         <DocumentPanel trace={trace} anatomy={combined} source={{ kind: "text", text }} {...motion} />
@@ -170,35 +157,49 @@ export function CaseScreen({ state, store, bundle, reducedMotion }: CaseScreenPr
               {...motion}
             />
             </div>
-            <div className="case-actions">
-              <div className="xr-result-actions">
-                <button
-                  type="button"
-                  className="xr-footer-btn"
-                  disabled={accuseReason !== null}
-                  {...(accuseReason !== null ? { "aria-describedby": "accuse-reason" } : {})}
-                  onClick={onAccuse}
-                >
-                  Accuse
-                </button>
-                <button type="button" className="xr-footer-btn" onClick={() => setReplayKey((k) => k + 1)}>
-                  Replay
-                </button>
-              </div>
-              {accuseReason !== null && (
-                <p id="accuse-reason" className="xr-status case-reason">
-                  {accuseReason}
-                </p>
-              )}
-              {accuseError !== null && (
-                <p role="alert" className="xr-status case-reason">
-                  {accuseError}
-                </p>
-              )}
-              <ErrorPanel error={state.notice === null ? null : state.notice.error} title="Replay failed" />
-              <ErrorPanel error={effectiveError} title="Override could not be applied" />
-            </div>
           </div>
+        </div>
+        <ControlPanel
+          trace={trace}
+          anatomy={combined}
+          versions={VERSIONS}
+          value={state.selected}
+          onVersionChange={(v) => {
+            if (isVersionLabel(v)) store.selectVersion(v);
+          }}
+          xray={state.xray}
+          onXrayChange={(next) => {
+            if (next !== state.xray) store.toggleXray();
+          }}
+          {...motion}
+        />
+        <div className="case-actions">
+          <div className="xr-result-actions">
+            <button
+              type="button"
+              className="xr-footer-btn"
+              disabled={accuseReason !== null}
+              {...(accuseReason !== null ? { "aria-describedby": "accuse-reason" } : {})}
+              onClick={onAccuse}
+            >
+              Accuse
+            </button>
+            <button type="button" className="xr-footer-btn" onClick={() => setReplayKey((k) => k + 1)}>
+              Replay
+            </button>
+          </div>
+          {accuseReason !== null && (
+            <p id="accuse-reason" className="xr-status case-reason">
+              {accuseReason}
+            </p>
+          )}
+          {accuseError !== null && (
+            <p role="alert" className="xr-status case-reason">
+              {accuseError}
+            </p>
+          )}
+          <ErrorPanel error={state.notice === null ? null : state.notice.error} title="Replay failed" />
+          <ErrorPanel error={effectiveError} title="Override could not be applied" />
         </div>
         <DoctorPanel
           key={`doctor-${replayKey}`}
@@ -209,9 +210,17 @@ export function CaseScreen({ state, store, bundle, reducedMotion }: CaseScreenPr
           extraMessages={extraMessages}
           {...(effective === null ? {} : { effective })}
           onReplay={() => setReplayKey((k) => k + 1)}
+          onOverride={() => setDialogOpen(true)}
+          overrideRef={overrideRef}
           {...motion}
         />
       </ShellFrame>
+      <OverrideDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={(form) => store.submitOverride(form)}
+        returnFocusTo={overrideRef}
+      />
     </HoveredRuleProvider>
   );
 }

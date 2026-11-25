@@ -56,10 +56,13 @@ main {
   width: 100%;
   max-height: calc(150 * var(--xr-u, 1px));
 }
-.case-actions {
+/* The buttons are a lightbox child after the control panel (tab order, requirement 16.5), placed in the
+   lower right of the stage area: row 2, the stage column right of the control panel. */
+.xr-shell .xr-shell-frame .case-actions {
+  grid-area: 2 / 3 / 3 / 4;
   align-self: end;
   min-width: 0;
-  padding: 0 0 calc(8 * var(--xr-u, 1px)) 31%;
+  padding: 0 calc(8 * var(--xr-u, 1px)) calc(8 * var(--xr-u, 1px));
 }
 .case-reason {
   margin: calc(4 * var(--xr-u, 1px)) 0 0;
@@ -70,4 +73,16 @@ main {
   align-content: stretch;
   justify-items: stretch;
   grid-template-rows: minmax(0, 1fr);
+}
+/* Override form */
+.app-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xr-space-1);
+  margin: 0 0 var(--xr-space-3);
+}
+.app-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--xr-space-2);
 }
