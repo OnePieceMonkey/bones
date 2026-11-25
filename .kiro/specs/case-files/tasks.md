@@ -153,7 +153,7 @@ Decisions recorded here:
     - _Requirements: 23.2, 23.5, 23.6_
 
 - [ ] 4. Pipeline, Trace, replay, override, accusation
-  - [~] 4.1 Ports, clock and hash
+  - [x] 4.1 Ports, clock and hash
     - Files (new): `apps/case-files/src/pipeline/ports.ts`, `src/pipeline/hash.ts`, `tests/helpers/fakes.ts`, `tests/unit/ports.node.test.ts`.
     - Copy in shape from `apps/expense-auditor/src/pipeline/ports.ts` and `hash.ts` (D20, copy, no import): `makeClock` returns strictly increasing times at least 1 ms apart, id port (UUID), `KernelPorts` factory `forInput(hex, byteLength)` with a hasher that returns the precomputed hex and checks the byte length, `sha256Hex(bytes)` through Web Crypto in `hash.ts` only. `fakes.ts`: `counterPorts()` with fixed clock and ids for tests.
     - Unit tests: clock strictly increases even when `now()` repeats or goes back; hasher byte-length mismatch is an error; `sha256Hex` of a known string; the pure files contain no `Date.now` (only `ports.ts` default wiring).
