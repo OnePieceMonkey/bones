@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { isCoreError } from "@bones/core";
 import type { ChatMessage, EffectiveResult } from "@bones/xray-ui";
 import {
@@ -24,6 +24,7 @@ import { displayedTrace, effectiveView } from "../state/selectors";
 import type { SessionStore } from "../state/sessionStore";
 import { caseDocumentText, chatSpeedMs } from "./CaseScreen";
 import { ErrorPanel } from "./ErrorPanel";
+import { OverrideDialog } from "./OverrideDialog";
 import { ResultBanner, verdictNote } from "./ResultBanner";
 import type { DisplayedStanding } from "./ResultBanner";
 import { Toolbar } from "./Toolbar";
@@ -42,6 +43,8 @@ const VERSIONS: string[] = [...VERSION_LABELS];
 
 export function VerdictView({ state, accusation, store, bundle, reducedMotion }: VerdictViewProps) {
   const [replayKey, setReplayKey] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const overrideRef = useRef<HTMLButtonElement>(null);
   const rules = useMemo(() => bundle ?? loadBundle(), [bundle]);
 
   const trace = displayedTrace(state);
@@ -60,6 +63,7 @@ export function VerdictView({ state, accusation, store, bundle, reducedMotion }:
   const names = useMemo(() => new Map(derived.suspects.map((s) => [s.id, s.name] as const)), [derived]);
 
   const view = effectiveView(state);
+  const effectiveError = view !== null && isCoreError(view) ? view : null;
   const effective: EffectiveResult | null = view !== null && !isCoreError(view) ? view : null;
   const rejected = (effective?.result ?? trace.result) === "rejected";
 
@@ -167,6 +171,7 @@ export function VerdictView({ state, accusation, store, bundle, reducedMotion }:
             </button>
           </div>
           <ErrorPanel error={state.notice === null ? null : state.notice.error} title="Replay failed" />
+          <ErrorPanel error={effectiveError} title="Override could not be applied" />
         </div>
         <DoctorPanel
           key={`doctor-${replayKey}`}
@@ -177,9 +182,17 @@ export function VerdictView({ state, accusation, store, bundle, reducedMotion }:
           extraMessages={extraMessages}
           {...(effective === null ? {} : { effective })}
           onReplay={() => setReplayKey((k) => k + 1)}
+          onOverride={() => setDialogOpen(true)}
+          overrideRef={overrideRef}
           {...motion}
         />
       </ShellFrame>
+      <OverrideDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={(form) => store.submitOverride(form)}
+        returnFocusTo={overrideRef}
+      />
     </HoveredRuleProvider>
   );
 }
