@@ -4,7 +4,7 @@ import { drBonesUrl } from "../../assets";
 import { cx } from "../../cx";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { buildChatMessages } from "../../model/chat";
-import type { Anatomy, CommonProps, EffectiveResult, Trace } from "../../types";
+import type { Anatomy, ChatMessage, CommonProps, EffectiveResult, Trace } from "../../types";
 import { ChatLog } from "../chat/ChatLog";
 import { AssetImage } from "../shell/AssetImage";
 import { ResultFooter } from "./ResultFooter";
@@ -16,6 +16,8 @@ export interface DoctorPanelProps extends CommonProps {
   claimedCents: number;
   effective?: EffectiveResult;
   speedMs?: number;
+  /** Optional messages appended after the built-in ones, typed the same way. */
+  extraMessages?: ChatMessage[] | undefined;
   onMessagesComplete?: () => void;
   onReplay?: () => void;
   onOverride?: () => void;
@@ -32,6 +34,7 @@ export function DoctorPanel({
   claimedCents,
   effective,
   speedMs,
+  extraMessages,
   onMessagesComplete,
   onReplay,
   onOverride,
@@ -40,7 +43,10 @@ export function DoctorPanel({
   className,
 }: DoctorPanelProps) {
   const reduced = useReducedMotion(reducedMotion);
-  const messages = useMemo(() => buildChatMessages(trace, anatomy), [trace, anatomy]);
+  const messages = useMemo(() => {
+    const built = buildChatMessages(trace, anatomy);
+    return extraMessages === undefined || extraMessages.length === 0 ? built : [...built, ...extraMessages];
+  }, [trace, anatomy, extraMessages]);
   const messagesKey = useMemo(() => messages.map((m) => m.id + ":" + m.text).join("\u0001"), [messages]);
 
   return (
