@@ -224,8 +224,8 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add trace export with round-trip property`
     - _Requirements: 9.8, 11.8_
 
-- [ ] 5. Xray-ui additions (additive, optional props, default pixels unchanged)
-  - [~] 5.1 SkeletonEnsemble
+- [x] 5. Xray-ui additions (additive, optional props, default pixels unchanged)
+  - [x] 5.1 SkeletonEnsemble
     - Files: `packages/xray-ui/src/components/stage/SkeletonEnsemble.tsx` (new), `packages/xray-ui/src/types.ts`, `packages/xray-ui/src/index.ts`, `packages/xray-ui/src/styles/stage.css`, `packages/xray-ui/src/__tests__/components/SkeletonEnsemble.test.tsx` (new), `packages/xray-ui/src/__tests__/properties/ensemble-fracture-count.test.tsx` (new), `packages/xray-ui/src/__tests__/domain-isolation.test.ts`.
     - Component as in the design: props `trace`, `members` (`{id, label, anatomy, accused?}`), `xray`, `selectedId`, `onSelect`, `selectLabel`, `reducedMotion`, `className`. Name plates form a `role="radiogroup"` with `aria-label`, each plate is `role="radio"` with `aria-checked`, roving tabindex, arrow keys, Home and End, activation by click, Enter and Space calls `onSelect(id)`. `xray` false renders plates only. Each member renders one existing `Stage` with `selectBones(trace, member.anatomy)` only. `data-accused` on plates and members. 1 to 4 members, grid `grid-auto-columns: minmax(160px, 1fr)`, sizes with `--xr-u` or percentages, no raster file, no new `@keyframes`, no transition without the reduced-motion entry (motion guard). Existing components, props and DOM do not change.
     - Domain isolation: in the same commit, extend the forbidden words of `domain-isolation.test.ts` with `clue` and `culprit` (comment: `case-files R20.8`). Run the existing xray-ui guards (`size-limit`, typography, label-box, motion, source-hygiene, assets, contrast); if one needs an allow-list entry for the new selectors, add it with a comment in this commit, never loosen a rule.
@@ -237,7 +237,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add SkeletonEnsemble for several skeletons on one Trace`
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 13.11, 16.2, 16.3, 20.8_
 
-  - [~] 5.2 DoctorPanel `extraMessages`
+  - [x] 5.2 DoctorPanel `extraMessages`
     - Files: `packages/xray-ui/src/components/panels/DoctorPanel.tsx`, `packages/xray-ui/src/types.ts`, `packages/xray-ui/src/__tests__/components/DoctorPanel.test.tsx` (add one test).
     - Optional `extraMessages?: ChatMessage[]`, appended after the output of `buildChatMessages(trace, anatomy)` before `ChatLog`. Omitted or `undefined` gives exactly the old messages. `speedMs` already exists and is not changed.
     - New test: with `extraMessages` the messages appear after the built-in ones, in order, and typed with the same typing logic; without the prop the DOM equals the old DOM. Existing assertions stay unchanged. Second cut-order item: if the Time_Box forces this cut, skip this task and show the Solver reason on the Glass_Card only.
@@ -245,7 +245,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add optional extraMessages to DoctorPanel`
     - _Requirements: 13.10, 15.4, 15.5, 15.7_
 
-  - [~] 5.3 GlassCard `overruled` and `stampDetail`
+  - [x] 5.3 GlassCard `overruled` and `stampDetail`
     - Files: `packages/xray-ui/src/components/panels/GlassCard.tsx`, `packages/xray-ui/src/types.ts`, `packages/xray-ui/src/__tests__/components/GlassCard.layout.test.tsx` (add two tests).
     - Optional `overruled?: boolean` (true forces the cracked glass and the stamp "OVERRULED BY RULE", independent of the field-based computation) and `stampDetail?: string` (text after the stamp title, for example the version label). Both omitted: the old computation, the same DOM and the same pixels.
     - New tests: `overruled` forces the stamp and cracks without any overruled field; `stampDetail` appears in the stamp; `overruled` false with fractured fields keeps the old behaviour (the prop only forces on). Existing assertions unchanged. Fourth cut-order item.
@@ -254,7 +254,7 @@ Decisions recorded here:
     - _Requirements: 13.10, 15.8, 20.8_
 
 - [ ] 6. UI: Anatomy_Builder and screens
-  - [~] 6.1 Anatomy_Builder and formatValue
+  - [x] 6.1 Anatomy_Builder and formatValue
     - Files (new): `apps/case-files/src/anatomy.ts`, `src/format/formatValue.ts`, `tests/unit/anatomy.node.test.ts`.
     - `buildCombinedAnatomy(derivedCase)` and `buildSuspectAnatomy(combined, suspect)` as in the design: bone regions by D18 (`skull` motive, `arm-right` means, `leg-right` opportunity, statements N=1..5 on `ribs`, `spine`, `arm-left`, `pelvis`, `leg-left`), unique `ruleId` per bone (instance ids), labels at most 40 characters starting with the suspect name (name truncated by a `truncateName(name, suffix)` helper, built from templates and ids, never from model text), `fieldLabels` for every derived evidence path and the case fields, `formatValue` that formats `crime` as "<place>, <hh:mm>-<hh:mm>, <item>" and `amountCents` as "<n> convictable" (never a currency symbol).
     - Unit tests: 4 suspects with 5 statements give at most 8 bones each and unique rule ids; label length at most 40 for names of 40 characters; every bone `ruleId` is an instance id that the Binder produces for some version (or is absent from the displayed rule set and then shows as not applicable); `formatValue("crime", …)` for the three recorded cases; `formatValue("amountCents", 0|1|2)`.
@@ -262,7 +262,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add anatomy builder and value formatting`
     - _Requirements: 15.1, 15.2, 15.3, 15.10, 15.12_
 
-  - [~] 6.2 App shell, ErrorPanel and StartScreen
+  - [x] 6.2 App shell, ErrorPanel and StartScreen
     - Files (new): `apps/case-files/src/App.tsx`, `src/ui/StartScreen.tsx`, `src/ui/ErrorPanel.tsx`, `src/ui/Toolbar.tsx` (header actions: "Download trace" and "Load another case" style actions with the xray-ui header icons, handlers from the store), `tests/components/StartScreen.test.tsx`, `tests/components/ErrorPanel.test.tsx`. Edit: `src/main.tsx` (mounts `App`), `src/styles/app.css`, `index.html`.
     - Start screen: visually hidden `h1` "Bones Case Files", header bar with wordmark and tagline, `StartLayout` with one `FilmSheet` per Recorded_Case (title, number of suspects, one-line setting from the stored case) and a fourth "Write a new case" `FormStrip` card with a theme select (4 themes) and a button. While Live_Mode is off (no live code exists yet, so `liveAvailable` is `false`) the card is disabled with the note "Live mode is off on this server. Pick a recorded case." and the recorded sheets stay usable. Choosing a sheet calls `store.loadRecordedCase`. `ErrorPanel` shows a CoreError with `role="alert"`. `App.tsx` builds the bundle once (a bundle error shows "The rules could not be loaded") and switches `start` and `case`.
     - `app.css` holds layout only: position, display, flex, grid, gap, padding, margin, sizes with percentages or `--xr-u`; colour, border, background, shadow and font only in the `body` rule. No `@keyframes`, no `transition`, no `animation`, no image, no `url(`. Everything visual comes from xray-ui components and tokens.
@@ -272,7 +272,7 @@ Decisions recorded here:
     - Honest label (requirement 24.2): each of the three recorded sheets shows the small visible note "Recorded demo case", passed to the generic `FilmSheet` through an existing or optional domain-free prop. Contrast at least 4.5:1, no new raster. The component test asserts the note on each of the three sheets, and the start-screen e2e spec asserts the same text three times.
     - _Requirements: 8.1, 11.1, 11.2, 14.1, 14.2, 14.3, 14.10, 14.11, 16.1, 16.2, 16.6, 24.2_
 
-  - [~] 6.3 CaseScreen
+  - [x] 6.3 CaseScreen
     - Files (new): `apps/case-files/src/ui/CaseScreen.tsx`, `src/ui/VersionNote.tsx`, `tests/components/CaseScreen.test.tsx`. Edit: `src/App.tsx`, `src/styles/app.css` (layout only).
     - Composition as in the design: `ShellFrame` with `ControlPanel` (knob `v1`, `v2`, `v3`; AI READ CONFIDENCE meter on the combined Trace; X-RAY switch, starting off), `DocumentPanel` with the case text as lines (Crime line, Clues, Statements of the selected suspect; escaped React text, no marks, `sources` is `{}`), the `.xr-shell-stagecell` with `SkeletonEnsemble` (suspect members from `buildSuspectAnatomy`, mounted so name plates are always visible and skeletons only when X-RAY is on) and the `GlassCard` (`overruled` when the effective result is `rejected`, `stampDetail` = version label) above it, `DoctorPanel` with `extraMessages` from `buildSolverMessages`, `claimedCents` = number of suspects (D9 progress share), `speedMs` from D25. Buttons "Accuse" and "Replay" below the ensemble: Accuse is disabled while no suspect is selected or the effective result is `rejected`, with the reason in an element referenced by `aria-describedby`. "Replay" re-runs intro and typing without re-evaluation. `VersionNote` shows "Replayed with v<N>. Original: v1." in the header. Replay errors show in `ErrorPanel` and keep the previous Trace.
     - Component tests: X-RAY off at start (plates and statements readable, no skeleton image); X-RAY on shows bones; radiogroup keyboard (arrows move selection, one tab stop); Accuse disabled with no selection and for a rejected Trace (`candlesticks` v1), enabled for v2; the knob shows the verdict, fractures and card state of the displayed Trace; the stamp appears for a rejected Trace and not for an approved one; the version note text; text is escaped (a statement text with `<b>` renders as text); the meter shows the mean confidence and "n/a" for empty confidence.
@@ -280,7 +280,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add case screen with ensemble, glass card, knob and accuse gating`
     - _Requirements: 6.4, 6.5, 6.6, 10.5, 10.6, 10.7, 11.3, 11.4, 11.5, 11.6, 14.4, 14.5, 14.9, 15.4, 15.5, 15.6, 15.7, 15.8, 15.9, 15.10, 15.11, 15.12, 16.5, 16.6, 16.8_
 
-  - [~] 6.4 OverrideDialog
+  - [x] 6.4 OverrideDialog
     - Files (new): `apps/case-files/src/ui/OverrideDialog.tsx`, `tests/components/OverrideDialog.test.tsx`. Edit: `src/ui/CaseScreen.tsx` (the "Human override" button, effective result display, ambiguous override panel), `src/styles/app.css` (layout only).
     - The dialog is copied in structure from the expense app (D20, no import): fields reviewer name (required), reason (required, at most 500 characters), replacement result (`approved` or `rejected`), `role="dialog"` with focus trap and focus return to the button, field errors next to the field without closing. The result display passes the effective result and the reviewer name so that it reads "overruled by <name>" and "Rules decided: <result>". An `ambiguous_override` error shows in a `role="alert"` panel and keeps the rule result.
     - Component tests: validation errors for empty name, empty reason and 501 characters; the dialog stays open; focus returns on close; override to `approved` enables Accuse and shows "overruled by"; override to `rejected` of an accepted case disables Accuse; the rule outcomes and fractures do not change after an override.
@@ -288,7 +288,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add human override dialog and effective result display`
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 16.5, 16.6, 19.5_
 
-  - [~] 6.5 VerdictView and Result_Banner
+  - [x] 6.5 VerdictView and Result_Banner
     - Files (new): `apps/case-files/src/ui/VerdictView.tsx`, `src/ui/ResultBanner.tsx`, `tests/components/VerdictView.test.tsx`. Edit: `src/App.tsx`, `src/styles/app.css` (layout only).
     - The verdict view is the case layout with X-RAY on, `data-accused="true"` on the accused member, the banner in the centre area below the Glass_Card ("CASE CLOSED: <name> is guilty." or "WRONG SUSPECT: <name> cannot be convicted.", then the convictable suspects, texts from `solverMessages.ts`), `role="status"` announcing the result, and the buttons "Replay" and "New case". The banner text appears at once (fifth cut-order item is the default; typed animation only if time allows). Turning the knob keeps the Accusation_Record and shows a note when the displayed version gives another verdict for the accused suspect. "New case" returns to the start screen and discards the session.
     - Component tests: correct and incorrect banners for the greenhouse widow and another suspect; convictable list text; `data-accused`; the note after the knob turn (`candlesticks`: accuse Ada under v2, turn to v1); "New case" resets; the result is announced in a `role="status"` element; a fracture has a shape and a label, not colour only.
@@ -296,7 +296,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): add verdict view and result banner`
     - _Requirements: 11.7, 11.9, 11.10, 11.11, 14.6, 16.8, 16.10_
 
-  - [~] 6.6 App flow wiring and rejection at UI level
+  - [x] 6.6 App flow wiring and rejection at UI level
     - Files (new): `apps/case-files/tests/components/App.test.tsx`, `tests/properties/ui-rejection.node.test.tsx` (jsdom, name ends with `.test.tsx` because it renders; the file uses `fast-check` with at least 100 runs). Edit: `src/App.tsx` (final switch `start`, `case`, `verdict`, error and bundle-error paths), `src/ui/*` only where wiring needs it.
     - Wire the full flow: start, recorded case, case screen, knob, X-RAY, accuse, verdict, override, new case. Export action from the toolbar uses `exportTrace` and a download helper (Blob, no network). The tab order is header actions, name plates (one tab stop), knob, X-RAY switch, Accuse, Replay, Human override, and the focus ring has at least 3 CSS pixels.
     - **Property 16: Rejected case disables Accuse**
@@ -307,7 +307,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): wire the full play flow with keyboard order and rejection property`
     - _Requirements: 6.5, 7.8, 11.1, 11.2, 11.7, 11.11, 14.5, 16.5, 19.5, 19.7_
 
-  - [~] 6.7 Checkpoint: checkpoint ui done (HARD STOP)
+  - [-] 6.7 Checkpoint: checkpoint ui done (HARD STOP)
     - Build and serve the app: `pnpm --filter @bones/case-files build`, then start `pnpm --filter @bones/case-files exec vite preview --host 127.0.0.1 --port 5202 --strictPort` as a background process and stop it at the end. Use a temporary Playwright script kept outside the repository (for example `/tmp/cf-shots.mjs`, run with working directory `apps/case-files` so `@playwright/test` resolves, viewport 1600x900, `reducedMotion: "reduce"`) to take: the start screen, the case screen with X-RAY on and a selected suspect (`greenhouse`), the rejected case (`candlesticks` v1) and the verdict view.
     - Copy them to `.kiro/specs/case-files/review/ui-start-1600.png`, `ui-case-1600.png`, `ui-rejected-1600.png`, `ui-verdict-1600.png`.
     - Build the side-by-side images with a temporary `sharp` script outside the repository (run with working directory `packages/xray-ui` so `sharp` resolves), each panel scaled to the same height: `review/ui-side-by-side-retro.png` = `design/mockups/bones-7-retro-b.png` | `ui-case-1600.png` | `apps/expense-auditor/e2e/__screenshots__/reference-1600.spec.ts/signature-case-1600.png` (the expense Signature screen, read only), and `review/ui-side-by-side-casefiles.png` = `design/mockups/bones-6-casefiles-b.png` | `ui-verdict-1600.png`.

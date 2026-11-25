@@ -295,6 +295,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148145
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633305626
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633518627
       }
     ],
     "5.2 DoctorPanel `extraMessages`": [
@@ -302,6 +312,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148183
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633519168
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633801367
       }
     ],
     "5.3 GlassCard `overruled` and `stampDetail`": [
@@ -309,6 +329,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148206
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633800666
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633970091
       }
     ],
     "6.1 Anatomy_Builder and formatValue": [
@@ -316,6 +346,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148234
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633970702
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795634113232
       }
     ],
     "6.2 App shell, ErrorPanel and StartScreen": [
@@ -323,6 +363,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148265
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795634112823
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795634608035
       }
     ],
     "6.3 CaseScreen": [
@@ -330,6 +380,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148305
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795634608254
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795637846313
       }
     ],
     "6.4 OverrideDialog": [
@@ -337,6 +397,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148344
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795637846574
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795638342417
       }
     ],
     "6.5 VerdictView and Result_Banner": [
@@ -344,6 +414,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148370
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795638341603
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795639285372
       }
     ],
     "6.6 App flow wiring and rejection at UI level": [
@@ -351,6 +431,16 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148393
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795639285737
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795639612778
       }
     ],
     "6.7 Checkpoint: checkpoint ui done (HARD STOP)": [
@@ -358,6 +448,11 @@
         "executionId": "3e299063-8fcb-4e6c-9c3d-cb3dd5f48ab1",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795615148414
+      },
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795639613375
       }
     ],
     "7.1 Playwright finalisation, e2e fixture flag, fair-case and incorrect-accusation specs": [
@@ -477,6 +572,13 @@
         "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
         "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
         "timestamp": 1795633299883
+      }
+    ],
+    "5. Xray-ui additions (additive, optional props, default pixels unchanged)": [
+      {
+        "executionId": "87afe25a-eb5e-4897-b470-c5cd50a1253b",
+        "chatSessionId": "sess_64b9b612-7860-46df-ac16-bd589e2ab06a",
+        "timestamp": 1795633970142
       }
     ]
   }
