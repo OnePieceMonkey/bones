@@ -492,7 +492,7 @@ Decisions recorded here:
 
 ### Review verdicts
 
-- Checkpoint solver done: _pending_
+- Checkpoint solver done: accepted, no changes.
 - Checkpoint ui done: _pending_
 - Final checkpoint: _pending_
 
