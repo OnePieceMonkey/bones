@@ -49,8 +49,25 @@ describe("Dr. Bones says the article once", () => {
       });
     }
   }
-  it("fracture heads name the suspect with one article", async () => {
+  it("role names keep a lowercase article after 'in' (greenhouse)", async () => {
     const texts = await allTexts("greenhouse", null);
-    expect(texts.some((t) => /fracture in the (Widow|Gardener|Nephew): /.test(t))).toBe(true);
+    const heads = texts.filter((t) => t.startsWith("I see a fracture in "));
+    expect(heads.length).toBeGreaterThan(0);
+    expect(heads.some((t) => /^I see a fracture in the (widow|gardener|nephew): /.test(t))).toBe(true);
+    for (const t of heads) expect(t).not.toMatch(/fracture in the (Widow|Gardener|Nephew)/);
   });
+  for (const [id, names] of [
+    ["candlesticks", ["Ada", "Bram", "Clara"]],
+    ["empty-room", ["Dana", "Felix", "Greta"]],
+  ] as const) {
+    it(`proper names in ${id} take no article`, async () => {
+      const texts = await allTexts(id, null);
+      const heads = texts.filter((t) => t.startsWith("I see a fracture in "));
+      expect(heads.length).toBeGreaterThan(0);
+      for (const t of heads) {
+        expect(t).not.toMatch(/fracture in the /);
+        expect(names.some((n) => t.startsWith(`I see a fracture in ${n}: `))).toBe(true);
+      }
+    });
+  }
 });

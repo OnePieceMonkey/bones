@@ -9,6 +9,7 @@ import { countPassed, evidenceRows, selectBones } from "./selectors";
 export const TEMPLATES = {
   greeting: () => "Let's take a look at this decision.",
   fractureHead: (label: string) => `I see a fracture in the ${label} bone.`,
+  fractureHeadOf: (bonePhrase: string) => `I see a fracture in ${bonePhrase}.`,
   fractureRule: (ruleId: string, ruleVersion: string, renderedMessage: string) =>
     `Rule ${ruleId} v${ruleVersion}: ${renderedMessage}`,
   evidenceLine: (fieldLabel: string, value: string) => `${fieldLabel}: ${value}`,
@@ -58,7 +59,9 @@ export function buildChatMessages(trace: Trace, anatomy: Anatomy): ChatMessage[]
     const bone = byOutcome.get(outcome);
     if (!bone) continue;
     const lines = [
-      TEMPLATES.fractureHead(bone.label),
+      anatomy.describeBone === undefined
+        ? TEMPLATES.fractureHead(bone.label)
+        : TEMPLATES.fractureHeadOf(anatomy.describeBone(bone.label)),
       TEMPLATES.fractureRule(outcome.ruleId, outcome.ruleVersion, outcome.renderedMessage),
       ...evidenceRows(outcome, anatomy)
         .slice(0, MAX_EVIDENCE_LINES)

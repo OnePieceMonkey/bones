@@ -101,3 +101,16 @@ describe("buildChatMessages", () => {
     `);
   });
 });
+
+describe("describeBone (additive, optional)", () => {
+  it("leaves default output unchanged when absent", () => {
+    const msgs = buildChatMessages(signatureTrace(), signatureAnatomy());
+    expect(msgs[1]!.text.split("\n")[0]).toBe("I see a fracture in the Line item cap bone.");
+  });
+  it("uses the supplied phrase when present", () => {
+    const anatomy: Anatomy = { ...signatureAnatomy(), describeBone: (l) => `${l} thing` };
+    expect(buildChatMessages(signatureTrace(), anatomy)[1]!.text.split("\n")[0]).toBe(
+      "I see a fracture in Line item cap thing.",
+    );
+  });
+});

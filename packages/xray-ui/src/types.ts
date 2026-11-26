@@ -32,6 +32,11 @@ export interface Anatomy {
   bones: AnatomyBone[];
   fieldLabels: Record<string, string>;
   formatValue?: (path: string, value: unknown) => string;
+  /**
+   * Optional. Phrase naming a bone after "a fracture in" (for example "Ada: Means bone").
+   * Default when absent: `the ${label} bone`.
+   */
+  describeBone?: (label: string) => string;
 }
 
 export type BoneState = "passed" | "not-applicable" | "fractured";
