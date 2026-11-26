@@ -318,8 +318,8 @@ Decisions recorded here:
     - **HARD STOP:** After finishing this task, STOP and reply with exactly "checkpoint ui done". Do not start any further task until the user says "weiter". The user compares `review/ui-side-by-side-retro.png` and `review/ui-side-by-side-casefiles.png`. After "weiter", record the verdict with the commit `docs(case-files): record ui done verdict`. If the verdict lists changes, the next task starts with them and refreshes the review images at its end.
     - _Requirements: 23.3, 23.5, 23.6_
 
-- [ ] 7. End-to-end tests and reference screenshots
-  - [~] 7.1 Playwright finalisation, e2e fixture flag, fair-case and incorrect-accusation specs
+- [x] 7. End-to-end tests and reference screenshots
+  - [x] 7.1 Playwright finalisation, e2e fixture flag, fair-case and incorrect-accusation specs
     - Files: `apps/case-files/playwright.config.ts`, `vite.config.ts`, `src/extraction/samples.ts`, `src/main.tsx` (or a small `src/e2eHook.ts`), `e2e/fixtures/four-suspects.ts` (new, 4 suspects with 5 statements each, valid under the Case_Schema), `e2e/fair-case.spec.ts`, `e2e/incorrect-accusation.spec.ts`, `tests/unit/e2e-fixture-flag.node.test.ts` (new).
     - Config: `testIgnore: /(reference-1600|no-scroll)\.spec\.ts/` for project `chromium`, `testMatch: /(reference-1600|no-scroll)\.spec\.ts/` for `chromium-1600` (the 1280x720 checks use `page.setViewportSize` inside `no-scroll.spec.ts`), `snapshotPathTemplate: "{testDir}/__screenshots__/{testFileName}/{arg}{ext}"`, `maxDiffPixelRatio: 0.001`, `threshold: 0.2`, `animations: "disabled"`, `updateSnapshots: "none"`, web server env `LIVE_EXTRACTION=off` and `CASE_FILES_E2E=1`.
     - Fixture flag: `vite.config.ts` defines `__CASE_FILES_E2E__` as `true` only when `process.env.CASE_FILES_E2E === "1"`. Only then `samples.ts` adds the 4-suspect case to the adapter's entries (not to the start screen sheets) and `main.tsx` exposes `window.__caseFilesE2E.loadRecordedCase(id)`. In a normal build the code is dead and removed. `e2e-fixture-flag.node.test.ts` builds without the variable into a temp dir and asserts the output has neither the id `four-suspects` nor `__caseFilesE2E`.
@@ -328,21 +328,21 @@ Decisions recorded here:
     - Commit message: `test(case-files): add e2e config, e2e fixture flag and the two accusation flows`
     - _Requirements: 21.1, 21.2, 21.3, 11.7, 19.6_
 
-  - [~] 7.2 Knob-rejection, empty-room and override specs
+  - [x] 7.2 Knob-rejection, empty-room and override specs
     - Files (new): `apps/case-files/e2e/knob-rejection.spec.ts`, `e2e/empty-room.spec.ts`, `e2e/override.spec.ts`.
     - `knob-rejection.spec.ts` (flow c): `candlesticks` under v1 is rejected, the stamp is inside the Glass_Card, Accuse is disabled with a reason; turn the knob to v2: accepted, Accuse enabled, the status note "Replayed with v2. Original: v1." is shown. `empty-room.spec.ts` (flow d): v1 `unfair_none`, v2 accepted with Dana convictable, v3 `unfair_none`. `override.spec.ts` (flow e): rejected case, Human override to `approved` with reviewer and reason, Accuse enabled, "overruled by <name>" and "Rules decided: rejected" visible; the fractures are unchanged.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
     - Commit message: `test(case-files): add e2e for knob rejection, empty-room versions and override`
     - _Requirements: 6.4, 6.5, 10.5, 12.4, 12.5, 21.2_
 
-  - [~] 7.3 Keyboard and network specs
+  - [x] 7.3 Keyboard and network specs
     - Files (new): `apps/case-files/e2e/keyboard.spec.ts`, `e2e/network.spec.ts`.
     - `keyboard.spec.ts` (flow f): from the start screen to the verdict with keys only: Tab and Enter to pick a sheet, arrow keys on the plates, Tab to knob (arrow keys change the version), X-RAY switch (Space), Accuse (Enter), then Replay and Human override reachable; the focus ring has an outline of at least 3 px on every stop; no mouse event is used. `network.spec.ts` (flow g): record every request; none leaves `127.0.0.1:5202`, no font host, no request to `/api/case` (live is off and the status request gets no server answer; the app handles it, and the note shows), the only allowed requests are the app's own files.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
     - Commit message: `test(case-files): add keyboard-only and network e2e`
     - _Requirements: 16.5, 21.2, 18.5_
 
-  - [~] 7.4 No-scroll, no-overlap and computed-style spec
+  - [x] 7.4 No-scroll, no-overlap and computed-style spec
     - Files (new): `apps/case-files/e2e/no-scroll.spec.ts`.
     - For each Viewport (1600x900 in project `chromium-1600`; the spec sets 1440x900 and 1280x720 with `page.setViewportSize`): the start screen, the case screen (with the `four-suspects` case through `window.__caseFilesE2E`, X-RAY on) and the verdict view have `scrollHeight <= innerHeight` and `scrollWidth <= innerWidth`; `.xr-doc`, `.xr-glass`, `.xr-ensemble-stage`, `.xr-doctor` and `.xr-cpanel` lie fully inside the viewport and do not overlap (exceptions: `.xr-cpanel` on the steel frame, the stamp on the Glass_Card, transparent margins of skeleton images); each of the 4 members is at least 160 CSS pixels wide at 1280x720 and members do not overlap. Computed-style checks: no `dashed` or `dotted` border or outline anywhere; label elements (`.xr-cpanel-plaque`, `.xr-doctor-title`) have no border box, background or shadow; the stamp lies inside the Glass_Card when the card is cracked (`candlesticks` v1).
     - If an assertion fails, fix the layout in `src/styles/app.css` (layout only) in this commit; xray-ui changes need their own commit in task 5.x style first.
@@ -350,36 +350,36 @@ Decisions recorded here:
     - Commit message: `test(case-files): assert no scroll, no overlap and computed styles at three viewports`
     - _Requirements: 13.7, 14.7, 14.8, 14.9, 21.3, 21.5_
 
-  - [~] 7.5 Reference screenshots at 1440x900 and 1600x900
+  - [x] 7.5 Reference screenshots at 1440x900 and 1600x900
     - Files (new): `apps/case-files/e2e/reference.spec.ts` (project `chromium`), `e2e/reference-1600.spec.ts` (project `chromium-1600`), six PNGs under `apps/case-files/e2e/__screenshots__/reference.spec.ts/` and `reference-1600.spec.ts/`: start screen, fair-case verdict view (`greenhouse`, widow accused), `candlesticks` rejected under v1. Names: `start-screen.png`, `verdict-fair.png`, `rejected-candlesticks.png` and the same with `-1600` suffix. Each test waits for fonts (`document.fonts.ready`) and for the intro state before `toHaveScreenshot` with `animations: "disabled"`.
     - Create the PNGs on purpose: `pnpm --filter @bones/case-files exec vite build`, then `pnpm --filter @bones/case-files exec playwright test reference.spec.ts reference-1600.spec.ts --update-snapshots` (with `CASE_FILES_E2E=1` as in the config). Look at the six images before committing. Then run `pnpm e2e:case-files` without the update flag: all pass. Only these six PNGs are new; no PNG of the expense app changes (`git status` shows nothing under `apps/expense-auditor`).
     - Commit message: `test(case-files): add six reference screenshots (start, fair verdict, rejected) at 1440 and 1600`
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
     - _Requirements: 21.4, 21.6_
 
-- [ ] 8. Guards
-  - [~] 8.1 Cross-app and workspace-import guards
+- [x] 8. Guards
+  - [x] 8.1 Cross-app and workspace-import guards
     - Files (new): `apps/case-files/tests/guards/no-expense-auditor.node.test.ts`, `tests/guards/workspace-imports.node.test.ts`.
     - `no-expense-auditor`: scans `src`, `api`, `shared`, `tests`, `e2e` for imports, paths and CSS `@import` that name the expense app; the forbidden name is built from two parts so the file does not match itself; positive and negative self-tests (requirement 20.1). Other direction: confirm that `apps/expense-auditor/tests/guards/no-case-files.node.test.ts` exists and is green and unchanged (the task does not edit it; the check is that `pnpm -r test` runs it and `git diff <START> -- apps/expense-auditor` is empty). `workspace-imports`: in `src` only `@bones/core`, `@bones/xray-ui`, `react`, `react-dom`, `zod` and relative files, no Node built-in, and `shared/` and `api/_lib/` never import `src/` (requirement 20.2; `api` and `shared` may not exist yet, the guard then passes on the empty set and the self-tests cover it).
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
     - Commit message: `test(case-files): guard against cross-app imports and stray workspace imports`
     - _Requirements: 1.4, 1.5, 20.1, 20.2_
 
-  - [~] 8.2 No API key in the client, canary build
+  - [x] 8.2 No API key in the client, canary build
     - Files (new): `apps/case-files/tests/guards/no-secrets.node.test.ts`, `tests/helpers/build.ts`.
     - Source scan of `src` for key names, `sk-` tokens, `api key`, `x-api-key`, `VITE_` names with KEY or SECRET. `build.ts` (copied in algorithm from the expense app, new random-looking canary strings): production build into a temp directory with canary values in `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`, `EXTRACTION_MODEL` and without `CASE_FILES_E2E`; scan every output file for the canary values, provider hosts, `Bearer`, `x-api-key`, `anthropic-version`, `sourceMappingURL` and `.map` files. The test builds once (`beforeAll`, with a generous timeout). Positive and negative self-tests of the scanner.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean (the temp directory is outside the repo).
     - Commit message: `test(case-files): guard against keys in the client with a canary build scan`
     - _Requirements: 8.3, 18.6, 20.3_
 
-  - [~] 8.3 No LLM in chat
+  - [x] 8.3 No LLM in chat
     - Files (new): `apps/case-files/tests/guards/no-llm-in-chat.node.test.ts`, `tests/guards/no-llm-in-chat.runtime.test.tsx`.
     - Static: `src/ui` and `src/state` import no LLM client (`anthropic`, `openai`, `@anthropic-ai`), call no network function (`fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`) in code that produces chat text. Runtime: render the case screen with a `fetch` spy and let the chat type through a fixture Trace (fake timers); the spy records 0 calls. Self-tests for the scanner.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
     - Commit message: `test(case-files): guard that Dr. Bones text never comes from an LLM`
     - _Requirements: 15.4, 15.6, 20.4_
 
-  - [~] 8.4 `app.css` layout-only and no-raster guards
+  - [x] 8.4 `app.css` layout-only and no-raster guards
     - Files (new): `apps/case-files/tests/guards/no-visual-in-app.node.test.ts`, `tests/guards/no-raster.node.test.ts`.
     - `no-visual-in-app` (copy of the expense guard, requirement 14.10): in `src/styles/app.css` only layout declarations; colour, border, background, shadow and font declarations only in the `body` rule; no `url(`, `@import`, `@keyframes`, `transition`, `animation`, `style=` on shell-like elements, no image import in `src`; plus no `@keyframes` or animation anywhere in `apps/case-files` (requirement 16.9). `no-raster`: no `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.avif` file in `apps/case-files` outside `e2e/__screenshots__` and `node_modules`/`dist` (requirement 16.4). Self-tests for both.
     - Fix any real violation found in `app.css` in this commit (move it to xray-ui in a separate earlier commit if it needs a component change).
@@ -387,7 +387,7 @@ Decisions recorded here:
     - Commit message: `test(case-files): guard app.css to layout only and forbid raster files`
     - _Requirements: 14.10, 16.2, 16.4, 16.9, 20.5_
 
-  - [~] 8.5 Contrast guard
+  - [x] 8.5 Contrast guard
     - Files (new): `apps/case-files/tests/guards/contrast.node.test.ts`.
     - Copy the token-resolution and ratio check of `apps/expense-auditor/tests/guards/contrast.node.test.ts`, pointed at the Xray_UI token values and this app's pairs. List every text and background pair that the app adds (for example the banner text on its background, the live note text, the version note, disabled button text) with at least 4.5:1, and the focus ring pairs with at least 3:1. If the app adds no new pair beyond the xray-ui ones, the list says so in a comment and still checks the pairs of the elements the app places (plates, banner, notes). Self-test: a failing pair is detected.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e:case-files`, core/expense diff empty, `git status` clean.
@@ -446,8 +446,8 @@ Decisions recorded here:
     - Commit message: `feat(case-files): wire live mode into the start screen with rejection view`
     - _Requirements: 8.2, 18.1, 18.2, 18.3, 18.4, 18.5, 18.6_
 
-- [ ] 10. README
-  - [~] 10.1 App README
+- [x] 10. README
+  - [x] 10.1 App README
     - Files (new): `apps/case-files/README.md`, `apps/case-files/tests/unit/readme.node.test.ts`.
     - Sections: what it is, why the LLM never decides, the five Bones parts in this app, how to play, how to run (port 5201, `pnpm dev:case-files`), the scripts table, tests, rule versions and the verdict matrix of the three cases (from `tests/fixtures/expected-matrix.ts`), live mode (if group 9 was built: how to enable it with the env names and the kill switch; if it was skipped: one line "Live mode is not built in this version"), security notes (no key in the client, closed theme list, canary build guard), known limitations (the Open questions Q1 to Q7, listed in one short list or linked to `requirements.md`). Every command named in the README is described.
     - `readme.node.test.ts`: every `pnpm …` script named in the README exists in `apps/case-files/package.json` or the root `package.json`; the README names ports 5201 and 5202 and Q1 to Q7.
@@ -456,7 +456,7 @@ Decisions recorded here:
     - Honest sentence (requirement 24.1): the README states in one sentence that the three recorded cases are hand-written fixtures in the model output format, not real LLM output. `readme.node.test.ts` also asserts that this sentence is present.
     - _Requirements: 22.1, 22.3, 22.4, 24.1_
 
-  - [~] 10.2 Root README entry
+  - [x] 10.2 Root README entry
     - Files: `README.md` (root).
     - Add a short "Apps" section (or an entry in an existing one) for Case Files with the run command `pnpm dev:case-files`. Change no other statement. Show the diff with `git diff README.md` and confirm only added lines.
     - Checklist: `pnpm -r typecheck`, `pnpm -r test`, core/expense diff empty, `git status` clean.
@@ -464,7 +464,7 @@ Decisions recorded here:
     - _Requirements: 22.2_
 
 - [ ] 11. Final checkpoint
-  - [~] 11.1 Checkpoint: final checkpoint done (HARD STOP)
+  - [-] 11.1 Checkpoint: final checkpoint done (HARD STOP)
     - Run from the repo root: `pnpm -r typecheck`, `pnpm -r test`, `pnpm e2e` (expense, no skips, no update flag) and `pnpm e2e:case-files` (both projects, no update flag).
     - Core and expense guard: `git diff --exit-code <START> -- packages/core apps/expense-auditor` prints nothing. Also run `git diff --stat <START> -- packages/core` and confirm it is empty (no change under `packages/core`; `<START>` is the parent of the first case-files commit). `git diff --stat <START>` on test files shows only tests named in this plan.
     - Confirm the xray-ui changes are additive: `git diff <START> -- packages/xray-ui/src/assets` is empty; `git diff <START> --stat -- apps/expense-auditor/e2e/__screenshots__` is empty.
