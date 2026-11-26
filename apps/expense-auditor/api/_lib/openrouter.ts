@@ -1,9 +1,9 @@
 // OpenRouter chat completions client behind the LlmClient port. Plain fetch, no SDK.
 // The key is only placed in the Authorization header. Every failure collapses to
 // { ok: false, kind: "upstream" } with no provider text; there are no retries.
-import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT, USER_TEXT } from "./schema";
+import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT, USER_TEXT } from "./schema.js";
 
-import type { LlmClient } from "./handler";
+import type { LlmClient } from "./handler.js";
 
 export const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 export const OPENROUTER_TITLE = "Bones Expense Auditor";

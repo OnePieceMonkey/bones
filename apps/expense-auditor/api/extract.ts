@@ -1,6 +1,6 @@
-import { createExtractHandler } from "./_lib/handler";
-import { createOpenRouterClient } from "./_lib/openrouter";
-import { createAnthropicClient } from "./_lib/provider";
+import { createExtractHandler } from "./_lib/handler.js";
+import { createOpenRouterClient } from "./_lib/openrouter.js";
+import { createAnthropicClient } from "./_lib/provider.js";
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>(); // per warm instance
 

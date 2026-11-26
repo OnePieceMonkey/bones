@@ -8,8 +8,8 @@ import {
   MAX_IMAGE_BYTES,
   modelOutputSchema,
   toExtractionResult,
-} from "../../shared/wire";
-import { checkRateLimit, clientKey } from "./rateLimit";
+} from "../../shared/wire.js";
+import { checkRateLimit, clientKey } from "./rateLimit.js";
 
 export interface LlmClient {
   readReceipt(args: { imageBase64: string; mediaType: "image/jpeg" | "image/png" }): Promise<

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isRealIsoDate } from "./iso";
+import { isRealIsoDate } from "./iso.js";
 
 /** Wire contract of GET/POST /api/extract, shared by `src` and `api`. */
 

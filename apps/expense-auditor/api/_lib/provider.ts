@@ -1,9 +1,9 @@
 // Anthropic Messages API client behind the LlmClient port. Plain fetch, no SDK.
 // The key is only placed in the x-api-key header. Every failure collapses to
 // { ok: false, kind: "upstream" } with no provider text; there are no retries.
-import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT, USER_TEXT } from "./schema";
+import { MODEL_JSON_SCHEMA, SYSTEM_PROMPT, USER_TEXT } from "./schema.js";
 
-import type { LlmClient } from "./handler";
+import type { LlmClient } from "./handler.js";
 
 export const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 // From the API versions page. In this version temperature, top_p and top_k are removed.

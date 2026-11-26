@@ -1,6 +1,6 @@
 // Per-IP fixed-window rate limiter. Best effort: the store lives in one warm
 // function instance. The IP is a map key in memory only and is never logged.
-import type { RateLimitStore } from "./handler";
+import type { RateLimitStore } from "./handler.js";
 
 export const RATE_LIMIT_MAX = 10;
 export const RATE_LIMIT_WINDOW_MS = 10 * 60_000;
