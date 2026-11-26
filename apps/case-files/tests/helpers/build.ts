@@ -1,0 +1,84 @@
+import { mkdtempSync, readdirSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { build } from "vite";
+
+const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+/** Fake secret placed in the build environment. It must never appear in any output file. */
+export const CANARY_KEY = "sk-canary-cf4Rw8Nq2Ym6Tx1Bv7Hd3Zj9Pk5Lc0Ae";
+
+/** Fake OpenRouter secret, same rule. */
+export const OPENROUTER_CANARY_KEY = "sk-or-canary-Gv3Ma7Ux2Sd9Fq4Wn6Jt1Ce8Rb5Yh0Kp";
+const CANARY_ENV: Record<string, string> = {
+  ANTHROPIC_API_KEY: CANARY_KEY,
+  OPENROUTER_API_KEY: OPENROUTER_CANARY_KEY,
+  LLM_PROVIDER: "openrouter",
+  LIVE_EXTRACTION: "on",
+  EXTRACTION_MODEL: "canary-model",
+};
+
+/** Must be unset so the build is the normal (non-e2e) one. */
+const UNSET_ENV = ["CASE_FILES_E2E"];
+
+export interface BuildResult {
+  /** Absolute path of the temporary output directory. */
+  outDir: string;
+  /** Absolute paths of every file below outDir. */
+  files: string[];
+}
+
+export function listFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) out.push(...listFiles(full));
+    else out.push(full);
+  }
+  return out;
+}
+
+let cached: Promise<BuildResult> | undefined;
+
+/**
+ * Builds the app once per process with canary server variables set, into an os temp dir.
+ * The environment is restored afterwards. Nothing is written to disk besides the temp outDir.
+ */
+export function buildOnce(): Promise<BuildResult> {
+  cached ??= (async () => {
+    const outDir = mkdtempSync(join(tmpdir(), "bones-case-files-dist-"));
+    const saved = new Map<string, string | undefined>();
+    for (const [key, value] of Object.entries(CANARY_ENV)) {
+      saved.set(key, process.env[key]);
+      process.env[key] = value;
+    }
+    for (const key of UNSET_ENV) {
+      saved.set(key, process.env[key]);
+      delete process.env[key];
+    }
+    try {
+      await build({
+        root: APP_ROOT,
+        logLevel: "silent",
+        mode: "production",
+        build: { outDir, emptyOutDir: true, sourcemap: false },
+      });
+    } finally {
+      for (const [key, value] of saved) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+    return { outDir, files: listFiles(outDir) };
+  })();
+  return cached;
+}
+
+/** Removes the temp build output. Safe to call when no build ran. */
+export async function cleanupBuild(): Promise<void> {
+  if (!cached) return;
+  const result = await cached.catch(() => undefined);
+  cached = undefined;
+  if (result) rmSync(result.outDir, { recursive: true, force: true });
+}
