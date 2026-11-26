@@ -253,7 +253,7 @@ Decisions recorded here:
     - Commit message: `feat(xray-ui): add optional overruled and stampDetail to GlassCard`
     - _Requirements: 13.10, 15.8, 20.8_
 
-- [ ] 6. UI: Anatomy_Builder and screens
+- [x] 6. UI: Anatomy_Builder and screens
   - [x] 6.1 Anatomy_Builder and formatValue
     - Files (new): `apps/case-files/src/anatomy.ts`, `src/format/formatValue.ts`, `tests/unit/anatomy.node.test.ts`.
     - `buildCombinedAnatomy(derivedCase)` and `buildSuspectAnatomy(combined, suspect)` as in the design: bone regions by D18 (`skull` motive, `arm-right` means, `leg-right` opportunity, statements N=1..5 on `ribs`, `spine`, `arm-left`, `pelvis`, `leg-left`), unique `ruleId` per bone (instance ids), labels at most 40 characters starting with the suspect name (name truncated by a `truncateName(name, suffix)` helper, built from templates and ids, never from model text), `fieldLabels` for every derived evidence path and the case fields, `formatValue` that formats `crime` as "<place>, <hh:mm>-<hh:mm>, <item>" and `amountCents` as "<n> convictable" (never a currency symbol).
@@ -307,7 +307,7 @@ Decisions recorded here:
     - Commit message: `feat(case-files): wire the full play flow with keyboard order and rejection property`
     - _Requirements: 6.5, 7.8, 11.1, 11.2, 11.7, 11.11, 14.5, 16.5, 19.5, 19.7_
 
-  - [-] 6.7 Checkpoint: checkpoint ui done (HARD STOP)
+  - [x] 6.7 Checkpoint: checkpoint ui done (HARD STOP)
     - Build and serve the app: `pnpm --filter @bones/case-files build`, then start `pnpm --filter @bones/case-files exec vite preview --host 127.0.0.1 --port 5202 --strictPort` as a background process and stop it at the end. Use a temporary Playwright script kept outside the repository (for example `/tmp/cf-shots.mjs`, run with working directory `apps/case-files` so `@playwright/test` resolves, viewport 1600x900, `reducedMotion: "reduce"`) to take: the start screen, the case screen with X-RAY on and a selected suspect (`greenhouse`), the rejected case (`candlesticks` v1) and the verdict view.
     - Copy them to `.kiro/specs/case-files/review/ui-start-1600.png`, `ui-case-1600.png`, `ui-rejected-1600.png`, `ui-verdict-1600.png`.
     - Build the side-by-side images with a temporary `sharp` script outside the repository (run with working directory `packages/xray-ui` so `sharp` resolves), each panel scaled to the same height: `review/ui-side-by-side-retro.png` = `design/mockups/bones-7-retro-b.png` | `ui-case-1600.png` | `apps/expense-auditor/e2e/__screenshots__/reference-1600.spec.ts/signature-case-1600.png` (the expense Signature screen, read only), and `review/ui-side-by-side-casefiles.png` = `design/mockups/bones-6-casefiles-b.png` | `ui-verdict-1600.png`.
@@ -493,7 +493,7 @@ Decisions recorded here:
 ### Review verdicts
 
 - Checkpoint solver done: accepted, no changes.
-- Checkpoint ui done: _pending_
+- Checkpoint ui done: accepted with two fixes (Dr. Bones messages must not double the article, e.g. 'the the widow'; glass card row Victim shows the victim name with its confidence instead of '1 field') and one optional change (result banner as SOLVABLE / UNFAIR with the convictable count, only if possible without touching packages/core or the expense-auditor behaviour; otherwise one line in Q3).
 - Final checkpoint: _pending_
 
 ## Task Dependency Graph
