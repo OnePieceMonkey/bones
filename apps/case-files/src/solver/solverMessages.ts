@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@bones/xray-ui";
+import { RULE_SET_REFS, VERSION_LABELS } from "../rules/catalog";
 import type { SolveResult, SolverReason } from "./solve";
 
 /**
@@ -73,6 +74,11 @@ export function renderBannerList(convictableIds: readonly string[], names: NameM
   return convictableIds.length === 0 ? "Convictable: nobody." : `Convictable: ${list}.`;
 }
 
+/** The Solver result carries the rule set semver ("1.0.0"); the texts name the knob label ("v1"). */
+function labelOf(semver: string): string {
+  return VERSION_LABELS.find((l) => RULE_SET_REFS[l].version === semver) ?? semver;
+}
+
 export function buildSolverMessages(
   result: SolveResult,
   accusation: AccusationText | null,
@@ -82,7 +88,7 @@ export function buildSolverMessages(
   if (result.verdict !== "accepted") {
     const reason = result.reasons[0];
     if (reason !== undefined) {
-      out.push({ id: "solver-reason", kind: "summary", text: renderReasonTemplate(reason, names, result.ruleSetVersion) });
+      out.push({ id: "solver-reason", kind: "summary", text: renderReasonTemplate(reason, names, labelOf(result.ruleSetVersion)) });
     }
   }
   if (accusation !== null) {

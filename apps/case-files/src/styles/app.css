@@ -49,6 +49,10 @@ main {
   min-height: 0;
   padding-top: calc(8 * var(--xr-u, 1px));
 }
+/* The card is only 150 units tall here, so the -6deg stamp needs more room at the bottom to stay inside it (R21.5). */
+.xr-shell .xr-shell-stagecell .case-center .xr-glass .xr-glass-stamp {
+  bottom: calc(18 * var(--xr-u, 1px));
+}
 .xr-shell .xr-shell-stagecell .case-center .xr-glass.xr-glass {
   position: relative;
   left: auto;

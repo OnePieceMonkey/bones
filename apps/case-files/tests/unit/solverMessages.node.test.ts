@@ -103,6 +103,7 @@ describe("solver message templates", () => {
     expect(manyMsgs).toHaveLength(1);
     expect(manyMsgs[0]).toMatchObject({ id: "solver-reason", kind: "summary" });
     noLeft(manyMsgs[0]!.text);
+    expect(manyMsgs[0]!.text).toMatch(/^Rule set v1 convicts /); // the knob label, not the semver
 
     const ok = solve(derived, "v2", bundle) as SolveResult;
     expect(buildSolverMessages(ok, null, nm)).toEqual([]);
