@@ -58,7 +58,7 @@ main {
   left: auto;
   top: auto;
   width: 100%;
-  max-height: calc(150 * var(--xr-u, 1px));
+  max-height: none;
 }
 /* The buttons are a lightbox child after the control panel (tab order, requirement 16.5), placed in the
    lower right of the stage area: row 2, the stage column right of the control panel. */
