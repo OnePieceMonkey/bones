@@ -494,7 +494,7 @@ Decisions recorded here:
 
 - Checkpoint solver done: accepted, no changes.
 - Checkpoint ui done: accepted with two fixes (Dr. Bones messages must not double the article, e.g. 'the the widow'; glass card row Victim shows the victim name with its confidence instead of '1 field') and one optional change (result banner as SOLVABLE / UNFAIR with the convictable count, only if possible without touching packages/core or the expense-auditor behaviour; otherwise one line in Q3).
-- Final checkpoint: _pending_
+- Final checkpoint: changes requested (1. Vercel functions of apps/expense-auditor need .js extensions on relative imports in api/** and shared/*.ts, with a guard test; 2. raise testTimeout in the vitest configs of both apps so the full run stops timing out, no assertion or numRuns weakened; 3. no article before a proper name in Dr. Bones messages ("in Ada"), role names keep it ("in the gardener"), with a test for both; 4. add review/final-side-by-side-retro.png required by task 11.1). 11.1 stays open until these are done and the user accepts.
 
 ## Task Dependency Graph
 
