@@ -34,6 +34,10 @@ export function makeFormatValue(lookup: FormatLookup): (path: string, value: unk
     if (path === "amountCents" && typeof value === "number" && Number.isSafeInteger(value) && value >= 0) {
       return `${value} convictable`;
     }
+    if (path === "victim" && typeof value === "object" && value !== null) {
+      const name = (value as Record<string, unknown>).name;
+      if (typeof name === "string" && name !== "") return name;
+    }
     if (path === "crime" && typeof value === "object" && value !== null) {
       const c = value as Record<string, unknown>;
       const place = nameOf(lookup.places, c.placeId);
