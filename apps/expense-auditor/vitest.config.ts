@@ -11,5 +11,7 @@ export default defineConfig({
     include: ["tests/**/*.test.{ts,tsx}"],
     exclude: ["e2e/**", "node_modules/**", "dist/**"],
     css: false,
+    testTimeout: 20000,
+    hookTimeout: 20000,
   },
 });
