@@ -293,8 +293,10 @@
   border-color: var(--xr-red, currentColor);
 }
 .xr-ensemble-plate:focus-visible {
-  outline: 2px solid var(--xr-cyan, currentColor);
-  outline-offset: 2px;
+  /* case-files R16.5: the same 3px focus ring as every other stop. */
+  outline: calc(3 * var(--xr-u, 1px)) solid var(--xr-focus, #3de8ff);
+  outline-offset: calc(2 * var(--xr-u, 1px));
+  box-shadow: 0 0 0 calc(5 * var(--xr-u, 1px)) var(--xr-focus-contrast, #05090d);
 }
 .xr-ensemble-stage {
   display: grid;
