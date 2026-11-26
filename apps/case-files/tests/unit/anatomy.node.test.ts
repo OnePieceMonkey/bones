@@ -1,7 +1,7 @@
 import { isCoreError } from "@bones/core";
 import { defaultFormat } from "@bones/xray-ui";
 import { describe, expect, it } from "vitest";
-import { buildCombinedAnatomy, buildSuspectAnatomy, truncateName } from "../../src/anatomy";
+import { buildCombinedAnatomy, buildSuspectAnatomy, labelName, truncateName } from "../../src/anatomy";
 import { deriveFacts } from "../../src/derive/factDeriver";
 import type { DerivedCase } from "../../src/derive/factDeriver";
 import { makeFormatValue } from "../../src/format/formatValue";
@@ -77,7 +77,7 @@ describe("Anatomy_Builder", () => {
       const combined = buildCombinedAnatomy(d);
       for (const s of d.suspects) {
         for (const b of buildSuspectAnatomy(combined, s).bones) {
-          expect(b.label.startsWith(s.name)).toBe(true);
+          expect(b.label.startsWith(labelName(s.name))).toBe(true);
           expect(b.label.length).toBeLessThanOrEqual(40);
         }
       }

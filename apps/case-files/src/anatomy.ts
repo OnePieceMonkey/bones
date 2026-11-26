@@ -18,6 +18,16 @@ export function truncateName(name: string, suffix: string): string {
   return name.length <= room ? name : name.slice(0, room).trimEnd();
 }
 
+/**
+ * Suspect names in the case data carry their own article ("the widow"). The labels are wrapped in
+ * sentences by Dr. Bones ("a fracture in the <label> bone"), so the article is dropped here and the
+ * name is capitalised. The article then appears once.
+ */
+export function labelName(name: string): string {
+  const bare = name.replace(/^(the|a|an)\s+/i, "").trim();
+  if (bare === "") return name;
+  return `${bare.charAt(0).toUpperCase()}${bare.slice(1)}`;
+}
 const label = (name: string, suffix: string): string => `${truncateName(name, suffix)}${suffix}`;
 
 /** Labels for the generic derived paths and the case fields. */
@@ -50,11 +60,11 @@ const STATEMENT_PATHS = ["conflictsAny", "conflictsFirm", "authorName"] as const
 function buildFieldLabels(derivedCase: DerivedCase): Record<string, string> {
   const labels: Record<string, string> = { ...BASE_LABELS };
   derivedCase.suspects.forEach((s, i) => {
-    for (const p of SUSPECT_PATHS) labels[`suspects.${i}.${p}`] = `${truncateName(s.name, ` ${BASE_LABELS[p]}`)} ${BASE_LABELS[p]}`;
+    for (const p of SUSPECT_PATHS) labels[`suspects.${i}.${p}`] = `${truncateName(labelName(s.name), ` ${BASE_LABELS[p]}`)} ${BASE_LABELS[p]}`;
     s.statements.forEach((_st, j) => {
       for (const p of STATEMENT_PATHS) {
         const text = `Statement ${j + 1}: ${BASE_LABELS[p]}`;
-        labels[`suspects.${i}.statements.${j}.${p}`] = `${truncateName(s.name, ` ${text}`)} ${text}`;
+        labels[`suspects.${i}.statements.${j}.${p}`] = `${truncateName(labelName(s.name), ` ${text}`)} ${text}`;
       }
     });
   });
@@ -64,13 +74,13 @@ function buildFieldLabels(derivedCase: DerivedCase): Record<string, string> {
 export function buildCombinedAnatomy(derivedCase: DerivedCase): Anatomy {
   const bones: AnatomyBone[] = [];
   for (const s of derivedCase.suspects) {
-    bones.push({ ruleId: `proof-motive:${s.id}`, label: label(s.name, ": Motive"), region: "skull" });
-    bones.push({ ruleId: `proof-means:${s.id}`, label: label(s.name, ": Means"), region: "arm-right" });
-    bones.push({ ruleId: `proof-opportunity:${s.id}`, label: label(s.name, ": Opportunity"), region: "leg-right" });
+    bones.push({ ruleId: `proof-motive:${s.id}`, label: label(labelName(s.name), ": Motive"), region: "skull" });
+    bones.push({ ruleId: `proof-means:${s.id}`, label: label(labelName(s.name), ": Means"), region: "arm-right" });
+    bones.push({ ruleId: `proof-opportunity:${s.id}`, label: label(labelName(s.name), ": Opportunity"), region: "leg-right" });
     s.statements.forEach((st, j) => {
       bones.push({
         ruleId: `statement-${st.kind}-contradicted:${st.id}`,
-        label: label(s.name, `: Statement ${j + 1}`),
+        label: label(labelName(s.name), `: Statement ${j + 1}`),
         region: STATEMENT_REGIONS[j] ?? "ribs",
       });
     });
