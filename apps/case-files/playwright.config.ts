@@ -42,7 +42,7 @@ export default defineConfig({
     url: "http://127.0.0.1:5202",
     timeout: 60_000,
     reuseExistingServer: !process.env.CI,
-    env: { LIVE_EXTRACTION: "off" },
+    env: { LIVE_EXTRACTION: "off", CASE_FILES_E2E: "1" },
   },
   reporter: [["html", { open: "never" }], ["list"]],
 });
