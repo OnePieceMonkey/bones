@@ -323,3 +323,19 @@
 .xr-ensemble-member[data-accused="true"] {
   box-shadow: inset 0 0 calc(14 * var(--xr-u, 1px)) rgba(255, 59, 48, 0.5);
 }
+/* case-files: flat view (X-RAY off) sits on the cream paper, so plate labels and the reason line
+   use the dark paper text token (>= 4.5:1 on --xr-bg-paper). Scoped to the ensemble plates and
+   .case-reason, which no other app uses. */
+.xr-shell[data-xray="false"] .xr-ensemble-plate {
+  color: var(--xr-text-on-paper);
+  border-color: var(--xr-text-on-paper);
+}
+.xr-shell[data-xray="false"] .xr-ensemble-plate[aria-checked="true"] {
+  box-shadow: 0 0 0 calc(2 * var(--xr-u, 1px)) var(--xr-text-on-paper);
+}
+.xr-shell[data-xray="false"] .xr-ensemble-plate[data-accused="true"] {
+  border-color: var(--xr-bg-red-fill);
+}
+.xr-shell[data-xray="false"] .case-reason {
+  color: var(--xr-text-on-paper);
+}

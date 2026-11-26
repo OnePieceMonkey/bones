@@ -22,12 +22,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: /(reference-1600|no-scroll)\.spec\.ts/,
+      testIgnore: /(reference-1600|no-scroll|flat-contrast)\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
     },
     {
       name: "chromium-1600",
-      testMatch: /(reference-1600|no-scroll)\.spec\.ts/,
+      testMatch: /(reference-1600|no-scroll|flat-contrast)\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1600, height: 900 },
